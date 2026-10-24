@@ -27,7 +27,7 @@ export default function AboutSection({ onExploreCategories }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Story & Mission */}
-          <div className="lg:col-span-6" data-aos="fade-right">
+          <div className="lg:col-span-6" data-aos="fade-up">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
               <span>About Now 9</span>
@@ -57,7 +57,7 @@ export default function AboutSection({ onExploreCategories }) {
           </div>
 
           {/* Right Column: Key Pillars */}
-          <div className="lg:col-span-6 space-y-4" data-aos="fade-left">
+          <div className="lg:col-span-6 space-y-4" data-aos="fade-up">
             {highlights.map((item, idx) => {
               const Icon = item.icon;
               return (

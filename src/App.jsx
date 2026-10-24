@@ -24,11 +24,11 @@ export default function App() {
 
   useEffect(() => {
     AOS.init({
-      duration: 600,
+      duration: 500,
       easing: 'ease-out-cubic',
       once: true,
-      offset: 50,
-      disable: false
+      offset: 30,
+      disable: 'mobile' // Prevents horizontal scroll/shift on mobile screens
     });
   }, []);
 
@@ -68,7 +68,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-ink-primary font-sans antialiased">
+    <div className="min-h-screen flex flex-col bg-white text-ink-primary font-sans antialiased overflow-x-hidden w-full max-w-full">
       {/* Top Navigation */}
       <Navbar
         activePage={activePage}
@@ -80,7 +80,7 @@ export default function App() {
       />
 
       {/* Main View Router */}
-      <main className="flex-1">
+      <main className="flex-1 overflow-x-hidden w-full max-w-full">
         {activePage === 'home' && (
           <HomePage
             setActivePage={setActivePage}

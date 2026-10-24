@@ -380,10 +380,10 @@ export default function LocationPoliticalTracker({ onTakeFullSurvey, onDistrictD
         </div>
 
         {/* Political Parties & Multi-Step Opinion Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
           
           {/* Left Column (7 cols): Political Parties for the Present District */}
-          <div className="lg:col-span-7 space-y-4" data-aos="fade-right">
+          <div className="lg:col-span-7 space-y-4 w-full" data-aos="fade-up">
             <div className="flex items-center justify-between pb-3 border-b border-surface-border">
               <div>
                 <h3 className="text-xl font-bold text-ink-primary">
@@ -405,35 +405,35 @@ export default function LocationPoliticalTracker({ onTakeFullSurvey, onDistrictD
                   <div
                     key={party.id}
                     onClick={() => handleSelectParty(party)}
-                    className={`bg-white rounded-2xl p-5 border cursor-pointer transition-all duration-200 hover-card-lift ${
+                    className={`bg-white rounded-2xl p-4 sm:p-5 border cursor-pointer transition-all duration-200 hover-card-lift ${
                       isSelected
                         ? 'border-brand-500 bg-brand-50/40 ring-2 ring-brand-500/20'
                         : 'border-surface-border hover:border-brand-300'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start justify-between gap-3 sm:gap-4">
                       
                       {/* Party Symbol & Details */}
-                      <div className="flex items-start gap-3.5">
+                      <div className="flex items-start gap-3 sm:gap-3.5 flex-1 min-w-0">
                         <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 border"
+                          className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-lg sm:text-xl shrink-0 border"
                           style={{ borderColor: party.color, backgroundColor: `${party.color}15` }}
                         >
                           <span>{party.symbol.split(' ')[1] || '🗳️'}</span>
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-extrabold text-base text-ink-primary">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                            <h4 className="font-extrabold text-sm sm:text-base text-ink-primary">
                               {party.name}
                             </h4>
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-ink-secondary">
+                            <span className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-ink-secondary">
                               {party.status}
                             </span>
                           </div>
-                          <p className="text-xs font-medium text-ink-secondary mt-1">
+                          <p className="text-[11px] sm:text-xs font-medium text-ink-secondary mt-1">
                             Key Leader: <span className="font-bold text-ink-primary">{party.leader}</span> • {party.seats}
                           </p>
-                          <p className="text-xs text-ink-secondary mt-2 leading-relaxed">
+                          <p className="text-[11px] sm:text-xs text-ink-secondary mt-1.5 sm:mt-2 leading-relaxed">
                             {party.description}
                           </p>
                         </div>
@@ -442,7 +442,7 @@ export default function LocationPoliticalTracker({ onTakeFullSurvey, onDistrictD
                       {/* Select Option Indicator */}
                       <div className="shrink-0 pt-1">
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                          className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                             isSelected
                               ? 'border-brand-500 bg-brand-500 text-white'
                               : 'border-gray-300'
@@ -460,7 +460,7 @@ export default function LocationPoliticalTracker({ onTakeFullSurvey, onDistrictD
           </div>
 
           {/* Right Column (5 cols): Multi-Step Interactive Poll Widget */}
-          <div className="lg:col-span-5" id="evaluation-flow" data-aos="fade-left">
+          <div className="lg:col-span-5 w-full" id="evaluation-flow" data-aos="fade-up">
             <div className="lg:sticky lg:top-28 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 border border-surface-border shadow-elevated">
               
               {/* Step indicator header */}

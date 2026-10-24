@@ -66,17 +66,17 @@ export default function Navbar({
           {/* Logo / Brand */}
           <button
             onClick={() => handleNavClick('home')}
-            className="flex items-center gap-2.5 text-left group focus:outline-none"
+            className="flex items-center gap-2 sm:gap-2.5 text-left group focus:outline-none shrink-0"
             aria-label="Now 9 Home"
           >
-            <div className="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-black text-xl shadow-sm transition-transform duration-200 group-hover:scale-105">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-black text-lg sm:text-xl shadow-sm transition-transform duration-200 group-hover:scale-105">
               <span>9</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-2xl tracking-tight text-ink-primary leading-none">
+              <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-ink-primary leading-none">
                 Now <span className="text-brand-500">9</span>
               </span>
-              <span className="text-[11px] font-medium text-ink-secondary tracking-wider uppercase mt-1">
+              <span className="text-[11px] font-medium text-ink-secondary tracking-wider uppercase mt-0.5 hidden sm:inline-block">
                 Survey & Opinion Platform
               </span>
             </div>
@@ -125,8 +125,8 @@ export default function Navbar({
             </button>
           </div>
 
-          {/* Mobile Right Bar: Live Pill + District Pill + Hamburger */}
-          <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
+          {/* Mobile Right Bar: Live Pill + Hamburger (Fit within 360px without stretching) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 md:hidden shrink-0">
             {/* Quick Live Button on Mobile Topbar */}
             <button
               onClick={onOpenLiveStream}
@@ -134,15 +134,6 @@ export default function Navbar({
             >
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
               <span>Live</span>
-            </button>
-
-            {/* Quick District Chip on Mobile Topbar */}
-            <button
-              onClick={() => handleNavClick('regional')}
-              className="inline-flex items-center gap-1 bg-brand-50 text-brand-700 border border-brand-200 text-[11px] font-bold px-2 py-1 rounded-full max-w-[110px] truncate"
-            >
-              <MapPin className="w-3 h-3 text-brand-600 shrink-0" />
-              <span className="truncate">{currentDistrictName}</span>
             </button>
 
             {/* Mobile Hamburger Button */}

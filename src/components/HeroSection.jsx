@@ -26,7 +26,7 @@ export default function HeroSection({ onTakeSurvey, onExploreCategories }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
           
           {/* Left Column: Headline and Call to Actions */}
-          <div className="lg:col-span-7 text-left" data-aos="fade-right">
+          <div className="lg:col-span-7 text-left" data-aos="fade-up">
             
             {/* Live badge */}
             <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 mb-4 sm:mb-6 shadow-xs">
@@ -83,7 +83,7 @@ export default function HeroSection({ onTakeSurvey, onExploreCategories }) {
           </div>
 
           {/* Right Column: Visual Element related to surveys/opinions (Interactive Live Poll Widget) */}
-          <div className="lg:col-span-5" data-aos="fade-left">
+          <div className="lg:col-span-5" data-aos="fade-up">
             <div className="relative bg-white rounded-3xl p-6 sm:p-8 border border-surface-border shadow-elevated">
               
               {/* Header of poll card */}
