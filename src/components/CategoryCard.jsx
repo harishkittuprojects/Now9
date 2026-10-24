@@ -15,7 +15,7 @@ export default function CategoryCard({ category, onSelectCategory, onTakeSurvey,
 
   return (
     <div
-      className="bg-white rounded-2xl border border-surface-border p-8 hover-card-lift relative flex flex-col justify-between group"
+      className="bg-white rounded-2xl border border-surface-border p-5 sm:p-8 hover-card-lift relative flex flex-col justify-between group"
       data-aos="fade-up"
       data-aos-delay={delay}
     >

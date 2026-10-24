@@ -36,7 +36,7 @@ export default function CategoriesPage({ onOpenSurveyModal, onUploadVideo, onGoL
         {/* Filter & Search Bar */}
         <div className="max-w-4xl mx-auto mb-12 flex flex-col sm:flex-row items-center gap-4 bg-white p-3 rounded-2xl border border-surface-border shadow-card">
           {/* Category Tabs */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
             <button
               onClick={() => setActiveFilter('all')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors ${

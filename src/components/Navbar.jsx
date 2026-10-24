@@ -76,7 +76,7 @@ export default function Navbar({
               <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-ink-primary leading-none">
                 Now <span className="text-brand-500">9</span>
               </span>
-              <span className="text-[11px] font-medium text-ink-secondary tracking-wider uppercase mt-0.5 hidden sm:inline-block">
+              <span className="text-[11px] font-medium text-ink-secondary tracking-wider uppercase mt-0.5 hidden md:inline-block">
                 Survey & Opinion Platform
               </span>
             </div>
