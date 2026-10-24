@@ -404,59 +404,64 @@ export default function LocationPoliticalTracker({ onTakeFullSurvey, onDistrictD
               </span>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
               {currentState.parties.map((party) => {
                 const isSelected = selectedParty?.id === party.id;
                 return (
                   <div
                     key={party.id}
                     onClick={() => handleSelectParty(party)}
-                    className={`bg-white rounded-2xl p-3.5 sm:p-5 border cursor-pointer transition-all duration-200 hover-card-lift ${
+                    className={`bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 border cursor-pointer transition-all duration-200 flex flex-col justify-between hover-card-lift relative group ${
                       isSelected
                         ? 'border-brand-500 bg-brand-50/40 ring-2 ring-brand-500/20'
-                        : 'border-surface-border hover:border-brand-300'
+                        : 'border-surface-border hover:border-brand-400 shadow-xs'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-2.5 sm:gap-4">
-                      
-                      {/* Party Symbol & Details */}
-                      <div className="flex items-start gap-2.5 sm:gap-3.5 flex-1 min-w-0">
+                    <div>
+                      {/* Top Row: Symbol + Status Badge */}
+                      <div className="flex items-center justify-between gap-1 mb-2">
                         <div
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-lg sm:text-xl shrink-0 border"
+                          className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-base sm:text-xl shrink-0 border"
                           style={{ borderColor: party.color, backgroundColor: `${party.color}15` }}
                         >
                           <span>{party.symbol.split(' ')[1] || '🗳️'}</span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            <h4 className="font-extrabold text-sm sm:text-base text-ink-primary">
-                              {party.name}
-                            </h4>
-                            <span className="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-ink-secondary">
-                              {party.status}
-                            </span>
-                          </div>
-                          <p className="text-[11px] sm:text-xs font-medium text-ink-secondary mt-1">
-                            Key Leader: <span className="font-bold text-ink-primary">{party.leader}</span> • {party.seats}
-                          </p>
-                          <p className="text-[11px] sm:text-xs text-ink-secondary mt-1 sm:mt-1.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
-                            {party.description}
-                          </p>
-                        </div>
-                      </div>
 
-                      {/* Evaluate indicator button */}
-                      <div className="shrink-0 pt-0.5 flex flex-col items-end gap-1">
-                        <span className={`text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-lg border transition-colors ${
-                          isSelected
-                            ? 'bg-brand-500 text-white border-brand-500'
-                            : 'text-brand-600 bg-brand-50 border-brand-200 hover:bg-brand-500 hover:text-white'
-                        }`}>
-                          Evaluate →
+                        <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-gray-100 text-ink-secondary truncate max-w-[85px] sm:max-w-none text-right">
+                          {party.status.split(' ')[0]}
                         </span>
                       </div>
 
+                      {/* Party Name */}
+                      <h4 className="font-extrabold text-xs sm:text-sm text-ink-primary leading-snug line-clamp-2">
+                        {party.name}
+                      </h4>
+
+                      {/* Key Leader */}
+                      <p className="text-[10px] sm:text-xs text-ink-secondary mt-1.5 truncate">
+                        Leader: <span className="font-bold text-ink-primary">{party.leader.split('/')[0].split('(')[0].trim()}</span>
+                      </p>
+
+                      {/* Seats */}
+                      <p className="text-[10px] sm:text-[11px] text-brand-700 font-semibold mt-0.5 truncate">
+                        {party.seats.split('(')[0].trim()}
+                      </p>
                     </div>
+
+                    {/* Action Button */}
+                    <div className="mt-2.5 pt-2 border-t border-surface-borderLight">
+                      <div
+                        className={`w-full py-1.5 px-2 rounded-lg text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1 transition-colors ${
+                          isSelected
+                            ? 'bg-brand-500 text-white'
+                            : 'bg-brand-50 text-brand-700 group-hover:bg-brand-500 group-hover:text-white'
+                        }`}
+                      >
+                        <span>Evaluate</span>
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+
                   </div>
                 );
               })}
