@@ -13,7 +13,7 @@ import {
   Tag
 } from 'lucide-react';
 
-export default function UploadVideoModal({ isOpen, onClose, presentDistrict }) {
+export default function UploadVideoModal({ isOpen, onClose, presentDistrict, onVideoUploaded }) {
   if (!isOpen) return null;
 
   const [videoFile, setVideoFile] = useState(null);
@@ -97,6 +97,23 @@ export default function UploadVideoModal({ isOpen, onClose, presentDistrict }) {
           setTimeout(() => {
             setIsUploading(false);
             setIsSuccess(true);
+            if (onVideoUploaded) {
+              onVideoUploaded({
+                id: `user-video-${Date.now()}`,
+                title: title.trim(),
+                topic: topic,
+                description: description.trim() || 'Community perspective shared on Now 9 Common Talks.',
+                author: isAnonymous ? 'Anonymous Citizen' : (userName.trim() || 'Community Voice'),
+                district: presentDistrict?.districtName || 'Hyderabad',
+                state: presentDistrict?.stateName || 'Telangana',
+                videoUrl: videoPreviewUrl,
+                createdAt: 'Just now',
+                likes: 1,
+                views: '1',
+                isUserUpload: true,
+                duration: 'User Upload'
+              });
+            }
           }, 400);
           return 100;
         }
@@ -107,9 +124,6 @@ export default function UploadVideoModal({ isOpen, onClose, presentDistrict }) {
 
   const handleReset = () => {
     setVideoFile(null);
-    if (videoPreviewUrl) {
-      URL.revokeObjectURL(videoPreviewUrl);
-    }
     setVideoPreviewUrl(null);
     setTitle('');
     setDescription('');
@@ -196,7 +210,7 @@ export default function UploadVideoModal({ isOpen, onClose, presentDistrict }) {
                   onClick={onClose}
                   className="w-full sm:w-auto px-8 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold shadow-md hover:shadow-green-glow transition-all"
                 >
-                  Done
+                  View in Common Talks Feed
                 </button>
               </div>
             </div>

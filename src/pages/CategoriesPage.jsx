@@ -1,13 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SectionHeading from '../components/SectionHeading';
 import CategoryCard from '../components/CategoryCard';
+import CommonTalksVideoFeed from '../components/CommonTalksVideoFeed';
 import { categoriesData } from '../data/categories';
 import { surveysData } from '../data/surveys';
 import { Landmark, MessageSquareText, Clock, Users, ArrowRight, CheckCircle2, Search, Filter } from 'lucide-react';
 
-export default function CategoriesPage({ onOpenSurveyModal, onUploadVideo, onGoLive, selectedCategoryFilter, setSelectedCategoryFilter }) {
+export default function CategoriesPage({ 
+  onOpenSurveyModal, 
+  onUploadVideo, 
+  onGoLive, 
+  selectedCategoryFilter, 
+  setSelectedCategoryFilter,
+  commonTalksVideos = [],
+  presentDistrict
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState(selectedCategoryFilter || 'all');
+
+  useEffect(() => {
+    if (selectedCategoryFilter) {
+      setActiveFilter(selectedCategoryFilter);
+    }
+  }, [selectedCategoryFilter]);
 
   const filteredCategories = categoriesData.filter(cat => {
     if (activeFilter === 'all') return true;
@@ -96,6 +111,17 @@ export default function CategoriesPage({ onOpenSurveyModal, onUploadVideo, onGoL
             />
           ))}
         </div>
+
+        {/* Common Talks Community Video Opinions Feed */}
+        {(activeFilter === 'all' || activeFilter === 'common-talks') && (
+          <div className="max-w-5xl mx-auto mb-16">
+            <CommonTalksVideoFeed
+              videos={commonTalksVideos}
+              onUploadVideo={onUploadVideo}
+              presentDistrict={presentDistrict}
+            />
+          </div>
+        )}
 
         {/* Active Surveys Grid */}
         <div className="max-w-5xl mx-auto">

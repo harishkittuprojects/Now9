@@ -1,0 +1,50 @@
+export const initialCommonTalksVideos = [
+  {
+    id: 'sample-video-1',
+    title: 'Work-Life Balance in Hyderabad: Hybrid vs Work from Office',
+    description: 'Sharing my perspective on long commutes, hybrid work culture in Cyberabad, and why family time needs to be prioritized by employers.',
+    topic: 'Work & Life Balance',
+    author: 'Kavitha R.',
+    district: 'Hyderabad',
+    state: 'Telangana',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80',
+    createdAt: '2 hours ago',
+    likes: 142,
+    views: '1.8K',
+    isUserUpload: false,
+    duration: '1:15'
+  },
+  {
+    id: 'sample-video-2',
+    title: 'Local Markets & Organic Produce: Prices and Availability',
+    description: 'Walking through our weekly Rythu Bazar in Warangal to check consumer price trends and how everyday families are managing grocery budgets.',
+    topic: 'Consumer Habits',
+    author: 'Srinivas Rao',
+    district: 'Warangal',
+    state: 'Telangana',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=600&q=80',
+    createdAt: '5 hours ago',
+    likes: 98,
+    views: '1.2K',
+    isUserUpload: false,
+    duration: '0:45'
+  },
+  {
+    id: 'sample-video-3',
+    title: 'Digital Living: Screen Time Rules for Kids and Families',
+    description: 'How we set device-free dinner hours at home and the challenges of remote schooling and smartphone addiction.',
+    topic: 'Digital Living',
+    author: 'Ananya Deshmukh',
+    district: 'Rangareddy',
+    state: 'Telangana',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80',
+    createdAt: 'Yesterday',
+    likes: 76,
+    views: '950',
+    isUserUpload: false,
+    duration: '1:02'
+  }
+];

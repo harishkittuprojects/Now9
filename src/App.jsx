@@ -7,6 +7,7 @@ import ServicesPage from './pages/ServicesPage';
 import SurveyModal from './components/SurveyModal';
 import UploadVideoModal from './components/UploadVideoModal';
 import LiveStreamModal from './components/LiveStreamModal';
+import { initialCommonTalksVideos } from './data/commonTalksVideos';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -21,6 +22,45 @@ export default function App() {
     districtName: "Hyderabad",
     stateName: "Telangana"
   });
+
+  const [commonTalksVideos, setCommonTalksVideos] = useState(() => {
+    try {
+      const saved = localStorage.getItem('now9_common_talks_videos');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read saved videos from localStorage', e);
+    }
+    return initialCommonTalksVideos;
+  });
+
+  const handleVideoUploaded = (newVideo) => {
+    setCommonTalksVideos(prev => {
+      const updated = [newVideo, ...prev];
+      try {
+        localStorage.setItem('now9_common_talks_videos', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Could not save to localStorage', e);
+      }
+      return updated;
+    });
+
+    // Automatically navigate to Categories page and focus on Common Talks
+    setActivePage('categories');
+    setSelectedCategoryFilter('common-talks');
+
+    // Smoothly scroll down to the video feed so user sees their uploaded video directly
+    setTimeout(() => {
+      const el = document.getElementById('common-talks-videos');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 350);
+  };
 
   useEffect(() => {
     AOS.init({
@@ -99,6 +139,8 @@ export default function App() {
             onGoLive={handleOpenLiveStreamModal}
             selectedCategoryFilter={selectedCategoryFilter}
             setSelectedCategoryFilter={setSelectedCategoryFilter}
+            commonTalksVideos={commonTalksVideos}
+            presentDistrict={presentDistrict}
           />
         )}
 
@@ -128,6 +170,7 @@ export default function App() {
         isOpen={isUploadVideoModalOpen}
         onClose={handleCloseUploadVideoModal}
         presentDistrict={presentDistrict}
+        onVideoUploaded={handleVideoUploaded}
       />
 
       {/* Live Stream Broadcast & Studio Modal */}
