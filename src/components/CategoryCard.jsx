@@ -1,5 +1,5 @@
 import React from 'react';
-import { Landmark, MessageSquareText, ArrowRight, CheckCircle, Users, Video, Radio } from 'lucide-react';
+import { Landmark, MessageSquareText, ArrowRight, CheckCircle, Users, Video } from 'lucide-react';
 
 export default function CategoryCard({ category, onSelectCategory, onTakeSurvey, onUploadVideo, onGoLive, delay = 0 }) {
   // Map icon name to component
@@ -67,23 +67,13 @@ export default function CategoryCard({ category, onSelectCategory, onTakeSurvey,
       {/* Action Buttons */}
       <div className="pt-5 sm:pt-6 border-t border-surface-borderLight flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
         {category.id === 'common-talks' ? (
-          <>
-            <button
-              onClick={() => (onUploadVideo ? onUploadVideo(category) : onTakeSurvey(category.id))}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm px-3.5 py-3 rounded-xl shadow-sm hover:shadow-green-glow transition-all duration-200"
-            >
-              <Video className="w-4 h-4" />
-              <span>Upload Video</span>
-            </button>
-            <button
-              onClick={() => (onGoLive ? onGoLive(category) : null)}
-              className="inline-flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm px-3.5 py-3 rounded-xl shadow-sm hover:shadow-red-glow transition-all duration-200"
-            >
-              <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
-              <Radio className="w-4 h-4" />
-              <span>Live Stream</span>
-            </button>
-          </>
+          <button
+            onClick={() => (onUploadVideo ? onUploadVideo(category) : onTakeSurvey(category.id))}
+            className="flex-1 inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm px-3.5 py-3 rounded-xl shadow-sm hover:shadow-green-glow transition-all duration-200"
+          >
+            <Video className="w-4 h-4" />
+            <span>Upload Video</span>
+          </button>
         ) : (
           <button
             onClick={() => onTakeSurvey(category.id)}

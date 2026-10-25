@@ -457,7 +457,7 @@ export default function LocationPoliticalTracker({ onTakeFullSurvey, onDistrictD
                             : 'bg-brand-50 text-brand-700 group-hover:bg-brand-500 group-hover:text-white'
                         }`}
                       >
-                        <span>Evaluate</span>
+                        <span>Select</span>
                         <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
