@@ -244,26 +244,28 @@ export function ScreenLogin({
                 {isLocating ? 'Locating your address via GPS...' : '📍 Auto-located Address'}
               </span>
               <span className="text-[8px] text-gray-400 font-mono">
-                PIN: {currentLocation.pincode}
+                PIN: {currentLocation?.pincode || '500033'}
               </span>
             </div>
             <p className="text-[11px] font-extrabold text-white leading-tight">
-              {currentLocation.formattedAddress}
+              {currentLocation?.formattedAddress || currentLocation?.exactAddress || 'Road No. 36, Jubilee Hills, Hyderabad'}
             </p>
             <p className="text-[8px] text-[#FDE047] font-semibold mt-0.5">
-              {currentLocation.assembly} • {currentLocation.ward}
+              {currentLocation?.assembly || 'Jubilee Hills Assembly'} • {currentLocation?.ward || 'Ward No. 98'}
             </p>
 
             <div className="mt-2 pt-1.5 border-t border-[#2A261C] flex items-center justify-between">
               <div className="flex items-center gap-1 overflow-x-auto phone-scroll">
                 <span className="text-[8px] text-gray-400 shrink-0">Parties:</span>
-                {currentLocation.parties.map(p => (
+                {(currentLocation?.parties || []).map(p => (
                   <span 
                     key={p.id} 
-                    className="text-[8px] px-1.5 py-0.2 rounded-full font-bold shrink-0" 
-                    style={{ backgroundColor: `${p.color}25`, color: p.color, border: `1px solid ${p.color}50` }}
+                    className="text-[8px] px-1.5 py-0.2 rounded-full font-bold shrink-0 flex items-center gap-0.5" 
+                    style={{ backgroundColor: `${p.color || '#F59E0B'}25`, color: p.color || '#F59E0B', border: `1px solid ${p.color || '#F59E0B'}50` }}
                   >
-                    {p.name.split(' ')[0]} ({p.voteShare}%)
+                    <span>{p.symbol || '🗳️'}</span>
+                    <span>{(p.name || '').split(' ')[0]}</span>
+                    <span>({p.voteShare}%)</span>
                   </span>
                 ))}
               </div>
@@ -901,10 +903,10 @@ export function Screen2Home({
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-[11px] font-extrabold text-white leading-tight">
-                  {currentLocation.exactAddress}
+                  {currentLocation?.exactAddress || currentLocation?.formattedAddress || 'Road No. 36, Jubilee Hills, Hyderabad'}
                 </p>
                 <p className="text-[8px] text-amber-300/80 mt-0.5 font-medium">
-                  {currentLocation.detectionMethod}
+                  {currentLocation?.detectionMethod || 'Auto-detected via GPS & Network 🛰️'}
                 </p>
               </div>
               <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[8px] font-bold shrink-0 border border-emerald-500/30">
@@ -915,11 +917,11 @@ export function Screen2Home({
             <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-[#1C1C24] text-[8px] text-gray-300">
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">🏛️ Assembly:</span>
-                <span className="font-bold text-white truncate">{currentLocation.assembly}</span>
+                <span className="font-bold text-white truncate">{currentLocation?.assembly || 'Jubilee Hills'}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">🗳️ Ward:</span>
-                <span className="font-bold text-white truncate">{currentLocation.ward}</span>
+                <span className="font-bold text-white truncate">{currentLocation?.ward || 'Ward No. 98'}</span>
               </div>
             </div>
           </div>
@@ -929,21 +931,23 @@ export function Screen2Home({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-[11px] font-extrabold text-white flex items-center gap-1">
-                  <span>Political Parties in {currentLocation.locality}</span>
+                  <span>Political Parties in {currentLocation?.locality || 'Your Area'}</span>
                 </h3>
                 <p className="text-[8px] text-gray-400">
                   Contesting MLA candidates & real-time citizen approval
                 </p>
               </div>
               <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-mono">
-                {currentLocation.parties?.length || 0} Parties
+                {(currentLocation?.parties || []).length} Parties
               </span>
             </div>
 
             {/* List of parties */}
             <div className="space-y-2">
-              {currentLocation.parties?.map((party) => {
+              {(currentLocation?.parties || []).map((party) => {
                 const hasVoted = Boolean(userLocalVotes[party.id]);
+                const partyStatus = party.status || party.role || 'Contestant';
+                const isHighlight = partyStatus.includes('Incumbent') || partyStatus.includes('Ruling') || partyStatus.includes('Sitting');
                 return (
                   <div 
                     key={party.id}
@@ -952,13 +956,13 @@ export function Screen2Home({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <span className="text-base p-1 rounded-lg bg-[#181822] border border-[#282834]">
-                          {party.symbol}
+                          {party.symbol || '🗳️'}
                         </span>
                         <div>
                           <div className="flex items-center gap-1">
                             <span className="text-[10px] font-black text-white">{party.name}</span>
                             <span className="text-[8px] font-mono px-1 rounded bg-[#20202C] text-gray-300">
-                              {party.code}
+                              {party.code || party.id?.toUpperCase()}
                             </span>
                           </div>
                           <span className="text-[8px] font-bold text-amber-300 block">
@@ -968,18 +972,18 @@ export function Screen2Home({
                       </div>
 
                       <span className={`text-[7px] font-extrabold px-1.5 py-0.5 rounded-full border ${
-                        party.status.includes('Incumbent') || party.status.includes('Ruling')
+                        isHighlight
                           ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                           : 'bg-blue-500/15 text-blue-300 border-blue-500/30'
                       }`}>
-                        {party.status}
+                        {partyStatus}
                       </span>
                     </div>
 
                     {/* Ward Focus */}
                     <p className="text-[8px] text-gray-300 bg-[#161620] px-2 py-0.5 rounded-md leading-tight">
                       <span className="text-gray-400 font-semibold">🎯 Ward Focus: </span>
-                      {party.keyFocus}
+                      {party.keyFocus || party.focus || 'Local civic improvements'}
                     </p>
 
                     {/* Vote share bar */}
@@ -991,7 +995,7 @@ export function Screen2Home({
                       <div className="w-full h-1.5 bg-[#1F1F2B] rounded-full overflow-hidden">
                         <div 
                           className="h-full rounded-full transition-all duration-500" 
-                          style={{ width: `${party.voteShare}%`, backgroundColor: party.color }}
+                          style={{ width: `${party.voteShare}%`, backgroundColor: party.color || '#F59E0B' }}
                         ></div>
                       </div>
                     </div>
@@ -1218,8 +1222,8 @@ export function Screen2Home({
             </div>
 
             <div className="space-y-1.5 overflow-y-auto phone-scroll max-h-60 pr-0.5">
-              {CONSTITUENCY_DATABASE.map((item) => {
-                const isSelected = item.id === currentLocation.id;
+              {(CONSTITUENCY_DATABASE || []).map((item) => {
+                const isSelected = item.id === currentLocation?.id;
                 return (
                   <div
                     key={item.id}
@@ -1245,11 +1249,11 @@ export function Screen2Home({
                         </span>
                       )}
                     </div>
-                    <p className="text-[8px] text-gray-400 mt-0.5 leading-tight">{item.exactAddress}</p>
+                    <p className="text-[8px] text-gray-400 mt-0.5 leading-tight">{item.exactAddress || item.formattedAddress}</p>
                     <div className="mt-1 flex items-center gap-2 text-[7px] text-amber-300 font-medium">
                       <span>🏛️ {item.assembly}</span>
                       <span>•</span>
-                      <span>🗳️ {item.parties.length} Parties Contesting</span>
+                      <span>🗳️ {(item.parties || []).length} Parties Contesting</span>
                     </div>
                   </div>
                 );
@@ -1294,10 +1298,10 @@ export function Screen2Home({
 
             <div className="space-y-2 overflow-y-auto phone-scroll max-h-56 pr-0.5">
               <span className="text-[9px] font-black text-amber-400 uppercase tracking-wider block">
-                Local Promises for {currentLocation.locality}:
+                Local Promises for {currentLocation?.locality || 'Your Area'}:
               </span>
               <div className="space-y-1.5">
-                {selectedManifestoParty.manifestoPromises?.map((promise, idx) => (
+                {(selectedManifestoParty?.manifestoPromises || selectedManifestoParty?.promises || []).map((promise, idx) => (
                   <div key={idx} className="p-2 rounded-xl bg-[#181822] border border-[#252535] flex items-start gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                     <span className="font-telugu text-[10px] text-gray-200 leading-tight">
