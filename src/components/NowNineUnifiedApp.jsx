@@ -31,6 +31,7 @@ export default function NowNineUnifiedApp() {
   const [activeScreenId, setActiveScreenId] = useState('login');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(DEFAULT_DETECTED_LOCATION);
+  const [selectedSurveyParty, setSelectedSurveyParty] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationToast, setLocationToast] = useState(null);
 
@@ -109,10 +110,19 @@ export default function NowNineUnifiedApp() {
             onLocationChange={setCurrentLocation}
             isLocating={isLocating}
             onDetectLiveGps={detectLiveGpsLocation}
+            onSelectSurveyParty={setSelectedSurveyParty}
           />
         );
       case 'survey':
-        return <Screen3Survey onBack={() => handleNav('home')} onFinish={() => handleNav('home')} onNavigate={handleNav} />;
+        return (
+          <Screen3Survey 
+            onBack={() => handleNav('home')} 
+            onFinish={() => handleNav('home')} 
+            onNavigate={handleNav}
+            selectedParty={selectedSurveyParty}
+            currentLocation={currentLocation}
+          />
+        );
       case 'live-debates':
         return <Screen4LiveDebates onBack={() => handleNav('home')} onSelectDebate={() => handleNav('debate-detail')} onNavigate={handleNav} />;
       case 'short-videos':

@@ -855,7 +855,8 @@ export function Screen2Home({
   currentLocation = DEFAULT_DETECTED_LOCATION, 
   onLocationChange = () => {}, 
   isLocating = false,
-  onDetectLiveGps = () => {}
+  onDetectLiveGps = () => {},
+  onSelectSurveyParty = () => {}
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -877,8 +878,13 @@ export function Screen2Home({
       ...prev,
       [partyId]: true
     }));
-    setVoteToast(`🗳️ Vote recorded for ${partyName} in ${currentLocation.locality}!`);
-    setTimeout(() => setVoteToast(null), 3000);
+    const found = (currentLocation?.parties || []).find(p => p.id === partyId);
+    if (onSelectSurveyParty) {
+      onSelectSurveyParty(found || { id: partyId, name: partyName });
+    }
+    if (onNavigate) {
+      onNavigate('survey');
+    }
   };
 
   return (
@@ -1502,7 +1508,13 @@ export function Screen2Home({
 }
 
 // 3. SCREEN 3: POLITICAL SURVEY SCREEN (Full 5-Question Flow + Live Results)
-export function Screen3Survey({ onBack, onFinish, onNavigate = null }) {
+export function Screen3Survey({ 
+  onBack, 
+  onFinish, 
+  onNavigate = null,
+  selectedParty = null,
+  currentLocation = null 
+}) {
   const [currentStep, setCurrentStep] = useState(0); // 0 to 4
   const [answers, setAnswers] = useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 });
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -1564,10 +1576,18 @@ export function Screen3Survey({ onBack, onFinish, onNavigate = null }) {
           </button>
           <div>
             <h2 className="text-xs font-extrabold text-white leading-tight">
-              {isSubmitted ? 'సర్వే ఫలితాలు (Survey Results)' : 'Political Survey'}
+              {isSubmitted 
+                ? 'సర్వే ఫలితాలు (Survey Results)' 
+                : selectedParty 
+                  ? `Vote Survey • ${selectedParty.name}` 
+                  : 'Political Survey'}
             </h2>
             <p className="text-[8px] text-gray-400 leading-none mt-0.5">
-              {isSubmitted ? 'Official Citizen Sentiment 2026' : `Question ${currentStep + 1} of 5 • Your Opinion Matters`}
+              {isSubmitted 
+                ? 'Official Citizen Sentiment 2026' 
+                : selectedParty 
+                  ? `${currentLocation?.locality || 'Your Area'} • Question ${currentStep + 1} of 5` 
+                  : `Question ${currentStep + 1} of 5 • Your Opinion Matters`}
             </p>
           </div>
         </div>
