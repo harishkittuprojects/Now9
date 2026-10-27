@@ -1532,18 +1532,12 @@ export function Screen3Survey({ onBack, onFinish, onNavigate = null }) {
 
   const handlePrev = () => {
     if (isSubmitted) {
-      setIsSubmitted(false);
+      onBack();
     } else if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else {
       onBack();
     }
-  };
-
-  const handleResetSurvey = () => {
-    setCurrentStep(0);
-    setIsSubmitted(false);
-    showToast('సర్వే పునఃప్రారంభించబడింది (Survey Reset)');
   };
 
   return (
@@ -1717,16 +1711,7 @@ export function Screen3Survey({ onBack, onFinish, onNavigate = null }) {
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-2 pt-1">
-            <button
-              type="button"
-              onClick={handleResetSurvey}
-              className="w-full py-2.5 px-3 rounded-xl bg-[#181822] border border-[#2E2E3C] text-gray-200 hover:text-white hover:border-amber-400/50 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-              <span>Vote Again / Edit Responses</span>
-            </button>
-
+          <div className="pt-1">
             <button
               type="button"
               onClick={() => onNavigate ? onNavigate('home') : onBack()}

@@ -749,16 +749,10 @@ export default function LocationPoliticalTracker({ onTakeFullSurvey, onDistrictD
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex flex-col gap-2.5">
-                    <button
-                      onClick={handleResetSurvey}
-                      className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-ink-primary font-bold py-3 px-4 rounded-xl border border-surface-border text-xs transition-colors shadow-xs"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5 text-brand-600" />
-                      <span>Vote on Another Party or Re-evaluate</span>
-                    </button>
-
+                  {/* Vote Confirmed Message */}
+                  <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center text-xs font-semibold text-emerald-800 flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Your vote is officially recorded & verified</span>
                   </div>
                 </div>
               )}
