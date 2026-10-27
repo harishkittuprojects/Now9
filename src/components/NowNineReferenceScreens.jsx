@@ -38,12 +38,11 @@ import {
   LIVE_CHAT_MESSAGES 
 } from '../data/nowNineCompleteAppData';
 
-// Phone Status Bar (9:41, Cellular, Wifi, Battery)
-export function PhoneStatusBar({ time = "9:41" }) {
+// Phone Status Bar (Cellular, Wifi, Battery without time)
+export function PhoneStatusBar() {
   return (
-    <div className="h-6 px-4 flex items-center justify-between text-white text-[11px] font-semibold tracking-tight z-30 select-none bg-transparent">
-      <span>{time}</span>
-      <div className="flex items-center gap-1.5 opacity-90">
+    <div className="h-5 px-4 flex items-center justify-end text-white text-[11px] font-semibold tracking-tight z-30 select-none bg-transparent shrink-0">
+      <div className="flex items-center gap-1.5 opacity-90 ml-auto">
         <div className="flex items-end gap-[1.5px] h-2.5">
           <span className="w-[2px] h-1 bg-white rounded-2xs"></span>
           <span className="w-[2px] h-1.5 bg-white rounded-2xs"></span>
