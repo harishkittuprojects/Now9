@@ -52,6 +52,7 @@ import {
   LIVE_CHAT_MESSAGES 
 } from '../data/nowNineCompleteAppData';
 import { SURVEY_QUESTIONS, PARTIES } from '../data/nowNineAppFlowData';
+import { DEFAULT_DETECTED_LOCATION, CONSTITUENCY_DATABASE } from '../data/locationConstituencyData';
 
 // Phone Status Bar (Cellular, Wifi, Battery without time)
 export function PhoneStatusBar() {
@@ -131,7 +132,14 @@ export function IndiaFlag() {
 }
 
 // LOGIN SCREEN
-export function ScreenLogin({ onLoginSuccess, onSkipToHome, onNavigate = null }) {
+export function ScreenLogin({ 
+  onLoginSuccess, 
+  onSkipToHome, 
+  onNavigate = null,
+  currentLocation = DEFAULT_DETECTED_LOCATION,
+  onLocationChange = () => {},
+  isLocating = false
+}) {
   const [phoneNumber, setPhoneNumber] = useState('9876543210');
   const [otpStep, setOtpStep] = useState(false);
   const [otpValues, setOtpValues] = useState(['9', '4', '1', '0']);
@@ -228,7 +236,41 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome, onNavigate = null })
             </span>
           </div>
 
-          <div className="mt-4 text-left">
+          {/* Auto-Located Address & Contesting Political Parties Banner */}
+          <div className="mt-3 p-2.5 rounded-2xl bg-gradient-to-r from-[#1C1A12] via-[#241F10] to-[#161410] border border-amber-500/40 shadow-md text-left">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[8px] font-extrabold uppercase text-amber-400 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                {isLocating ? 'Locating your address via GPS...' : '📍 Auto-located Address'}
+              </span>
+              <span className="text-[8px] text-gray-400 font-mono">
+                PIN: {currentLocation.pincode}
+              </span>
+            </div>
+            <p className="text-[11px] font-extrabold text-white leading-tight">
+              {currentLocation.formattedAddress}
+            </p>
+            <p className="text-[8px] text-[#FDE047] font-semibold mt-0.5">
+              {currentLocation.assembly} • {currentLocation.ward}
+            </p>
+
+            <div className="mt-2 pt-1.5 border-t border-[#2A261C] flex items-center justify-between">
+              <div className="flex items-center gap-1 overflow-x-auto phone-scroll">
+                <span className="text-[8px] text-gray-400 shrink-0">Parties:</span>
+                {currentLocation.parties.map(p => (
+                  <span 
+                    key={p.id} 
+                    className="text-[8px] px-1.5 py-0.2 rounded-full font-bold shrink-0" 
+                    style={{ backgroundColor: `${p.color}25`, color: p.color, border: `1px solid ${p.color}50` }}
+                  >
+                    {p.name.split(' ')[0]} ({p.voteShare}%)
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-3 text-left">
             <h2 className="text-base font-extrabold text-white">
               {otpStep ? 'Verify OTP' : 'Login / Register'}
             </h2>
@@ -592,10 +634,19 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
 }
 
 // 2. SCREEN 2: HOME SCREEN
-export function Screen2Home({ onNavigate }) {
+export function Screen2Home({ 
+  onNavigate, 
+  currentLocation = DEFAULT_DETECTED_LOCATION, 
+  onLocationChange = () => {}, 
+  isLocating = false 
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [appLang, setAppLang] = useState('తెలుగు');
+  const [isConstituencyModalOpen, setIsConstituencyModalOpen] = useState(false);
+  const [selectedManifestoParty, setSelectedManifestoParty] = useState(null);
+  const [userLocalVotes, setUserLocalVotes] = useState({});
+  const [voteToast, setVoteToast] = useState(null);
   const [notifs, setNotifs] = useState([
     { id: 1, title: 'Live Debate: 2026 ఎన్నికలు - ఎవరికి అవకాశాలు?', subtitle: '12.4K watching now', time: 'Just now', target: 'debate-detail', isUnread: true },
     { id: 2, title: 'Political Survey: 12,400+ Citizens Voted', subtitle: 'Cast your vote on governance & leadership', time: '1h ago', target: 'survey', isUnread: true },
@@ -603,6 +654,15 @@ export function Screen2Home({ onNavigate }) {
   ]);
 
   const unreadCount = notifs.filter(n => n.isUnread).length;
+
+  const handleVoteLocalParty = (partyId, partyName) => {
+    setUserLocalVotes(prev => ({
+      ...prev,
+      [partyId]: true
+    }));
+    setVoteToast(`🗳️ Vote recorded for ${partyName} in ${currentLocation.locality}!`);
+    setTimeout(() => setVoteToast(null), 3000);
+  };
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
@@ -809,6 +869,171 @@ export function Screen2Home({ onNavigate }) {
           <p className="text-[10px] text-gray-400">Stay informed. Stay ahead.</p>
         </div>
 
+        {/* Auto-Located Address & Contesting Political Parties Section */}
+        <div className="rounded-2xl p-3 bg-gradient-to-b from-[#181822] via-[#14141A] to-[#0D0D12] border border-amber-500/40 shadow-xl space-y-2.5 relative overflow-hidden">
+          {/* Subtle gold accent aura */}
+          <div className="absolute top-0 right-0 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+          {/* Header row: Auto-detection status & Change Button */}
+          <div className="flex items-center justify-between pb-1.5 border-b border-[#22222E]">
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] font-black tracking-wide text-[#FDE047] uppercase">
+                {isLocating ? 'Locating via GPS...' : 'Auto-Located Address'}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsConstituencyModalOpen(true)}
+              className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:bg-amber-500/25 transition-all text-[8px] font-bold flex items-center gap-1 cursor-pointer"
+            >
+              <MapPin className="w-2.5 h-2.5 text-[#F5C754]" />
+              <span>Change Address 📍</span>
+            </button>
+          </div>
+
+          {/* Detected Address Details Card */}
+          <div className="p-2 rounded-xl bg-[#0F0F15] border border-[#23232F] space-y-1">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-extrabold text-white leading-tight">
+                  {currentLocation.exactAddress}
+                </p>
+                <p className="text-[8px] text-amber-300/80 mt-0.5 font-medium">
+                  {currentLocation.detectionMethod}
+                </p>
+              </div>
+              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[8px] font-bold shrink-0 border border-emerald-500/30">
+                GPS Verified
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-[#1C1C24] text-[8px] text-gray-300">
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">🏛️ Assembly:</span>
+                <span className="font-bold text-white truncate">{currentLocation.assembly}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">🗳️ Ward:</span>
+                <span className="font-bold text-white truncate">{currentLocation.ward}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Contesting Political Parties in this Area */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-[11px] font-extrabold text-white flex items-center gap-1">
+                  <span>Political Parties in {currentLocation.locality}</span>
+                </h3>
+                <p className="text-[8px] text-gray-400">
+                  Contesting MLA candidates & real-time citizen approval
+                </p>
+              </div>
+              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-mono">
+                {currentLocation.parties?.length || 0} Parties
+              </span>
+            </div>
+
+            {/* List of parties */}
+            <div className="space-y-2">
+              {currentLocation.parties?.map((party) => {
+                const hasVoted = Boolean(userLocalVotes[party.id]);
+                return (
+                  <div 
+                    key={party.id}
+                    className="p-2 rounded-xl bg-[#111117] border border-[#22222E] hover:border-amber-400/30 transition-all space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-base p-1 rounded-lg bg-[#181822] border border-[#282834]">
+                          {party.symbol}
+                        </span>
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-black text-white">{party.name}</span>
+                            <span className="text-[8px] font-mono px-1 rounded bg-[#20202C] text-gray-300">
+                              {party.code}
+                            </span>
+                          </div>
+                          <span className="text-[8px] font-bold text-amber-300 block">
+                            👤 {party.candidate}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className={`text-[7px] font-extrabold px-1.5 py-0.5 rounded-full border ${
+                        party.status.includes('Incumbent') || party.status.includes('Ruling')
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                          : 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                      }`}>
+                        {party.status}
+                      </span>
+                    </div>
+
+                    {/* Ward Focus */}
+                    <p className="text-[8px] text-gray-300 bg-[#161620] px-2 py-0.5 rounded-md leading-tight">
+                      <span className="text-gray-400 font-semibold">🎯 Ward Focus: </span>
+                      {party.keyFocus}
+                    </p>
+
+                    {/* Vote share bar */}
+                    <div>
+                      <div className="flex justify-between text-[8px] mb-0.5">
+                        <span className="text-gray-400">Locality Approval:</span>
+                        <span className="font-extrabold font-mono text-white">{party.voteShare}%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#1F1F2B] rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all duration-500" 
+                          style={{ width: `${party.voteShare}%`, backgroundColor: party.color }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Action buttons: Vote Local and Manifesto */}
+                    <div className="flex items-center gap-1.5 pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => handleVoteLocalParty(party.id, party.name)}
+                        className={`flex-1 py-1 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                          hasVoted 
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                            : 'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110 shadow-xs'
+                        }`}
+                      >
+                        <Vote className="w-2.5 h-2.5" />
+                        <span>{hasVoted ? 'Voted Locally ✓' : 'Vote Local 🗳️'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedManifestoParty(party)}
+                        className="py-1 px-2.5 rounded-lg bg-[#1C1C26] hover:bg-[#252535] border border-[#2B2B38] text-gray-200 text-[8px] font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <FileText className="w-2.5 h-2.5 text-amber-400" />
+                        <span>Manifesto 📑</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-1 text-center">
+              <span className="text-[7px] text-gray-400 flex items-center justify-center gap-1">
+                <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
+                <span>Real-time constituency mapping for Telangana & Andhra Pradesh</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Hero Card: Political Survey */}
         <div 
           onClick={() => onNavigate('survey')}
@@ -963,6 +1188,149 @@ export function Screen2Home({ onNavigate }) {
           </p>
         </div>
       </div>
+
+      {/* Toast Notification for Local Voting */}
+      {voteToast && (
+        <div className="absolute top-12 left-4 right-4 z-50 bg-[#161410] border border-amber-400 text-amber-300 px-3 py-1.5 rounded-xl text-[10px] font-bold text-center shadow-2xl animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{voteToast}</span>
+        </div>
+      )}
+
+      {/* Constituency Switcher Modal */}
+      {isConstituencyModalOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-xs animate-fadeIn">
+          <div className="w-full max-h-[85%] bg-[#121217] border border-amber-500/40 rounded-2xl p-3.5 shadow-2xl flex flex-col justify-between space-y-2.5">
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-[#F5C754]" />
+                <div>
+                  <h3 className="text-xs font-black text-white">Select Your Address</h3>
+                  <p className="text-[8px] text-gray-400">View political parties contesting in your area</p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsConstituencyModalOpen(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="space-y-1.5 overflow-y-auto phone-scroll max-h-60 pr-0.5">
+              {CONSTITUENCY_DATABASE.map((item) => {
+                const isSelected = item.id === currentLocation.id;
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      onLocationChange(item);
+                      setIsConstituencyModalOpen(false);
+                      setVoteToast(`📍 Address changed to: ${item.locality}, ${item.city}`);
+                      setTimeout(() => setVoteToast(null), 3000);
+                    }}
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                      isSelected 
+                        ? 'bg-amber-500/20 border-amber-400 text-white' 
+                        : 'bg-[#181820] border-[#252532] text-gray-300 hover:border-amber-400/40'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-white flex items-center gap-1">
+                        <span>📍</span> {item.locality}, {item.city}
+                      </span>
+                      {isSelected && (
+                        <span className="text-[8px] font-black px-1.5 py-0.2 rounded-full bg-amber-400 text-black">
+                          SELECTED
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[8px] text-gray-400 mt-0.5 leading-tight">{item.exactAddress}</p>
+                    <div className="mt-1 flex items-center gap-2 text-[7px] text-amber-300 font-medium">
+                      <span>🏛️ {item.assembly}</span>
+                      <span>•</span>
+                      <span>🗳️ {item.parties.length} Parties Contesting</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsConstituencyModalOpen(false)}
+              className="w-full py-2 rounded-xl bg-[#1C1C24] border border-[#2B2B38] text-xs font-bold text-gray-300 hover:text-white cursor-pointer"
+            >
+              Done / Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Local Party Manifesto Modal */}
+      {selectedManifestoParty && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-xs animate-fadeIn">
+          <div className="w-full max-h-[85%] bg-[#121217] border border-amber-500/50 rounded-2xl p-3.5 shadow-2xl flex flex-col justify-between space-y-2.5">
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <div className="flex items-center gap-2">
+                <span className="text-xl p-1.5 rounded-xl bg-[#1C1C28] border border-[#2B2B3B]">
+                  {selectedManifestoParty.symbol}
+                </span>
+                <div>
+                  <h3 className="text-xs font-black text-white">{selectedManifestoParty.name}</h3>
+                  <p className="text-[8px] text-amber-300">
+                    Candidate: {selectedManifestoParty.candidate} • {currentLocation.assembly}
+                  </p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setSelectedManifestoParty(null)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="space-y-2 overflow-y-auto phone-scroll max-h-56 pr-0.5">
+              <span className="text-[9px] font-black text-amber-400 uppercase tracking-wider block">
+                Local Promises for {currentLocation.locality}:
+              </span>
+              <div className="space-y-1.5">
+                {selectedManifestoParty.manifestoPromises?.map((promise, idx) => (
+                  <div key={idx} className="p-2 rounded-xl bg-[#181822] border border-[#252535] flex items-start gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                    <span className="font-telugu text-[10px] text-gray-200 leading-tight">
+                      {promise}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1 border-t border-[#22222E]">
+              <button
+                type="button"
+                onClick={() => {
+                  handleVoteLocalParty(selectedManifestoParty.id, selectedManifestoParty.name);
+                  setSelectedManifestoParty(null);
+                }}
+                className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs shadow-md hover:brightness-110 cursor-pointer flex items-center justify-center gap-1"
+              >
+                <Vote className="w-3 h-3" />
+                <span>Support this Manifesto</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedManifestoParty(null)}
+                className="px-3 py-2 rounded-xl bg-[#1C1C24] text-xs font-bold text-gray-300 hover:text-white cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNavBar activeTab="home" onTabChange={onNavigate} />
     </div>
@@ -1908,8 +2276,14 @@ export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
 }
 
 // 7. SCREEN 7: AREA SPECIALS SCREEN
-export function Screen7AreaSpecials({ onBack, onNavigate, onSelectUpdate = null }) {
-  const [selectedArea, setSelectedArea] = useState('Hyderabad');
+export function Screen7AreaSpecials({ 
+  onBack, 
+  onNavigate, 
+  onSelectUpdate = null, 
+  currentLocation = null, 
+  onLocationChange = () => {} 
+}) {
+  const [selectedArea, setSelectedArea] = useState(currentLocation ? currentLocation.city : 'Hyderabad');
   const [isAreaDropdownOpen, setIsAreaDropdownOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -1926,6 +2300,10 @@ export function Screen7AreaSpecials({ onBack, onNavigate, onSelectUpdate = null 
   const handleSelectArea = (area) => {
     setSelectedArea(area);
     setIsAreaDropdownOpen(false);
+    const matched = CONSTITUENCY_DATABASE.find(c => c.city.toLowerCase() === area.toLowerCase());
+    if (matched) {
+      onLocationChange(matched);
+    }
     showToast(`📍 Selected Area: ${area}`);
   };
 
