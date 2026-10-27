@@ -39,7 +39,8 @@ import {
   ShieldCheck,
   RotateCcw,
   Mic,
-  MicOff
+  MicOff,
+  Newspaper
 } from 'lucide-react';
 import { 
   SURVEY_DATA, 
@@ -83,14 +84,13 @@ export function PhoneStatusBar() {
   );
 }
 
-// Bottom Navigation Bar (Home, Survey, Live, Shorts, Area)
+// Bottom Navigation Bar (Home, News, Live, Shorts)
 export function BottomNavBar({ activeTab = 'home', onTabChange = () => {} }) {
   const tabs = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'survey', label: 'Survey', icon: FileText },
+    { id: 'news', label: 'News', icon: Newspaper },
     { id: 'live-debates', label: 'Live', icon: Radio },
     { id: 'short-videos', label: 'Shorts', icon: Video },
-    { id: 'area-specials', label: 'Area', icon: MapPin },
   ];
 
   return (
@@ -806,10 +806,10 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
         {/* 4 Feature Icons Row */}
         <div className="w-full px-3 py-2 flex items-center justify-around text-center border-t border-b border-white/5 bg-[#101014]/80">
           {[
-            { label: 'Survey', icon: '📝', id: 'survey' },
             { label: 'Live Debates', icon: '🎙️', id: 'live-debates' },
+            { label: 'News', icon: '📰', id: 'news' },
+            { label: 'Common People', icon: '👥', id: 'common-people' },
             { label: 'Short Videos', icon: '🎬', id: 'short-videos' },
-            { label: 'Area Specials', icon: '📍', id: 'area-specials' },
           ].map((item, idx) => (
             <button 
               key={idx}
@@ -1048,9 +1048,10 @@ export function Screen2Home({
               <div className="py-3 space-y-1">
                 {[
                   { label: 'Political Survey', icon: FileText, target: 'survey', color: 'text-amber-400' },
+                  { label: 'NowNine News', icon: Newspaper, target: 'news', color: 'text-[#F5C754]' },
                   { label: 'Live Debates', icon: Radio, target: 'live-debates', color: 'text-red-400' },
                   { label: 'Short Videos', icon: Video, target: 'short-videos', color: 'text-amber-400' },
-                  { label: 'Area Specials', icon: MapPin, target: 'area-specials', color: 'text-emerald-400' },
+                  { label: 'Common People', icon: Users, target: 'common-people', color: 'text-emerald-400' },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
@@ -1119,147 +1120,23 @@ export function Screen2Home({
           <p className="text-[10px] text-gray-400">Stay informed. Stay ahead.</p>
         </div>
 
-        {/* Contesting Political Parties in User's Area */}
-        <div className="rounded-2xl p-3 bg-gradient-to-b from-[#181822] via-[#14141A] to-[#0D0D12] border border-amber-500/35 shadow-xl space-y-2 relative overflow-hidden">
-          {/* Subtle gold accent aura */}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
-          {/* Header row: Local Parties & Constituency */}
-          <div className="flex items-center justify-between pb-1.5 border-b border-[#22222E]">
-            <div>
-              <h3 className="text-[11px] font-black text-white flex items-center gap-1.5">
-                <span>🏛️ Local Political Parties</span>
-                <span className="text-amber-400 font-bold text-[9px]">({currentLocation?.locality || 'Your Area'})</span>
-              </h3>
-              <p className="text-[8px] text-gray-400">
-                MLA Candidates & citizen approval in {currentLocation?.assembly || 'Constituency'}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsConstituencyModalOpen(true)}
-              className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 hover:bg-amber-500/25 transition-all text-[8px] font-bold flex items-center gap-0.5 cursor-pointer"
-              title="Change or search constituency"
-            >
-              <span>Change</span>
-              <ChevronRight className="w-2.5 h-2.5" />
-            </button>
-          </div>
-
-          {/* Contesting Political Parties in this Area */}
-          <div className="space-y-1.5 pt-0.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-[11px] font-extrabold text-white flex items-center gap-1">
-                  <span>Political Parties in {currentLocation?.locality || 'Your Area'}</span>
-                </h3>
-                <p className="text-[8px] text-gray-400">
-                  Contesting MLA candidates & real-time citizen approval
-                </p>
-              </div>
-              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-mono">
-                {(currentLocation?.parties || []).length} Parties
-              </span>
-            </div>
-
-            {/* List of parties */}
-            <div className="space-y-2">
-              {(currentLocation?.parties || []).map((party) => {
-                const hasVoted = Boolean(userLocalVotes[party.id]);
-                const partyStatus = party.status || party.role || 'Contestant';
-                const isHighlight = partyStatus.includes('Incumbent') || partyStatus.includes('Ruling') || partyStatus.includes('Sitting');
-                return (
-                  <div 
-                    key={party.id}
-                    className="p-2 rounded-xl bg-[#111117] border border-[#22222E] hover:border-amber-400/30 transition-all space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-base p-1 rounded-lg bg-[#181822] border border-[#282834]">
-                          {party.symbol || '🗳️'}
-                        </span>
-                        <div>
-                          <div className="flex items-center gap-1">
-                            <span className="text-[10px] font-black text-white">{party.name}</span>
-                            <span className="text-[8px] font-mono px-1 rounded bg-[#20202C] text-gray-300">
-                              {party.code || party.id?.toUpperCase()}
-                            </span>
-                          </div>
-                          <span className="text-[8px] font-bold text-amber-300 block">
-                            👤 {party.candidate}
-                          </span>
-                        </div>
-                      </div>
-
-                      <span className={`text-[7px] font-extrabold px-1.5 py-0.5 rounded-full border ${
-                        isHighlight
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                          : 'bg-blue-500/15 text-blue-300 border-blue-500/30'
-                      }`}>
-                        {partyStatus}
-                      </span>
-                    </div>
-
-                    {/* Ward Focus */}
-                    <p className="text-[8px] text-gray-300 bg-[#161620] px-2 py-0.5 rounded-md leading-tight">
-                      <span className="text-gray-400 font-semibold">🎯 Ward Focus: </span>
-                      {party.keyFocus || party.focus || 'Local civic improvements'}
-                    </p>
-
-                    {/* Vote share bar */}
-                    <div>
-                      <div className="flex justify-between text-[8px] mb-0.5">
-                        <span className="text-gray-400">Locality Approval:</span>
-                        <span className="font-extrabold font-mono text-white">{party.voteShare}%</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-[#1F1F2B] rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all duration-500" 
-                          style={{ width: `${party.voteShare}%`, backgroundColor: party.color || '#F59E0B' }}
-                        ></div>
-                      </div>
-                    </div>
-
-                    {/* Action button: Vote Local */}
-                    <div className="pt-0.5">
-                      <button
-                        type="button"
-                        onClick={() => handleVoteLocalParty(party.id, party.name)}
-                        className={`w-full py-1.5 px-3 rounded-lg text-[9.5px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                          hasVoted 
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
-                            : 'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110 shadow-xs'
-                        }`}
-                      >
-                        <Vote className="w-2.5 h-2.5" />
-                        <span>{hasVoted ? 'Voted Locally ✓' : 'Vote Local 🗳️'}</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="pt-1 text-center">
-              <span className="text-[7px] text-gray-400 flex items-center justify-center gap-1">
-                <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
-                <span>Real-time constituency mapping for Telangana & Andhra Pradesh</span>
-              </span>
-            </div>
-          </div>
-        </div>
-
         {/* Hero Card: Political Survey */}
         <div 
           onClick={() => onNavigate('survey')}
-          className="relative rounded-2xl p-3 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group hover:border-amber-400 transition-all"
+          className="relative rounded-2xl p-3.5 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group hover:border-amber-400 transition-all"
         >
-          <div className="relative z-10 max-w-[65%]">
+          <div className="relative z-10 max-w-[68%]">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[9px] font-bold text-amber-300 uppercase tracking-wider">
+                Live Constituency Survey
+              </span>
+            </div>
             <span className="text-xs font-black text-[#FDE047] block leading-tight">
-              Political Survey
+              Political Survey & Local Voting
             </span>
-            <span className="text-[9px] text-gray-300 block mb-2 leading-tight">
-              Your Opinion Matters.
+            <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
+              Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
             </span>
             <button
               type="button"
@@ -1267,9 +1144,10 @@ export function Screen2Home({
                 e.stopPropagation();
                 onNavigate('survey');
               }}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F5C754] text-black font-extrabold text-[9px] shadow-sm group-hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[9.5px] shadow-sm group-hover:brightness-110 active:scale-95 transition-all cursor-pointer"
             >
-              <span>Take Survey</span>
+              <Vote className="w-2.5 h-2.5" />
+              <span>Take Survey & Vote Local</span>
               <ChevronRight className="w-3 h-3 stroke-[3]" />
             </button>
           </div>
@@ -1282,51 +1160,58 @@ export function Screen2Home({
           </div>
         </div>
 
-        {/* Feature Tiles Grid */}
-        <div className="grid grid-cols-3 gap-2">
+        {/* 2x2 Feature Tiles Grid */}
+        <div className="grid grid-cols-2 gap-2.5">
           {/* Tile 1: Live Debates */}
           <button 
             type="button"
             onClick={() => onNavigate('live-debates')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
+            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
           >
-            <div className="w-7 h-7 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 mb-1.5 group-hover:scale-105 transition-transform">
-              <Play className="w-3.5 h-3.5 fill-current" />
+            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+              <Play className="w-4 h-4 fill-[#F5C754] stroke-[#F5C754] ml-0.5" />
             </div>
-            <div>
-              <h3 className="font-bold text-[10.5px] text-white leading-tight">Live Debates</h3>
-              <p className="text-[7.5px] text-gray-400 mt-0.5">Watch & Discuss</p>
-            </div>
+            <h3 className="font-black text-[12px] text-white leading-tight">Live Debates</h3>
+            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Watch • Listen • Discuss</p>
           </button>
 
-          {/* Tile 2: Short Videos */}
+          {/* Tile 2: News */}
+          <button 
+            type="button"
+            onClick={() => onNavigate('news')}
+            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+          >
+            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+              <Newspaper className="w-4 h-4 text-[#F5C754]" />
+            </div>
+            <h3 className="font-black text-[12px] text-white leading-tight">News</h3>
+            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Breaking • State • Local</p>
+          </button>
+
+          {/* Tile 3: Common People */}
+          <button 
+            type="button"
+            onClick={() => onNavigate('common-people')}
+            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+          >
+            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+              <Users className="w-4 h-4 text-[#F5C754]" />
+            </div>
+            <h3 className="font-black text-[12px] text-white leading-tight">Common People</h3>
+            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Real Voices • Real Stories</p>
+          </button>
+
+          {/* Tile 4: Short Videos */}
           <button 
             type="button"
             onClick={() => onNavigate('short-videos')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
+            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
           >
-            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-1.5 group-hover:scale-105 transition-transform">
-              <Video className="w-3.5 h-3.5" />
+            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+              <Video className="w-4 h-4 text-[#F5C754]" />
             </div>
-            <div>
-              <h3 className="font-bold text-[10.5px] text-white leading-tight">Short Videos</h3>
-              <p className="text-[7.5px] text-gray-400 mt-0.5">Viral Updates</p>
-            </div>
-          </button>
-
-          {/* Tile 3: Area Specials */}
-          <button 
-            type="button"
-            onClick={() => onNavigate('area-specials')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
-          >
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-1.5 group-hover:scale-105 transition-transform">
-              <MapPin className="w-3.5 h-3.5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-[10.5px] text-white leading-tight">Area Specials</h3>
-              <p className="text-[7.5px] text-gray-400 mt-0.5">Your Area</p>
-            </div>
+            <h3 className="font-black text-[12px] text-white leading-tight">Short Videos</h3>
+            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Trending • Local • Viral</p>
           </button>
         </div>
 
@@ -1416,22 +1301,46 @@ export function Screen2Home({
   );
 }
 
-// 3. SCREEN 3: POLITICAL SURVEY SCREEN (Full 5-Question Flow + Live Results)
+// 3. SCREEN 3: POLITICAL SURVEY SCREEN (Local Parties Voting + 5-Question Flow + Live Results)
 export function Screen3Survey({ 
   onBack, 
   onFinish, 
   onNavigate = null,
   selectedParty = null,
-  currentLocation = null 
+  currentLocation = null,
+  onLocationChange = () => {},
+  isLocating = false,
+  onDetectLiveGps = () => {},
+  onSelectSurveyParty = () => {}
 }) {
+  const loc = currentLocation || DEFAULT_DETECTED_LOCATION;
+  const partiesList = loc?.parties || [];
+
+  // Active view tab: 'parties' | 'questions' | 'results'
+  const [activeTab, setActiveTab] = useState(() => (selectedParty ? 'questions' : 'parties'));
+  const [chosenParty, setChosenParty] = useState(selectedParty);
+  const [userLocalVotes, setUserLocalVotes] = useState({});
   const [currentStep, setCurrentStep] = useState(0); // 0 to 4
   const [answers, setAnswers] = useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [isConstituencyModalOpen, setIsConstituencyModalOpen] = useState(false);
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleVoteAndSelectParty = (party) => {
+    setChosenParty(party);
+    setUserLocalVotes(prev => ({ ...prev, [party.id]: true }));
+    if (onSelectSurveyParty) {
+      onSelectSurveyParty(party);
+    }
+    showToast(`🎉 ${party.name} (${party.candidate}) ఎంపిక చేయబడింది!`);
+    setTimeout(() => {
+      setActiveTab('questions');
+    }, 450);
   };
 
   const activeQuestion = SURVEY_QUESTIONS[currentStep] || SURVEY_QUESTIONS[0];
@@ -1447,15 +1356,21 @@ export function Screen3Survey({
       setCurrentStep(prev => prev + 1);
     } else {
       setIsSubmitted(true);
+      setActiveTab('results');
       showToast('🎉 మీ ఓటు విజయవంతంగా నమోదైంది! (Vote Recorded)');
     }
   };
 
   const handlePrev = () => {
-    if (isSubmitted) {
-      onBack();
-    } else if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+    if (isSubmitted || activeTab === 'results') {
+      setIsSubmitted(false);
+      setActiveTab('questions');
+    } else if (activeTab === 'questions') {
+      if (currentStep > 0) {
+        setCurrentStep(prev => prev - 1);
+      } else {
+        setActiveTab('parties');
+      }
     } else {
       onBack();
     }
@@ -1485,18 +1400,22 @@ export function Screen3Survey({
           </button>
           <div>
             <h2 className="text-xs font-extrabold text-white leading-tight">
-              {isSubmitted 
-                ? 'సర్వే ఫలితాలు (Survey Results)' 
-                : selectedParty 
-                  ? `Vote Survey • ${selectedParty.name}` 
-                  : 'Political Survey'}
+              {activeTab === 'parties'
+                ? 'Local Parties & Candidates'
+                : (isSubmitted || activeTab === 'results')
+                  ? 'సర్వే ఫలితాలు (Survey Results)' 
+                  : chosenParty 
+                    ? `Vote Survey • ${chosenParty.name}` 
+                    : 'Political Survey'}
             </h2>
             <p className="text-[8px] text-gray-400 leading-none mt-0.5">
-              {isSubmitted 
-                ? 'Official Citizen Sentiment 2026' 
-                : selectedParty 
-                  ? `${currentLocation?.locality || 'Your Area'} • Question ${currentStep + 1} of 5` 
-                  : `Question ${currentStep + 1} of 5 • Your Opinion Matters`}
+              {activeTab === 'parties'
+                ? `${loc?.locality || 'Your Area'} • ${loc?.assembly || 'Assembly'}`
+                : (isSubmitted || activeTab === 'results')
+                  ? 'Official Citizen Sentiment 2026' 
+                  : chosenParty 
+                    ? `${chosenParty.candidate || loc?.locality} • Question ${currentStep + 1} of 5` 
+                    : `Question ${currentStep + 1} of 5 • Your Opinion Matters`}
             </p>
           </div>
         </div>
@@ -1508,10 +1427,246 @@ export function Screen3Survey({
         </span>
       </div>
 
+      {/* Survey Workflow Steps / Tabs */}
+      <div className="px-3 py-1.5 bg-[#0E0E12] border-b border-[#1C1C24] flex items-center justify-between gap-1 shrink-0">
+        <button
+          type="button"
+          onClick={() => setActiveTab('parties')}
+          className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            activeTab === 'parties'
+              ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
+              : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
+          }`}
+        >
+          <Vote className="w-3 h-3" />
+          <span>1. Parties ({partiesList.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('questions')}
+          className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            activeTab === 'questions'
+              ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
+              : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
+          }`}
+        >
+          <FileText className="w-3 h-3" />
+          <span>2. Survey ({currentStep + 1}/5)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (isSubmitted) {
+              setActiveTab('results');
+            } else {
+              showToast('⚠️ Complete the survey or vote to view official pulse');
+            }
+          }}
+          className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            activeTab === 'results'
+              ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
+              : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
+          }`}
+        >
+          <TrendingUp className="w-3 h-3" />
+          <span>3. Results</span>
+        </button>
+      </div>
+
       {/* Main Body */}
-      {!isSubmitted ? (
+      {/* VIEW 1: POLITICAL PARTIES & LOCAL CANDIDATES */}
+      {activeTab === 'parties' && (
+        <div className="flex-1 min-h-0 px-3 py-2.5 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-6">
+          <div className="rounded-2xl p-3 bg-gradient-to-b from-[#181822] via-[#14141A] to-[#0D0D12] border border-amber-500/35 shadow-xl space-y-2 relative overflow-hidden">
+            {/* Subtle gold accent aura */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            {/* Header row: Local Parties & Constituency */}
+            <div className="flex items-center justify-between pb-1.5 border-b border-[#22222E]">
+              <div>
+                <h3 className="text-[11px] font-black text-white flex items-center gap-1.5">
+                  <span>🏛️ Local Political Parties</span>
+                  <span className="text-amber-400 font-bold text-[9px]">({loc?.locality || 'Your Area'})</span>
+                </h3>
+                <p className="text-[8px] text-gray-400">
+                  MLA Candidates & citizen approval in {loc?.assembly || 'Constituency'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsConstituencyModalOpen(true)}
+                className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 hover:bg-amber-500/25 transition-all text-[8px] font-bold flex items-center gap-0.5 cursor-pointer"
+                title="Change or search constituency"
+              >
+                <span>Change</span>
+                <ChevronRight className="w-2.5 h-2.5" />
+              </button>
+            </div>
+
+            {/* Contesting Political Parties in this Area */}
+            <div className="space-y-1.5 pt-0.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-[11px] font-extrabold text-white flex items-center gap-1">
+                    <span>Political Parties in {loc?.locality || 'Your Area'}</span>
+                  </h3>
+                  <p className="text-[8px] text-gray-400">
+                    Contesting MLA candidates & real-time citizen approval
+                  </p>
+                </div>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-mono">
+                  {partiesList.length} Parties
+                </span>
+              </div>
+
+              {/* List of parties */}
+              <div className="space-y-2">
+                {partiesList.map((party) => {
+                  const hasVoted = Boolean(userLocalVotes[party.id]) || chosenParty?.id === party.id;
+                  const partyStatus = party.status || party.role || 'Contestant';
+                  const isHighlight = partyStatus.includes('Incumbent') || partyStatus.includes('Ruling') || partyStatus.includes('Sitting');
+                  return (
+                    <div 
+                      key={party.id}
+                      className={`p-2.5 rounded-xl border transition-all space-y-1.5 ${
+                        hasVoted 
+                          ? 'bg-[#181824] border-amber-400/60 shadow-md shadow-amber-500/10' 
+                          : 'bg-[#111117] border-[#22222E] hover:border-amber-400/30'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base p-1 rounded-lg bg-[#181822] border border-[#282834]">
+                            {party.symbol || '🗳️'}
+                          </span>
+                          <div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] font-black text-white">{party.name}</span>
+                              <span className="text-[8px] font-mono px-1 rounded bg-[#20202C] text-gray-300">
+                                {party.code || party.id?.toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="text-[8.5px] font-bold text-amber-300 block">
+                              👤 {party.candidate}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className={`text-[7px] font-extrabold px-1.5 py-0.5 rounded-full border ${
+                          isHighlight
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                            : 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                        }`}>
+                          {partyStatus}
+                        </span>
+                      </div>
+
+                      {/* Ward Focus */}
+                      <p className="text-[8px] text-gray-300 bg-[#161620] px-2 py-0.5 rounded-md leading-tight">
+                        <span className="text-gray-400 font-semibold">🎯 Ward Focus: </span>
+                        {party.keyFocus || party.focus || 'Local civic improvements'}
+                      </p>
+
+                      {/* Vote share bar */}
+                      <div>
+                        <div className="flex justify-between text-[8px] mb-0.5">
+                          <span className="text-gray-400">Locality Approval:</span>
+                          <span className="font-extrabold font-mono text-white">{party.voteShare}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-[#1F1F2B] rounded-full overflow-hidden">
+                          <div 
+                            className="h-full rounded-full transition-all duration-500" 
+                            style={{ width: `${party.voteShare}%`, backgroundColor: party.color || '#F59E0B' }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* Action button: Vote Local */}
+                      <div className="pt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => handleVoteAndSelectParty(party)}
+                          className={`w-full py-1.5 px-3 rounded-lg text-[9.5px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            hasVoted 
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                              : 'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110 shadow-xs'
+                          }`}
+                        >
+                          <Vote className="w-2.5 h-2.5" />
+                          <span>{hasVoted ? '✓ Selected & Voted • Take Survey →' : 'Vote Local 🗳️'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="pt-1 text-center">
+                <span className="text-[7px] text-gray-400 flex items-center justify-center gap-1">
+                  <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
+                  <span>Real-time constituency mapping for Telangana & Andhra Pradesh</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick skip button to general survey questions */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab('questions')}
+              className="w-full py-2 px-3 rounded-xl bg-[#14141A] border border-[#23232C] text-gray-300 hover:text-white hover:border-amber-400/40 text-[9.5px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            >
+              <span>Skip directly to General Survey Questions</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* VIEW 2: 5-STEP POLICY & GOVERNANCE OPINION SURVEY */}
+      {activeTab === 'questions' && !isSubmitted && (
         <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y flex flex-col justify-between pb-4">
           <div>
+            {/* If a candidate is chosen, show candidate badge with option to change */}
+            {chosenParty ? (
+              <div className="mb-2.5 p-2 rounded-xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">{chosenParty.symbol || '🗳️'}</span>
+                  <div>
+                    <span className="text-[9.5px] font-bold text-white block leading-tight">
+                      Evaluating: {chosenParty.name}
+                    </span>
+                    <span className="text-[7.5px] text-amber-300 block">
+                      Candidate: {chosenParty.candidate || loc?.locality}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('parties')}
+                  className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[8px] font-bold hover:bg-amber-400/30 transition-colors cursor-pointer"
+                >
+                  Change Party
+                </button>
+              </div>
+            ) : (
+              <div className="mb-2.5 p-2 rounded-xl bg-[#14141A] border border-[#23232C] flex items-center justify-between">
+                <span className="text-[8.5px] text-gray-300">
+                  🏛️ Haven't picked a candidate yet?
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('parties')}
+                  className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[8px] font-bold hover:bg-amber-400/30 transition-colors cursor-pointer"
+                >
+                  Pick Candidate
+                </button>
+              </div>
+            )}
+
             {/* Progress Bar & Counter */}
             <div className="flex items-center gap-2 mb-3">
               <div className="flex-1 h-1.5 bg-[#1F1F26] rounded-full overflow-hidden">
@@ -1576,16 +1731,14 @@ export function Screen3Survey({
 
           {/* Nav Buttons Row */}
           <div className="pt-3 flex items-center gap-2">
-            {currentStep > 0 && (
-              <button
-                type="button"
-                onClick={handlePrev}
-                className="py-2.5 px-3 rounded-full bg-[#16161D] border border-[#2B2B36] text-gray-300 font-bold text-xs hover:bg-[#202028] hover:text-white transition-all cursor-pointer flex items-center gap-1"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-                <span>Prev</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="py-2.5 px-3 rounded-full bg-[#16161D] border border-[#2B2B36] text-gray-300 font-bold text-xs hover:bg-[#202028] hover:text-white transition-all cursor-pointer flex items-center gap-1"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>{currentStep === 0 ? 'Parties' : 'Prev'}</span>
+            </button>
 
             <button
               type="button"
@@ -1597,9 +1750,11 @@ export function Screen3Survey({
             </button>
           </div>
         </div>
-      ) : (
-        /* Submitted Live Results View */
-        <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-4">
+      )}
+
+      {/* VIEW 3: SUBMITTED LIVE PULSE RESULTS */}
+      {(isSubmitted || activeTab === 'results') && (
+        <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-6">
           <div className="text-center p-3 rounded-2xl bg-gradient-to-b from-[#1E1B12] to-[#121217] border border-amber-500/40 shadow-lg">
             <div className="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-400 text-amber-400 flex items-center justify-center mx-auto mb-1.5 shadow-inner">
               <CheckCircle2 className="w-5 h-5 text-[#F5C754]" />
@@ -1608,39 +1763,74 @@ export function Screen3Survey({
               ధన్యవాదాలు! మీ అభిప్రాయం రికార్డయింది.
             </h3>
             <p className="text-[9px] text-gray-400 mt-0.5">
-              Your anonymous opinion has been added to the 2026 People's Pulse.
+              {chosenParty 
+                ? `Your vote for ${chosenParty.name} (${chosenParty.candidate || loc?.locality}) has been recorded.` 
+                : "Your anonymous opinion has been added to the 2026 People's Pulse."}
             </p>
           </div>
 
           {/* Party Breakdown Bars */}
           <div className="p-3 rounded-2xl bg-[#141419] border border-[#23232C] space-y-2">
             <div className="flex items-center justify-between pb-1.5 border-b border-[#202028]">
-              <span className="text-[10px] font-bold text-white">Live Party Standings</span>
+              <span className="text-[10px] font-bold text-white">Live Party Standings ({loc?.locality || 'Telangana & AP'})</span>
               <span className="text-[8px] text-amber-400 font-mono">12,418 Votes</span>
             </div>
 
-            {PARTIES.map((party) => (
-              <div key={party.id} className="space-y-0.5">
-                <div className="flex items-center justify-between text-[9px]">
-                  <span className="font-bold text-white flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: party.color }}></span>
-                    <span>{party.name}</span>
-                    <span className="text-[8px] text-gray-400">({party.teluguName.slice(0, 8)}...)</span>
-                  </span>
-                  <span className="font-mono font-bold text-amber-400">{party.resultPercent}%</span>
+            {partiesList.length > 0 ? (
+              partiesList.map((party) => (
+                <div key={party.id} className="space-y-0.5">
+                  <div className="flex items-center justify-between text-[9px]">
+                    <span className="font-bold text-white flex items-center gap-1">
+                      <span>{party.symbol || '🗳️'}</span>
+                      <span>{party.name}</span>
+                      <span className="text-[8px] text-gray-400">({party.candidate})</span>
+                    </span>
+                    <span className="font-mono font-bold text-amber-400">{party.voteShare}%</span>
+                  </div>
+                  <div className="h-1.5 bg-[#1F1F28] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full rounded-full transition-all duration-500" 
+                      style={{ width: `${party.voteShare}%`, backgroundColor: party.color || '#F59E0B' }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="h-1.5 bg-[#1F1F28] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full rounded-full transition-all duration-500" 
-                    style={{ width: `${party.resultPercent}%`, backgroundColor: party.color }}
-                  ></div>
+              ))
+            ) : (
+              PARTIES.map((party) => (
+                <div key={party.id} className="space-y-0.5">
+                  <div className="flex items-center justify-between text-[9px]">
+                    <span className="font-bold text-white flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: party.color }}></span>
+                      <span>{party.name}</span>
+                      <span className="text-[8px] text-gray-400">({party.teluguName.slice(0, 8)}...)</span>
+                    </span>
+                    <span className="font-mono font-bold text-amber-400">{party.resultPercent}%</span>
+                  </div>
+                  <div className="h-1.5 bg-[#1F1F28] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full rounded-full transition-all duration-500" 
+                      style={{ width: `${party.resultPercent}%`, backgroundColor: party.color }}
+                    ></div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-1">
+          <div className="space-y-2 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSubmitted(false);
+                setActiveTab('parties');
+              }}
+              className="w-full py-2 px-3 rounded-xl bg-[#181822] border border-amber-400/40 text-amber-300 font-bold text-xs hover:bg-[#20202E] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Vote for Another Candidate / Review Parties</span>
+            </button>
+
             <button
               type="button"
               onClick={() => onNavigate ? onNavigate('home') : onBack()}
@@ -1652,6 +1842,19 @@ export function Screen3Survey({
           </div>
         </div>
       )}
+
+      {/* Constituency Switcher Modal */}
+      <ConstituencyPickerModal
+        isOpen={isConstituencyModalOpen}
+        onClose={() => setIsConstituencyModalOpen(false)}
+        currentLocation={loc}
+        onLocationChange={(item) => {
+          onLocationChange(item);
+          showToast(`📍 Constituency set to: ${item.locality}, ${item.city}`);
+        }}
+        onDetectLiveGps={onDetectLiveGps}
+        isLocating={isLocating}
+      />
 
       <BottomNavBar activeTab="survey" onTabChange={onNavigate || onBack} />
     </div>
@@ -2143,12 +2346,134 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
   );
 }
 
-// 6. SCREEN 6: COMMON PEOPLE SCREEN (Removed per user request)
-export function Screen6CommonPeople({ onNavigate = () => {} }) {
-  React.useEffect(() => {
-    onNavigate('home');
-  }, [onNavigate]);
-  return null;
+// 6. SCREEN 6: COMMON PEOPLE SCREEN (Real Voices • Real Stories)
+export function Screen6CommonPeople({ onBack, onNavigate, onSelectStory = null }) {
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const categories = ['All', 'Farmers', 'Students', 'Women', 'Workers'];
+
+  const filteredStories = COMMON_PEOPLE_STORIES.filter(s => {
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Farmers') return s.role.toLowerCase().includes('farmer');
+    if (activeFilter === 'Students') return s.role.toLowerCase().includes('student');
+    if (activeFilter === 'Women') return s.role.toLowerCase().includes('housewife') || s.role.toLowerCase().includes('women');
+    return true;
+  });
+
+  return (
+    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
+      <PhoneStatusBar />
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
+        <div className="flex items-center gap-2">
+          <button 
+            type="button" 
+            onClick={onBack || (() => onNavigate('home'))} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+            title="Go Back"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h2 className="text-xs font-extrabold text-white leading-tight">Common People</h2>
+            <p className="text-[8px] text-gray-400 leading-none mt-0.5">Real Voices • Real Stories</p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            showToast('🎙️ Microphone ready: Share your local story!');
+          }}
+          className="px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black text-[8px] font-extrabold flex items-center gap-1 cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-xs"
+        >
+          <Mic className="w-2.5 h-2.5" />
+          <span>Record Voice</span>
+        </button>
+      </div>
+
+      {/* Categories Filter Pills */}
+      <div className="px-3 py-2 border-b border-[#1A1A22] bg-[#0A0A0D] flex items-center gap-1.5 overflow-x-auto phone-scroll shrink-0">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setActiveFilter(cat)}
+            className={`px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
+              activeFilter === cat
+                ? 'bg-[#F5C754] text-black font-extrabold shadow-xs'
+                : 'bg-[#16161D] text-gray-400 border border-[#23232C] hover:text-white'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Stories Feed */}
+      <div className="flex-1 min-h-0 px-3 py-2.5 overflow-y-auto phone-scroll touch-pan-y space-y-2.5 pb-6">
+        {filteredStories.map((story) => (
+          <div
+            key={story.id}
+            onClick={() => onSelectStory ? onSelectStory(story) : onNavigate('video-player')}
+            className="p-2.5 rounded-xl bg-[#121217] border border-[#22222C] hover:border-amber-400/40 cursor-pointer transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg p-1 rounded-lg bg-[#181822] border border-[#2A2A36]">
+                  {story.icon}
+                </span>
+                <div>
+                  <h4 className="text-[10px] font-extrabold text-white group-hover:text-amber-300 transition-colors">
+                    {story.role}
+                  </h4>
+                  <span className="text-[8px] text-gray-400 font-mono">
+                    {story.views} Citizen Listens
+                  </span>
+                </div>
+              </div>
+
+              <span className="text-[8px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 font-bold flex items-center gap-1">
+                <Clock className="w-2.5 h-2.5" />
+                <span>{story.duration}</span>
+              </span>
+            </div>
+
+            <p className="font-telugu text-[11px] font-bold text-gray-200 leading-snug">
+              "{story.title}"
+            </p>
+
+            <div className="flex items-center justify-between pt-0.5">
+              <span className="text-[7.5px] text-emerald-400 flex items-center gap-1 font-semibold">
+                <CheckCircle2 className="w-2.5 h-2.5" />
+                <span>Verified Local Citizen Voice</span>
+              </span>
+              <div className="flex items-center gap-1 text-[8.5px] text-amber-400 font-bold group-hover:translate-x-0.5 transition-transform">
+                <Play className="w-2.5 h-2.5 fill-current" />
+                <span>Listen Now</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <BottomNavBar activeTab="home" onTabChange={onNavigate} />
+    </div>
+  );
 }
 
 // 7. SCREEN 7: AREA SPECIALS SCREEN
@@ -2159,6 +2484,11 @@ export function Screen7AreaSpecials({
   currentLocation = null, 
   onLocationChange = () => {} 
 }) {
+  React.useEffect(() => {
+    if (onNavigate) onNavigate('home');
+    else if (onBack) onBack();
+  }, [onNavigate, onBack]);
+  return null;
   const [selectedArea, setSelectedArea] = useState(currentLocation ? currentLocation.city : 'Hyderabad');
   const [isAreaDropdownOpen, setIsAreaDropdownOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -2966,6 +3296,189 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
           <Send className="w-3.5 h-3.5" />
         </button>
       </form>
+    </div>
+  );
+}
+
+// 10. SCREEN NEWS: 24/7 VERIFIED NEWS SCREEN
+export function ScreenNews({ onBack, onNavigate }) {
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const categories = ['All', 'Politics', 'Telangana', 'Andhra Pradesh', 'Development', 'Welfare'];
+
+  const newsItems = [
+    {
+      id: 1,
+      tag: 'Breaking',
+      tagColor: 'bg-red-500/20 text-red-400 border-red-500/30',
+      title: '2026 తెలంగాణ ఎన్నికల కార్యాచరణ: పార్టీల ముమ్మర సన్నాహాలు',
+      summary: 'రాష్ట్రవ్యాప్తంగా రాజకీయ సమీకరణాలు వేడెక్కాయి. అన్ని ప్రధాన పార్టీలు క్షేత్రస్థాయిలో ప్రచారానికి రంగం సిద్ధం చేస్తున్నాయి.',
+      time: '12m ago',
+      reads: '48.2K readers',
+      source: 'NowNine Political Desk',
+      img: '/assets/news_debate_studio.jpg'
+    },
+    {
+      id: 2,
+      tag: 'Development',
+      tagColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      title: 'హైదరాబాద్ మెట్రో ఫేజ్-2 కి కేబినెట్ ఆమోదం - 5 కొత్త కారిడార్లు',
+      summary: 'రూ. 24,000 కోట్ల అంచనా వ్యయంతో విమానాశ్రయ ఎక్స్‌ప్రెస్ మార్గంతో సహా శంషాబాద్, ఓల్డ్ సిటీ మార్గాల్లో విస్తరణ పనులకు ఆమోదం.',
+      time: '45m ago',
+      reads: '36.5K readers',
+      source: 'Civic Infrastructure',
+      img: '/assets/hyderabad_it.jpg'
+    },
+    {
+      id: 3,
+      tag: 'Welfare',
+      tagColor: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
+      title: 'రైతు రుణమాఫీ నిధుల 3వ విడత విడుదల - రైతుల హర్షం',
+      summary: 'రూ. 2 లక్షల వరకు రైతు రుణాల మాఫీ ప్రక్రియ దాదాపు పూర్తి. రైతుల బ్యాంక్ ఖాతాల్లోకి నేరుగా నగదు జమ.',
+      time: '2h ago',
+      reads: '54.1K readers',
+      source: 'Agriculture & Economy',
+      img: '/assets/farmer_portrait.jpg'
+    },
+    {
+      id: 4,
+      tag: 'Andhra Pradesh',
+      tagColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+      title: 'అమరావతి రాజధాని నిర్మాణ పనులకు రీ-టెండరింగ్ ఖరారు',
+      summary: 'ప్రపంచ స్థాయి రాజధాని నిర్మాణానికి నూతన బ్లూప్రింట్. మౌలిక సదుపాయాల పనులను వేగవంతం చేయాలని సీఎం సమీక్ష.',
+      time: '3h ago',
+      reads: '29.8K readers',
+      source: 'State Secretariat',
+      img: '/assets/youth_speaker_mic.jpg'
+    },
+    {
+      id: 5,
+      tag: 'Governance',
+      tagColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+      title: 'ప్రజా పాలన దరఖాస్తుల పరిష్కారం వేగవంతం - ప్రత్యేక పోర్టల్',
+      summary: 'స్థానిక సమస్యలు, సంక్షేమ దరఖాస్తులను ట్రాక్ చేసేందుకు అత్యాధునిక డిజిటల్ వ్యవస్థ ప్రారంభం.',
+      time: '5h ago',
+      reads: '21.4K readers',
+      source: 'Citizen Services',
+      img: '/assets/news_debate_studio.jpg'
+    }
+  ];
+
+  const filteredNews = newsItems.filter(item => {
+    if (activeCategory === 'All') return true;
+    if (activeCategory === 'Politics') return item.tag === 'Breaking' || item.tag === 'Governance';
+    if (activeCategory === 'Telangana') return item.title.includes('తెలంగాణ') || item.title.includes('హైదరాబాద్');
+    if (activeCategory === 'Andhra Pradesh') return item.tag === 'Andhra Pradesh' || item.title.includes('అమరావతి');
+    return item.tag.toLowerCase() === activeCategory.toLowerCase();
+  });
+
+  return (
+    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
+      <PhoneStatusBar />
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
+        <div className="flex items-center gap-2">
+          <button 
+            type="button" 
+            onClick={onBack || (() => onNavigate('home'))} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+            title="Go Back"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h2 className="text-xs font-extrabold text-white leading-tight flex items-center gap-1.5">
+              <span>NowNine News</span>
+              <span className="text-[9px] text-[#F5C754] font-bold">వార్తలు</span>
+            </h2>
+            <p className="text-[8px] text-gray-400 leading-none mt-0.5">Breaking • State • Local</p>
+          </div>
+        </div>
+
+        <span className="px-2 py-0.5 rounded-full bg-red-600/20 border border-red-500/40 text-red-400 text-[8px] font-black flex items-center gap-1 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+          <span>Live 24/7</span>
+        </span>
+      </div>
+
+      {/* Breaking Flash Ticker */}
+      <div className="px-3 py-1.5 bg-gradient-to-r from-red-950/60 via-[#181116] to-[#0A0A0D] border-b border-red-900/30 flex items-center gap-2 shrink-0">
+        <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[7.5px] uppercase tracking-wider shrink-0">
+          BREAKING
+        </span>
+        <p className="text-[8.5px] text-gray-200 font-medium truncate">
+          2026 ఎన్నికల సర్వే: తాజా ప్రజాతీర్పు గణాంకాలు వెల్లడి...
+        </p>
+      </div>
+
+      {/* Filter Categories */}
+      <div className="px-3 py-2 border-b border-[#1A1A22] bg-[#0A0A0D] flex items-center gap-1.5 overflow-x-auto phone-scroll shrink-0">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setActiveFilter(cat)}
+            className={`px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
+              activeCategory === cat
+                ? 'bg-[#F5C754] text-black font-extrabold shadow-xs'
+                : 'bg-[#16161D] text-gray-400 border border-[#23232C] hover:text-white'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* News Feed List */}
+      <div className="flex-1 min-h-0 px-3 py-2.5 overflow-y-auto phone-scroll touch-pan-y space-y-2.5 pb-6">
+        {filteredNews.map((news) => (
+          <div
+            key={news.id}
+            onClick={() => showToast(`📰 Opening: ${news.title.slice(0, 30)}...`)}
+            className="p-2.5 rounded-2xl bg-[#11141E] border border-[#1E293B] hover:border-[#F5C754]/50 cursor-pointer transition-all space-y-2 group shadow-sm active:scale-[0.99]"
+          >
+            <div className="flex items-center justify-between">
+              <span className={`text-[7.5px] font-extrabold px-1.5 py-0.5 rounded-full border ${news.tagColor}`}>
+                {news.tag}
+              </span>
+              <span className="text-[7.5px] text-gray-400 font-mono">
+                {news.time} • {news.reads}
+              </span>
+            </div>
+
+            <h3 className="font-telugu text-[12px] font-bold text-white group-hover:text-[#F5C754] transition-colors leading-snug">
+              {news.title}
+            </h3>
+
+            <p className="font-telugu text-[9px] text-gray-300 leading-relaxed line-clamp-2">
+              {news.summary}
+            </p>
+
+            <div className="flex items-center justify-between pt-1 border-t border-[#1C2638] text-[8px] text-gray-400">
+              <span className="font-medium text-amber-300/80">{news.source}</span>
+              <span className="font-bold text-[#F5C754] flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                Read Full Story →
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <BottomNavBar activeTab="news" onTabChange={onNavigate} />
     </div>
   );
 }

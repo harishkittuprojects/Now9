@@ -17,6 +17,7 @@ import {
   Screen7AreaSpecials, 
   Screen8ShortVideoPlayer, 
   Screen9LiveDebateDetail, 
+  ScreenNews,
   PhoneFrame 
 } from './NowNineReferenceScreens';
 import { 
@@ -121,25 +122,29 @@ export default function NowNineUnifiedApp() {
             onNavigate={handleNav}
             selectedParty={selectedSurveyParty}
             currentLocation={currentLocation}
+            onLocationChange={setCurrentLocation}
+            isLocating={isLocating}
+            onDetectLiveGps={detectLiveGpsLocation}
+            onSelectSurveyParty={setSelectedSurveyParty}
           />
         );
       case 'live-debates':
         return <Screen4LiveDebates onBack={() => handleNav('home')} onSelectDebate={() => handleNav('debate-detail')} onNavigate={handleNav} />;
+      case 'news':
+        return <ScreenNews onBack={() => handleNav('home')} onNavigate={handleNav} />;
       case 'short-videos':
         return <Screen5ShortVideos onBack={() => handleNav('home')} onSelectShort={() => handleNav('video-player')} onNavigate={handleNav} />;
       case 'common-people':
-        handleNav('home');
-        return null;
-      case 'area-specials':
         return (
-          <Screen7AreaSpecials 
+          <Screen6CommonPeople 
             onBack={() => handleNav('home')} 
             onNavigate={handleNav} 
-            onSelectUpdate={() => handleNav('video-player')} 
-            currentLocation={currentLocation}
-            onLocationChange={setCurrentLocation}
+            onSelectStory={() => handleNav('video-player')} 
           />
         );
+      case 'area-specials':
+        handleNav('home');
+        return null;
       case 'video-player':
         return <Screen8ShortVideoPlayer onBack={() => handleNav('short-videos')} onNavigate={handleNav} />;
       case 'debate-detail':
