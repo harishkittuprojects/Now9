@@ -178,6 +178,27 @@ export default function NowNineUnifiedApp() {
             </div>
           </div>
 
+          {/* Location in Desktop Header Bar */}
+          <button
+            type="button"
+            onClick={detectLiveGpsLocation}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161622] hover:bg-[#20202E] border border-amber-500/35 text-left transition-all cursor-pointer group shadow-sm hover:border-amber-400"
+            title="Click to refresh live GPS location"
+          >
+            <MapPin className="w-3.5 h-3.5 text-[#F5C754] shrink-0 group-hover:scale-110 transition-transform" />
+            <div className="flex flex-col text-left leading-none">
+              <span className="text-xs font-bold text-white group-hover:text-amber-300">
+                {currentLocation?.locality || currentLocation?.city || 'Locating...'}
+              </span>
+              <span className="text-[9px] text-gray-400 mt-0.5">
+                {currentLocation?.assembly || currentLocation?.district || ''} • PIN {currentLocation?.pincode}
+              </span>
+            </div>
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold ml-1">
+              {isLocating ? 'Locating...' : 'GPS Live'}
+            </span>
+          </button>
+
           {/* Header Actions */}
           <div className="flex items-center gap-2">
             {/* Reset to Login Button */}

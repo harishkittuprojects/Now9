@@ -441,67 +441,38 @@ export function ScreenLogin({
             </span>
           </div>
 
-          {/* Auto-Located Address & Contesting Political Parties Banner */}
-          <div className="mt-3 p-2.5 rounded-2xl bg-gradient-to-r from-[#1C1A12] via-[#241F10] to-[#161410] border border-amber-500/40 shadow-md text-left space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[8px] font-extrabold uppercase text-amber-400 flex items-center gap-1">
-                <span className={`w-1.5 h-1.5 rounded-full ${isLocating ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`}></span>
-                {isLocating ? 'Locating your exact GPS...' : '📍 Auto-located Address'}
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onDetectLiveGps) onDetectLiveGps();
-                    showToast('🛰️ Detecting Live Device Coordinates...');
-                  }}
-                  className="px-1.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[7px] font-bold hover:bg-amber-500/25 cursor-pointer flex items-center gap-0.5"
-                  title="Re-detect GPS Coordinates"
-                >
-                  <span>🛰️</span>
-                  <span>Re-detect</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsAddressModalOpen(true)}
-                  className="px-1.5 py-0.5 rounded-md bg-yellow-500/20 border border-yellow-400/50 text-[#FDE047] text-[7px] font-bold hover:bg-yellow-500/30 cursor-pointer flex items-center gap-0.5"
-                  title="Search or select your exact area"
-                >
-                  <span>✏️</span>
-                  <span>Change / Search</span>
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-[11px] font-extrabold text-white leading-tight">
-                {currentLocation?.exactAddress || currentLocation?.formattedAddress || 'Road No. 36, Jubilee Hills, Hyderabad'}
-              </p>
-              <div className="flex items-center justify-between mt-0.5">
-                <p className="text-[8px] text-[#FDE047] font-semibold">
-                  {currentLocation?.assembly || 'Assembly Constituency'} • {currentLocation?.ward || 'Ward'}
-                </p>
-                <span className="text-[7px] text-gray-400 font-mono">
-                  PIN: {currentLocation?.pincode || '500033'}
+          {/* Sleek Compact Header Location Pill */}
+          <div className="mt-2.5 flex items-center justify-between px-3 py-1.5 rounded-full bg-[#15151E] border border-amber-500/35 shadow-sm text-left">
+            <button
+              type="button"
+              onClick={() => setIsAddressModalOpen(true)}
+              className="flex items-center gap-1.5 min-w-0 cursor-pointer text-left flex-1"
+            >
+              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <div className="min-w-0">
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] font-extrabold text-white truncate">
+                    {currentLocation?.locality || 'Locating...'}, {currentLocation?.city || ''}
+                  </span>
+                  <span className="text-[8px] text-amber-400">▾</span>
+                </div>
+                <span className="text-[7.5px] text-gray-400 block truncate">
+                  {currentLocation?.assembly || 'Assembly Constituency'} • PIN {currentLocation?.pincode}
                 </span>
               </div>
-            </div>
-
-            <div className="pt-1.5 border-t border-[#2A261C] flex items-center justify-between">
-              <div className="flex items-center gap-1 overflow-x-auto phone-scroll">
-                <span className="text-[8px] text-gray-400 shrink-0">Contesting Parties:</span>
-                {(currentLocation?.parties || []).map(p => (
-                  <span 
-                    key={p.id} 
-                    className="text-[8px] px-1.5 py-0.2 rounded-full font-bold shrink-0 flex items-center gap-0.5" 
-                    style={{ backgroundColor: `${p.color || '#F59E0B'}25`, color: p.color || '#F59E0B', border: `1px solid ${p.color || '#F59E0B'}50` }}
-                  >
-                    <span>{p.symbol || '🗳️'}</span>
-                    <span>{(p.name || '').split(' ')[0]}</span>
-                    <span>({p.voteShare}%)</span>
-                  </span>
-                ))}
-              </div>
+            </button>
+            <div className="flex items-center gap-1 shrink-0 ml-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onDetectLiveGps) onDetectLiveGps();
+                  showToast('🛰️ Detecting Live GPS Coordinates...');
+                }}
+                className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[8px] font-bold hover:bg-amber-500/25 cursor-pointer"
+                title="Re-detect live GPS"
+              >
+                {isLocating ? 'Locating...' : '🛰️ GPS'}
+              </button>
             </div>
           </div>
 
@@ -914,35 +885,65 @@ export function Screen2Home({
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
-      {/* Top Header */}
-      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0 z-30">
-        <button 
-          type="button"
-          onClick={() => setIsMenuOpen(true)}
-          className="text-gray-300 hover:text-white p-1 rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
-          title="Open Menu"
-        >
-          <Menu className="w-4 h-4 text-[#F5C754]" />
-        </button>
+      {/* Top Header with Compact Location Pill */}
+      <div className="px-3 py-2 flex items-center justify-between gap-2 border-b border-[#1C1C22] bg-[#0E0E12] shrink-0 z-30">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button 
+            type="button"
+            onClick={() => setIsMenuOpen(true)}
+            className="text-gray-300 hover:text-white p-1 rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+            title="Open Menu"
+          >
+            <Menu className="w-4 h-4 text-[#F5C754]" />
+          </button>
 
-        <div 
-          onClick={() => onNavigate('home')}
-          className="flex items-center gap-1 cursor-pointer"
+          <div 
+            onClick={() => onNavigate('home')}
+            className="flex items-center gap-1 cursor-pointer"
+          >
+            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#B45309] to-[#FDE68A] p-[1px] flex items-center justify-center shadow-xs shrink-0">
+              <div className="w-full h-full rounded-full bg-[#121214] flex items-center justify-center font-black text-[10px] text-[#F5C754]">
+                9
+              </div>
+            </div>
+            <span className="font-extrabold text-xs text-white hidden xs:inline">
+              now<span className="text-[#F5C754]">nine</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Compact Location Pill in Header Bar */}
+        <button
+          type="button"
+          onClick={() => setIsConstituencyModalOpen(true)}
+          className="flex-1 max-w-[195px] px-2 py-1 rounded-full bg-[#161622] hover:bg-[#20202E] border border-amber-500/35 text-left transition-all flex items-center justify-between gap-1.5 cursor-pointer shadow-sm group hover:border-amber-400"
+          title="Click to search or change location"
         >
-          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#B45309] to-[#FDE68A] p-[1px] flex items-center justify-center shadow-xs">
-            <div className="w-full h-full rounded-full bg-[#121214] flex items-center justify-center font-black text-[10px] text-[#F5C754]">
-              9
+          <div className="flex items-center gap-1 min-w-0">
+            <MapPin className="w-3 h-3 text-[#F5C754] shrink-0 group-hover:scale-110 transition-transform" />
+            <div className="min-w-0 leading-tight">
+              <div className="flex items-center gap-0.5">
+                <span className="text-[10px] font-extrabold text-white truncate group-hover:text-amber-300">
+                  {currentLocation?.locality || currentLocation?.city || 'Locating...'}
+                </span>
+                <ChevronDown className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+              </div>
+              <p className="text-[7.5px] text-gray-400 truncate">
+                {currentLocation?.assembly || currentLocation?.district || 'Telangana'}
+              </p>
             </div>
           </div>
-          <span className="font-extrabold text-xs text-white">
-            now<span className="text-[#F5C754]">nine</span>
-          </span>
-        </div>
+          {isLocating ? (
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping shrink-0" />
+          ) : (
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+          )}
+        </button>
 
         <button 
           type="button"
           onClick={() => setIsNotifOpen(!isNotifOpen)}
-          className="text-gray-300 hover:text-white p-1 relative rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          className="text-gray-300 hover:text-white p-1 relative rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer shrink-0"
           title="Notifications"
         >
           <Bell className="w-4 h-4" />
@@ -1115,78 +1116,35 @@ export function Screen2Home({
           <p className="text-[10px] text-gray-400">Stay informed. Stay ahead.</p>
         </div>
 
-        {/* Auto-Located Address & Contesting Political Parties Section */}
-        <div className="rounded-2xl p-3 bg-gradient-to-b from-[#181822] via-[#14141A] to-[#0D0D12] border border-amber-500/40 shadow-xl space-y-2.5 relative overflow-hidden">
+        {/* Contesting Political Parties in User's Area */}
+        <div className="rounded-2xl p-3 bg-gradient-to-b from-[#181822] via-[#14141A] to-[#0D0D12] border border-amber-500/35 shadow-xl space-y-2 relative overflow-hidden">
           {/* Subtle gold accent aura */}
-          <div className="absolute top-0 right-0 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-          {/* Header row: Auto-detection status & Change Button */}
+          {/* Header row: Local Parties & Constituency */}
           <div className="flex items-center justify-between pb-1.5 border-b border-[#22222E]">
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isLocating ? 'bg-amber-400' : 'bg-emerald-400'} opacity-75`}></span>
-                <span className={`relative inline-flex rounded-full h-2 w-2 ${isLocating ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-              </span>
-              <span className="text-[10px] font-black tracking-wide text-[#FDE047] uppercase">
-                {isLocating ? 'Detecting via GPS...' : 'Auto-Located Address'}
-              </span>
+            <div>
+              <h3 className="text-[11px] font-black text-white flex items-center gap-1.5">
+                <span>🏛️ Local Political Parties</span>
+                <span className="text-amber-400 font-bold text-[9px]">({currentLocation?.locality || 'Your Area'})</span>
+              </h3>
+              <p className="text-[8px] text-gray-400">
+                MLA Candidates & citizen approval in {currentLocation?.assembly || 'Constituency'}
+              </p>
             </div>
-
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => {
-                  if (onDetectLiveGps) onDetectLiveGps();
-                  setVoteToast('🛰️ Requesting Live Device GPS Coordinates...');
-                  setTimeout(() => setVoteToast(null), 3000);
-                }}
-                className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 hover:bg-amber-500/25 transition-all text-[8px] font-bold flex items-center gap-1 cursor-pointer"
-                title="Re-detect live GPS coordinates"
-              >
-                <span>🛰️ GPS</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsConstituencyModalOpen(true)}
-                className="px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-400/50 text-[#FDE047] hover:bg-yellow-500/30 transition-all text-[8px] font-bold flex items-center gap-1 cursor-pointer"
-                title="Search or change address"
-              >
-                <MapPin className="w-2.5 h-2.5 text-[#F5C754]" />
-                <span>Change / Search 📍</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Detected Address Details Card */}
-          <div className="p-2 rounded-xl bg-[#0F0F15] border border-[#23232F] space-y-1">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="text-[11px] font-extrabold text-white leading-tight">
-                  {currentLocation?.exactAddress || currentLocation?.formattedAddress || 'Road No. 36, Jubilee Hills, Hyderabad'}
-                </p>
-                <p className="text-[8px] text-amber-300/80 mt-0.5 font-medium">
-                  {currentLocation?.detectionMethod || 'Auto-detected via GPS & Network 🛰️'}
-                </p>
-              </div>
-              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[8px] font-bold shrink-0 border border-emerald-500/30">
-                GPS Verified
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-[#1C1C24] text-[8px] text-gray-300">
-              <div className="flex items-center gap-1">
-                <span className="text-gray-400">🏛️ Assembly:</span>
-                <span className="font-bold text-white truncate">{currentLocation?.assembly || 'Jubilee Hills'}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-gray-400">🗳️ Ward:</span>
-                <span className="font-bold text-white truncate">{currentLocation?.ward || 'Ward No. 98'}</span>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setIsConstituencyModalOpen(true)}
+              className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 hover:bg-amber-500/25 transition-all text-[8px] font-bold flex items-center gap-0.5 cursor-pointer"
+              title="Change or search constituency"
+            >
+              <span>Change</span>
+              <ChevronRight className="w-2.5 h-2.5" />
+            </button>
           </div>
 
           {/* Contesting Political Parties in this Area */}
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-1.5 pt-0.5">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-[11px] font-extrabold text-white flex items-center gap-1">
