@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
+  ChevronUp,
+  ChevronDown,
   Bell, 
   Menu, 
   Play, 
+  Pause,
   Video, 
   Users, 
   MapPin, 
@@ -25,7 +28,18 @@ import {
   Sparkles,
   Home,
   FileText,
-  Compass
+  Compass,
+  X,
+  Volume2,
+  VolumeX,
+  ThumbsUp,
+  User,
+  LogOut,
+  Globe,
+  ShieldCheck,
+  RotateCcw,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { 
   SURVEY_DATA, 
@@ -37,6 +51,7 @@ import {
   DEBATE_PANELISTS, 
   LIVE_CHAT_MESSAGES 
 } from '../data/nowNineCompleteAppData';
+import { SURVEY_QUESTIONS, PARTIES } from '../data/nowNineAppFlowData';
 
 // Phone Status Bar (Cellular, Wifi, Battery without time)
 export function PhoneStatusBar() {
@@ -116,11 +131,18 @@ export function IndiaFlag() {
 }
 
 // LOGIN SCREEN
-export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
+export function ScreenLogin({ onLoginSuccess, onSkipToHome, onNavigate = null }) {
   const [phoneNumber, setPhoneNumber] = useState('9876543210');
   const [otpStep, setOtpStep] = useState(false);
   const [otpValues, setOtpValues] = useState(['9', '4', '1', '0']);
   const [touchStartY, setTouchStartY] = useState(null);
+  const [resendTimer, setResendTimer] = useState(28);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
 
   // Swipe up gesture handler for mobile view response
   const handleTouchStart = (e) => {
@@ -141,12 +163,24 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
     e.preventDefault();
     if (phoneNumber.length >= 10) {
       setOtpStep(true);
+      showToast(`OTP 9410 sent to +91 ${phoneNumber}!`);
     }
+  };
+
+  const handleResendOtp = () => {
+    setResendTimer(30);
+    showToast(`New OTP 9410 resent to +91 ${phoneNumber}!`);
   };
 
   const handleVerify = (e) => {
     e.preventDefault();
-    onLoginSuccess();
+    showToast('Verified! Welcome to NowNine.');
+    setTimeout(() => onLoginSuccess(), 400);
+  };
+
+  const handleGoogleLogin = () => {
+    showToast('Signing in with Google Account...');
+    setTimeout(() => onLoginSuccess(), 500);
   };
 
   return (
@@ -159,6 +193,13 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
       <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-amber-500/25 via-amber-600/10 to-transparent blur-2xl pointer-events-none"></div>
 
       <PhoneStatusBar />
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
       {/* Main Content - Fully scrollable and touch responsive */}
       <div className="flex-1 min-h-0 px-4 sm:px-5 py-3 flex flex-col z-10 overflow-y-auto phone-scroll touch-pan-y pb-8">
@@ -221,6 +262,15 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
                     className="flex-1 bg-transparent px-3 py-2.5 text-xs font-bold text-white placeholder-gray-500 focus:outline-none"
                     required
                   />
+                  {phoneNumber.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setPhoneNumber('')}
+                      className="px-2.5 text-gray-400 hover:text-white"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -255,11 +305,17 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
                   ))}
                 </div>
                 <div className="flex items-center justify-between mt-2 text-[9px]">
-                  <span className="text-gray-400">Resend OTP in <strong>28s</strong></span>
+                  <button 
+                    type="button" 
+                    onClick={handleResendOtp}
+                    className="text-gray-400 hover:text-amber-300 font-medium cursor-pointer"
+                  >
+                    Resend OTP in <strong className="text-amber-400">{resendTimer}s</strong>
+                  </button>
                   <button 
                     type="button" 
                     onClick={() => setOtpStep(false)}
-                    className="text-[#F5C754] font-bold hover:underline"
+                    className="text-[#F5C754] font-bold hover:underline cursor-pointer"
                   >
                     Change Number
                   </button>
@@ -280,8 +336,8 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
           <div className="mt-3 pt-3 border-t border-[#1C1C24] space-y-2 text-center">
             <button
               type="button"
-              onClick={onLoginSuccess}
-              className="w-full py-2 px-3 rounded-xl bg-[#14141A] border border-[#252530] text-gray-200 text-xs font-semibold hover:bg-[#1C1C24] transition-colors flex items-center justify-center gap-2 active:scale-[0.99]"
+              onClick={handleGoogleLogin}
+              className="w-full py-2 px-3 rounded-xl bg-[#14141A] border border-[#252530] text-gray-200 text-xs font-semibold hover:bg-[#1C1C24] transition-colors flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -295,7 +351,7 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
             <button
               type="button"
               onClick={onSkipToHome}
-              className="text-[10px] font-semibold text-gray-400 hover:text-[#F5C754] transition-colors inline-block mt-1"
+              className="text-[10px] font-semibold text-gray-400 hover:text-[#F5C754] transition-colors inline-block mt-1 cursor-pointer"
             >
               Skip & Continue as Guest →
             </button>
@@ -334,8 +390,8 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
 
           {/* Live Political Pulse Card */}
           <div 
-            onClick={onSkipToHome}
-            className="p-3 rounded-2xl bg-[#141419] border border-amber-500/30 shadow-md cursor-pointer hover:border-amber-400 transition-all"
+            onClick={() => onNavigate ? onNavigate('survey') : onSkipToHome()}
+            className="p-3 rounded-2xl bg-[#141419] border border-amber-500/30 shadow-md cursor-pointer hover:border-amber-400 transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-bold text-white flex items-center gap-1.5">
@@ -343,7 +399,7 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
                 <span>Live Political Pulse (2026)</span>
               </span>
               <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[7px] font-black uppercase">
-                Trending
+                Take Poll →
               </span>
             </div>
             <div className="space-y-1.5">
@@ -366,13 +422,13 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
 
           {/* Live Debate Spotlight */}
           <div 
-            onClick={onSkipToHome}
-            className="p-3 rounded-2xl bg-[#141419] border border-[#23232C] hover:border-amber-500/40 cursor-pointer transition-all"
+            onClick={() => onNavigate ? onNavigate('live-debates') : onSkipToHome()}
+            className="p-3 rounded-2xl bg-[#141419] border border-[#23232C] hover:border-amber-500/40 cursor-pointer transition-all group"
           >
             <div className="flex items-center gap-2 mb-1.5">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
               <span className="text-[10px] font-bold text-white">Live News Debate Stream</span>
-              <span className="ml-auto text-[8px] text-gray-400">12.4K Watching</span>
+              <span className="ml-auto text-[8px] text-amber-400 font-semibold group-hover:underline">Watch Live →</span>
             </div>
             <div className="flex items-center gap-2.5">
               <img 
@@ -394,7 +450,7 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
           {/* Direct Enter Action */}
           <button
             type="button"
-            onClick={onSkipToHome}
+            onClick={() => onNavigate ? onNavigate('home') : onSkipToHome()}
             className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2 hover:brightness-110 cursor-pointer active:scale-[0.99]"
           >
             <span>Enter NowNine Experience</span>
@@ -412,7 +468,7 @@ export function ScreenLogin({ onLoginSuccess, onSkipToHome }) {
 }
 
 // 1. SCREEN 1: SPLASH SCREEN
-export function Screen1Splash({ onGetStarted }) {
+export function Screen1Splash({ onGetStarted, onNavigate = null }) {
   const [touchStartY, setTouchStartY] = useState(null);
 
   const handleTouchStart = (e) => {
@@ -492,16 +548,25 @@ export function Screen1Splash({ onGetStarted }) {
         {/* 5 Feature Icons Row */}
         <div className="w-full px-3 py-2 flex items-center justify-around text-center border-t border-b border-white/5 bg-[#101014]/80">
           {[
-            { label: 'Survey', icon: '📝' },
-            { label: 'Live Debates', icon: '🎙️' },
-            { label: 'Short Videos', icon: '🎬' },
-            { label: 'Community', icon: '👥' },
-            { label: 'Area Specials', icon: '📍' },
+            { label: 'Survey', icon: '📝', id: 'survey' },
+            { label: 'Live Debates', icon: '🎙️', id: 'live-debates' },
+            { label: 'Short Videos', icon: '🎬', id: 'short-videos' },
+            { label: 'Community', icon: '👥', id: 'common-people' },
+            { label: 'Area Specials', icon: '📍', id: 'area-specials' },
           ].map((item, idx) => (
-            <div key={idx} className="flex flex-col items-center">
+            <button 
+              key={idx}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onNavigate) onNavigate(item.id);
+                else onGetStarted();
+              }}
+              className="flex flex-col items-center hover:scale-110 active:scale-95 transition-all p-1 cursor-pointer"
+            >
               <span className="text-sm">{item.icon}</span>
               <span className="text-[8px] font-medium text-gray-300 mt-0.5">{item.label}</span>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -528,18 +593,37 @@ export function Screen1Splash({ onGetStarted }) {
 
 // 2. SCREEN 2: HOME SCREEN
 export function Screen2Home({ onNavigate }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [appLang, setAppLang] = useState('తెలుగు');
+  const [notifs, setNotifs] = useState([
+    { id: 1, title: 'Live Debate: 2026 ఎన్నికలు - ఎవరికి అవకాశాలు?', subtitle: '12.4K watching now', time: 'Just now', target: 'debate-detail', isUnread: true },
+    { id: 2, title: 'Political Survey: 12,400+ Citizens Voted', subtitle: 'Cast your vote on governance & leadership', time: '1h ago', target: 'survey', isUnread: true },
+    { id: 3, title: 'Trending Voice: యువతకు ఉద్యోగాలు ఎలా వస్తాయి?', subtitle: '8.9K likes on local voice debate', time: '3h ago', target: 'video-player', isUnread: false },
+  ]);
+
+  const unreadCount = notifs.filter(n => n.isUnread).length;
+
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
       {/* Top Header */}
-      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
-        <button className="text-gray-300 hover:text-white p-1">
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0 z-30">
+        <button 
+          type="button"
+          onClick={() => setIsMenuOpen(true)}
+          className="text-gray-300 hover:text-white p-1 rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          title="Open Menu"
+        >
           <Menu className="w-4 h-4 text-[#F5C754]" />
         </button>
 
-        <div className="flex items-center gap-1">
-          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#B45309] to-[#FDE68A] p-[1px] flex items-center justify-center">
+        <div 
+          onClick={() => onNavigate('home')}
+          className="flex items-center gap-1 cursor-pointer"
+        >
+          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#B45309] to-[#FDE68A] p-[1px] flex items-center justify-center shadow-xs">
             <div className="w-full h-full rounded-full bg-[#121214] flex items-center justify-center font-black text-[10px] text-[#F5C754]">
               9
             </div>
@@ -549,14 +633,176 @@ export function Screen2Home({ onNavigate }) {
           </span>
         </div>
 
-        <button className="text-gray-300 hover:text-white p-1 relative">
+        <button 
+          type="button"
+          onClick={() => setIsNotifOpen(!isNotifOpen)}
+          className="text-gray-300 hover:text-white p-1 relative rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          title="Notifications"
+        >
           <Bell className="w-4 h-4" />
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 absolute top-1 right-1"></span>
+          {unreadCount > 0 && (
+            <span className="w-2 h-2 rounded-full bg-amber-400 absolute top-0.5 right-0.5 ring-2 ring-[#0E0E12] animate-pulse"></span>
+          )}
         </button>
       </div>
 
+      {/* Notifications Dropdown Panel */}
+      {isNotifOpen && (
+        <div className="absolute top-12 left-2 right-2 z-50 bg-[#14141A] border border-[#2A2A35] rounded-2xl shadow-2xl p-3 animate-fadeIn">
+          <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-white">Notifications</span>
+              {unreadCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-black">
+                  {unreadCount} NEW
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <button 
+                type="button"
+                onClick={() => setNotifs(prev => prev.map(n => ({ ...n, isUnread: false })))}
+                className="text-[9px] text-[#F5C754] hover:underline font-semibold cursor-pointer"
+              >
+                Mark read
+              </button>
+              <button 
+                type="button"
+                onClick={() => setIsNotifOpen(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+          <div className="mt-2 space-y-1.5 max-h-56 overflow-y-auto phone-scroll">
+            {notifs.map((n) => (
+              <div 
+                key={n.id}
+                onClick={() => {
+                  onNavigate(n.target);
+                  setIsNotifOpen(false);
+                }}
+                className={`p-2 rounded-xl border transition-all cursor-pointer flex flex-col gap-0.5 ${
+                  n.isUnread ? 'bg-[#1C1A14] border-amber-500/30' : 'bg-[#101014] border-[#222228] opacity-80'
+                }`}
+              >
+                <span className="text-[10px] font-bold text-white leading-tight">{n.title}</span>
+                <span className="text-[8px] text-gray-400">{n.subtitle}</span>
+                <span className="text-[7px] text-amber-400/80 mt-0.5 font-mono">{n.time}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Menu Side Drawer */}
+      {isMenuOpen && (
+        <div className="absolute inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div 
+            onClick={() => setIsMenuOpen(false)}
+            className="absolute inset-0 bg-black/70 backdrop-blur-xs cursor-pointer"
+          ></div>
+
+          {/* Drawer content */}
+          <div className="relative w-4/5 max-w-[280px] h-full bg-[#121217] border-r border-[#262632] flex flex-col justify-between p-4 z-10">
+            <div>
+              {/* Profile Card */}
+              <div className="flex items-center justify-between pb-3 border-b border-[#22222E]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#B45309] to-[#FDE68A] p-[1.5px] flex items-center justify-center">
+                    <div className="w-full h-full rounded-full bg-[#121214] flex items-center justify-center font-black text-xs text-[#F5C754]">
+                      9
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-xs text-white">NowNine Citizen</h3>
+                    <p className="text-[8px] text-amber-400 font-semibold flex items-center gap-1">
+                      <span>Verified Voter</span>
+                      <span>🇮🇳</span>
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Navigation Items */}
+              <div className="py-3 space-y-1">
+                {[
+                  { label: 'Political Survey', icon: FileText, target: 'survey', color: 'text-amber-400' },
+                  { label: 'Live Debates', icon: Radio, target: 'live-debates', color: 'text-red-400' },
+                  { label: 'Short Videos', icon: Video, target: 'short-videos', color: 'text-amber-400' },
+                  { label: 'Common People Voice', icon: Users, target: 'common-people', color: 'text-sky-400' },
+                  { label: 'Area Specials', icon: MapPin, target: 'area-specials', color: 'text-emerald-400' },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.target}
+                      type="button"
+                      onClick={() => {
+                        onNavigate(item.target);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full p-2 rounded-xl flex items-center gap-2.5 text-left text-xs font-semibold text-gray-200 hover:bg-[#1A1A24] hover:text-white transition-colors cursor-pointer"
+                    >
+                      <Icon className={`w-4 h-4 ${item.color}`} />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Settings & Info */}
+              <div className="pt-2 border-t border-[#22222E] space-y-1 text-[10px] text-gray-400">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const next = appLang === 'తెలుగు' ? 'ENG' : 'తెలుగు';
+                    setAppLang(next);
+                  }}
+                  className="w-full p-2 rounded-xl bg-[#181820] hover:bg-[#20202A] flex items-center justify-between transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-1.5 font-medium text-gray-300">
+                    <Globe className="w-3 h-3 text-[#F5C754]" />
+                    <span>Language / భాష</span>
+                  </span>
+                  <span className="font-bold text-[#F5C754] text-[9px] bg-amber-500/15 border border-amber-400/30 px-2 py-0.5 rounded-full">
+                    {appLang} (Tap to change)
+                  </span>
+                </button>
+                <div className="p-2 rounded-xl bg-[#181820] flex items-center gap-1.5 text-gray-300">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <span className="text-[9px] leading-tight">100% Anonymous & Secure Voting</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Logout / Switch Account */}
+            <button
+              type="button"
+              onClick={() => {
+                onNavigate('login');
+                setIsMenuOpen(false);
+              }}
+              className="w-full py-2 px-3 rounded-xl bg-red-600/15 border border-red-500/30 text-red-400 hover:bg-red-600/25 transition-colors text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Switch Account / Exit</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Scrollable Main Area */}
-      <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-6">
+      <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-16">
         {/* Greeting */}
         <div>
           <h2 className="text-sm font-extrabold text-white">Good Evening!</h2>
@@ -566,7 +812,7 @@ export function Screen2Home({ onNavigate }) {
         {/* Hero Card: Political Survey */}
         <div 
           onClick={() => onNavigate('survey')}
-          className="relative rounded-2xl p-3 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group"
+          className="relative rounded-2xl p-3 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group hover:border-amber-400 transition-all"
         >
           <div className="relative z-10 max-w-[65%]">
             <span className="text-xs font-black text-[#FDE047] block leading-tight">
@@ -575,14 +821,21 @@ export function Screen2Home({ onNavigate }) {
             <span className="text-[9px] text-gray-300 block mb-2 leading-tight">
               Your Opinion Matters.
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F5C754] text-black font-extrabold text-[9px] shadow-sm group-hover:brightness-110">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onNavigate('survey');
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F5C754] text-black font-extrabold text-[9px] shadow-sm group-hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+            >
               <span>Take Survey</span>
               <ChevronRight className="w-3 h-3 stroke-[3]" />
-            </span>
+            </button>
           </div>
 
           {/* Hand dropping ballot icon illustration */}
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 flex items-center justify-center opacity-85">
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 flex items-center justify-center opacity-85 group-hover:scale-110 transition-transform">
             <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl shadow-inner">
               🗳️
             </div>
@@ -592,67 +845,77 @@ export function Screen2Home({ onNavigate }) {
         {/* 4 Feature Tiles Grid (2x2) */}
         <div className="grid grid-cols-2 gap-2">
           {/* Tile 1: Live Debates */}
-          <div 
+          <button 
+            type="button"
             onClick={() => onNavigate('live-debates')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between"
+            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
-            <div className="w-7 h-7 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 mb-1.5 group-hover:scale-105 transition-transform">
               <Play className="w-3.5 h-3.5 fill-current" />
             </div>
             <div>
               <h3 className="font-bold text-[11px] text-white leading-tight">Live Debates</h3>
               <p className="text-[8px] text-gray-400 mt-0.5">Watch • Listen • Discuss</p>
             </div>
-          </div>
+          </button>
 
           {/* Tile 2: Short Videos */}
-          <div 
+          <button 
+            type="button"
             onClick={() => onNavigate('short-videos')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between"
+            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
-            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-1.5 group-hover:scale-105 transition-transform">
               <Video className="w-3.5 h-3.5" />
             </div>
             <div>
               <h3 className="font-bold text-[11px] text-white leading-tight">Short Videos</h3>
               <p className="text-[8px] text-gray-400 mt-0.5">Trending • Local • Viral</p>
             </div>
-          </div>
+          </button>
 
           {/* Tile 3: Common People */}
-          <div 
+          <button 
+            type="button"
             onClick={() => onNavigate('common-people')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between"
+            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
-            <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-400 mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-400 mb-1.5 group-hover:scale-105 transition-transform">
               <Users className="w-3.5 h-3.5" />
             </div>
             <div>
               <h3 className="font-bold text-[11px] text-white leading-tight">Common People</h3>
               <p className="text-[8px] text-gray-400 mt-0.5">Real Voices • Real Stories</p>
             </div>
-          </div>
+          </button>
 
           {/* Tile 4: Area Specials */}
-          <div 
+          <button 
+            type="button"
             onClick={() => onNavigate('area-specials')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between"
+            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
           >
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-1.5 group-hover:scale-105 transition-transform">
               <MapPin className="w-3.5 h-3.5" />
             </div>
             <div>
               <h3 className="font-bold text-[11px] text-white leading-tight">Area Specials</h3>
               <p className="text-[8px] text-gray-400 mt-0.5">Your Area • Your Updates</p>
             </div>
-          </div>
+          </button>
         </div>
 
-        {/* Trending Now Horizontal Carousel */}
+        {/* Trending Now Section */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-bold text-white">Trending Now</span>
-            <span className="text-[9px] text-[#F5C754] font-semibold cursor-pointer">See All &gt;</span>
+            <button 
+              type="button"
+              onClick={() => onNavigate('short-videos')}
+              className="text-[9px] text-[#F5C754] font-semibold hover:underline cursor-pointer"
+            >
+              See All &gt;
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -660,7 +923,7 @@ export function Screen2Home({ onNavigate }) {
               <div
                 key={item.id}
                 onClick={() => onNavigate('video-player')}
-                className="rounded-xl overflow-hidden bg-[#141418] border border-[#232328] cursor-pointer group"
+                className="rounded-xl overflow-hidden bg-[#141418] border border-[#232328] hover:border-amber-500/40 cursor-pointer group transition-all"
               >
                 <div className="h-16 w-full relative overflow-hidden">
                   <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
@@ -679,6 +942,26 @@ export function Screen2Home({ onNavigate }) {
             ))}
           </div>
         </div>
+
+        {/* Live Debate Spotlight Section */}
+        <div 
+          onClick={() => onNavigate('live-debates')}
+          className="p-3 rounded-2xl bg-gradient-to-r from-[#1A1212] via-[#241414] to-[#161214] border border-red-500/30 hover:border-red-500/60 cursor-pointer transition-all group"
+        >
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold text-white flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+              <span>Today's Big Debate (7:30 PM)</span>
+            </span>
+            <span className="text-[8px] text-red-400 font-semibold group-hover:underline">Join &gt;</span>
+          </div>
+          <p className="font-telugu text-[10px] font-bold text-white leading-snug">
+            2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
+          </p>
+          <p className="text-[8px] text-gray-400 mt-0.5">
+            4 Panelists • Live Chat Stream Active
+          </p>
+        </div>
       </div>
 
       <BottomNavBar activeTab="home" onTabChange={onNavigate} />
@@ -686,117 +969,380 @@ export function Screen2Home({ onNavigate }) {
   );
 }
 
-// 3. SCREEN 3: POLITICAL SURVEY SCREEN
-export function Screen3Survey({ onBack, onNext }) {
-  const [selectedIdx, setSelectedIdx] = useState(0);
+// 3. SCREEN 3: POLITICAL SURVEY SCREEN (Full 5-Question Flow + Live Results)
+export function Screen3Survey({ onBack, onFinish, onNavigate = null }) {
+  const [currentStep, setCurrentStep] = useState(0); // 0 to 4
+  const [answers, setAnswers] = useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const activeQuestion = SURVEY_QUESTIONS[currentStep] || SURVEY_QUESTIONS[0];
+  const progressPercent = ((currentStep + 1) / SURVEY_QUESTIONS.length) * 100;
+  const selectedOptionIdx = answers[currentStep] ?? 0;
+
+  const handleSelectOption = (idx) => {
+    setAnswers(prev => ({ ...prev, [currentStep]: idx }));
+  };
+
+  const handleNext = () => {
+    if (currentStep < SURVEY_QUESTIONS.length - 1) {
+      setCurrentStep(prev => prev + 1);
+    } else {
+      setIsSubmitted(true);
+      showToast('🎉 మీ ఓటు విజయవంతంగా నమోదైంది! (Vote Recorded)');
+    }
+  };
+
+  const handlePrev = () => {
+    if (isSubmitted) {
+      setIsSubmitted(false);
+    } else if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+    } else {
+      onBack();
+    }
+  };
+
+  const handleResetSurvey = () => {
+    setCurrentStep(0);
+    setIsSubmitted(false);
+    showToast('సర్వే పునఃప్రారంభించబడింది (Survey Reset)');
+  };
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="px-3 py-2 flex items-center gap-2 border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
-        <button onClick={onBack} className="p-1 text-gray-300 hover:text-white">
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <div>
-          <h2 className="text-xs font-extrabold text-white leading-tight">
-            {SURVEY_DATA.title}
-          </h2>
-          <p className="text-[8px] text-gray-400 leading-none mt-0.5">
-            {SURVEY_DATA.subtitle}
-          </p>
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
+        <div className="flex items-center gap-2">
+          <button 
+            type="button" 
+            onClick={handlePrev} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+            title="Go Back"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h2 className="text-xs font-extrabold text-white leading-tight">
+              {isSubmitted ? 'సర్వే ఫలితాలు (Survey Results)' : 'Political Survey'}
+            </h2>
+            <p className="text-[8px] text-gray-400 leading-none mt-0.5">
+              {isSubmitted ? 'Official Citizen Sentiment 2026' : `Question ${currentStep + 1} of 5 • Your Opinion Matters`}
+            </p>
+          </div>
         </div>
+
+        {/* Live Vote Count Badge */}
+        <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-[#FDE047] text-[8px] font-extrabold flex items-center gap-1">
+          <Vote className="w-2.5 h-2.5 text-amber-400" />
+          <span>12.4K Voted</span>
+        </span>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y flex flex-col justify-between pb-6">
-        <div>
-          {/* Progress Bar & Counter */}
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 h-1 bg-[#1F1F26] rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#F5C754] to-[#EAB308] rounded-full"
-                style={{ width: '20%' }}
-              ></div>
+      {/* Main Body */}
+      {!isSubmitted ? (
+        <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y flex flex-col justify-between pb-4">
+          <div>
+            {/* Progress Bar & Counter */}
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex-1 h-1.5 bg-[#1F1F26] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#F5C754] to-[#EAB308] rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
+              </div>
+              <span className="text-[10px] font-bold text-amber-400 font-mono">
+                {currentStep + 1} / 5
+              </span>
             </div>
-            <span className="text-[10px] font-bold text-gray-400">{SURVEY_DATA.progress}</span>
+
+            {/* Step Category Badge */}
+            <div className="mb-2">
+              <span className="px-2 py-0.5 rounded-full bg-[#181820] border border-[#2A2A35] text-[9px] font-bold text-gray-300 inline-block">
+                {currentStep === 0 && '🎯 ప్రాధాన్యత (Priority)'}
+                {currentStep === 1 && '⭐ నచ్చిన అంశం (Best Quality)'}
+                {currentStep === 2 && '📈 ఆశించిన మార్పు (Expectations)'}
+                {currentStep === 3 && '🤝 విశ్వాసం (Trust Factor)'}
+                {currentStep === 4 && '🗳️ తుది నిర్ణయం (Final Decision)'}
+              </span>
+            </div>
+
+            {/* Question in Telugu */}
+            <h3 className="font-telugu text-[13px] font-bold text-white mb-3.5 leading-snug">
+              {activeQuestion.question}
+            </h3>
+
+            {/* Options List */}
+            <div className="space-y-2">
+              {activeQuestion.options.map((optionText, idx) => {
+                const isSelected = selectedOptionIdx === idx;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectOption(idx)}
+                    className={`w-full text-left p-2.5 rounded-xl border transition-all flex items-center gap-2.5 cursor-pointer active:scale-[0.99] ${
+                      isSelected
+                        ? 'border-[#EAB308] bg-[#1E1A10] shadow-md shadow-amber-500/10'
+                        : 'border-[#222228] bg-[#121216] hover:border-gray-600'
+                    }`}
+                  >
+                    {/* Radio circle / checkmark */}
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                      isSelected ? 'border-[#F5C754] bg-[#F5C754] text-black font-black' : 'border-gray-500 bg-[#16161C]'
+                    }`}>
+                      {isSelected ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : <span className="text-[8px] text-gray-400">{idx + 1}</span>}
+                    </div>
+
+                    <span className={`font-telugu text-[11px] leading-snug flex-1 ${
+                      isSelected ? 'text-white font-bold' : 'text-gray-300'
+                    }`}>
+                      {optionText}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Question in Telugu */}
-          <h3 className="font-telugu text-xs font-bold text-white mb-3 leading-relaxed">
-            {SURVEY_DATA.question}
-          </h3>
+          {/* Nav Buttons Row */}
+          <div className="pt-3 flex items-center gap-2">
+            {currentStep > 0 && (
+              <button
+                type="button"
+                onClick={handlePrev}
+                className="py-2.5 px-3 rounded-full bg-[#16161D] border border-[#2B2B36] text-gray-300 font-bold text-xs hover:bg-[#202028] hover:text-white transition-all cursor-pointer flex items-center gap-1"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Prev</span>
+              </button>
+            )}
 
-          {/* Options */}
-          <div className="space-y-2">
-            {SURVEY_DATA.options.map((opt, idx) => {
-              const isSelected = selectedIdx === idx;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setSelectedIdx(idx)}
-                  className={`w-full text-left p-2.5 rounded-xl border transition-all flex items-center gap-2.5 ${
-                    isSelected
-                      ? 'border-[#EAB308] bg-[#1C1910] shadow-sm'
-                      : 'border-[#222228] bg-[#121216] hover:border-gray-600'
-                  }`}
-                >
-                  {/* Radio circle / checkmark */}
-                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                    isSelected ? 'border-[#F5C754] bg-[#F5C754] text-black' : 'border-gray-500'
-                  }`}>
-                    {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                  </div>
-
-                  <span className={`font-telugu text-[11px] leading-snug ${
-                    isSelected ? 'text-white font-semibold' : 'text-gray-300'
-                  }`}>
-                    {opt.text}
-                  </span>
-                </button>
-              );
-            })}
+            <button
+              type="button"
+              onClick={handleNext}
+              className="flex-1 py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer"
+            >
+              <span>{currentStep === 4 ? 'Submit Answers 🗳️' : 'Next Question'}</span>
+              <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+            </button>
           </div>
         </div>
-      </div>
+      ) : (
+        /* Submitted Live Results View */
+        <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-4">
+          <div className="text-center p-3 rounded-2xl bg-gradient-to-b from-[#1E1B12] to-[#121217] border border-amber-500/40 shadow-lg">
+            <div className="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-400 text-amber-400 flex items-center justify-center mx-auto mb-1.5 shadow-inner">
+              <CheckCircle2 className="w-5 h-5 text-[#F5C754]" />
+            </div>
+            <h3 className="font-telugu text-xs font-bold text-white">
+              ధన్యవాదాలు! మీ అభిప్రాయం రికార్డయింది.
+            </h3>
+            <p className="text-[9px] text-gray-400 mt-0.5">
+              Your anonymous opinion has been added to the 2026 People's Pulse.
+            </p>
+          </div>
 
-      {/* Bottom Button */}
-      <div className="p-3 border-t border-[#1C1C22] bg-[#0E0E12] shrink-0">
-        <button
-          type="button"
-          onClick={onNext}
-          className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 hover:brightness-110 cursor-pointer"
-        >
-          <span>Next</span>
-          <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
-        </button>
-        <div className="w-24 h-1 bg-white/20 rounded-full mx-auto mt-2"></div>
-      </div>
+          {/* Party Breakdown Bars */}
+          <div className="p-3 rounded-2xl bg-[#141419] border border-[#23232C] space-y-2">
+            <div className="flex items-center justify-between pb-1.5 border-b border-[#202028]">
+              <span className="text-[10px] font-bold text-white">Live Party Standings</span>
+              <span className="text-[8px] text-amber-400 font-mono">12,418 Votes</span>
+            </div>
+
+            {PARTIES.map((party) => (
+              <div key={party.id} className="space-y-0.5">
+                <div className="flex items-center justify-between text-[9px]">
+                  <span className="font-bold text-white flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: party.color }}></span>
+                    <span>{party.name}</span>
+                    <span className="text-[8px] text-gray-400">({party.teluguName.slice(0, 8)}...)</span>
+                  </span>
+                  <span className="font-mono font-bold text-amber-400">{party.resultPercent}%</span>
+                </div>
+                <div className="h-1.5 bg-[#1F1F28] rounded-full overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500" 
+                    style={{ width: `${party.resultPercent}%`, backgroundColor: party.color }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-2 pt-1">
+            <button
+              type="button"
+              onClick={handleResetSurvey}
+              className="w-full py-2.5 px-3 rounded-xl bg-[#181822] border border-[#2E2E3C] text-gray-200 hover:text-white hover:border-amber-400/50 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+              <span>Vote Again / Edit Responses</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigate ? onNavigate('home') : onBack()}
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer"
+            >
+              <span>Explore NowNine Home</span>
+              <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <BottomNavBar activeTab="survey" onTabChange={onNavigate || onBack} />
     </div>
   );
 }
 
 // 4. SCREEN 4: LIVE DEBATES SCREEN
 export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
-  const [filter, setFilter] = useState('live');
+  const [filter, setFilter] = useState('Live Now');
+  const [reminders, setReminders] = useState({});
+  const [isSpeakerModalOpen, setIsSpeakerModalOpen] = useState(false);
+  const [speakerTopic, setSpeakerTopic] = useState('');
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const toggleReminder = (e, id, title) => {
+    e.stopPropagation();
+    const next = !reminders[id];
+    setReminders(prev => ({ ...prev, [id]: next }));
+    showToast(next ? `🔔 Reminder set for: ${title}` : `Reminder cancelled`);
+  };
+
+  const handleSpeakerApply = (e) => {
+    e.preventDefault();
+    if (!speakerTopic.trim()) return;
+    setIsSpeakerModalOpen(false);
+    setSpeakerTopic('');
+    showToast('🎙️ Speaker application sent to Moderator! You will be queued.');
+  };
+
+  // Filter logic
+  const filteredDebates = LIVE_DEBATES.filter(item => {
+    if (filter === 'Live Now') return item.isLive;
+    if (filter === 'Upcoming') return !item.isLive;
+    return true; // 'Past'
+  });
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Speaker Application Modal */}
+      {isSpeakerModalOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
+          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <div className="flex items-center gap-1.5">
+                <Mic className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-bold text-white">Apply to Speak in Live Debate</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsSpeakerModalOpen(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <p className="text-[10px] text-gray-300">
+              Citizens can speak directly with analysts and leaders on live broadcast.
+            </p>
+
+            <form onSubmit={handleSpeakerApply} className="space-y-2.5">
+              <div>
+                <label className="text-[9px] font-bold text-gray-400 block mb-1">
+                  Your Name / నియోజకవర్గం
+                </label>
+                <input 
+                  type="text" 
+                  defaultValue="NowNine Citizen (Hyderabad)" 
+                  className="w-full bg-[#181820] border border-[#2B2B35] rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" 
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-[9px] font-bold text-gray-400 block mb-1">
+                  Question or Stance (ప్రశ్న / అంశం)
+                </label>
+                <textarea 
+                  rows={2} 
+                  value={speakerTopic} 
+                  onChange={(e) => setSpeakerTopic(e.target.value)} 
+                  placeholder="మీరు అడగాలనుకుంటున్న ప్రశ్న రాయండి..." 
+                  className="w-full bg-[#181820] border border-[#2B2B35] rounded-xl p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-400" 
+                  required 
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs shadow-md cursor-pointer hover:brightness-110"
+              >
+                Submit Application 🎙️
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
         <div className="flex items-center gap-1.5">
-          <button onClick={onBack} className="p-1 text-gray-300 hover:text-white">
+          <button 
+            type="button"
+            onClick={onBack} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <h2 className="text-xs font-extrabold text-white">Live Debates</h2>
         </div>
-        <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase">
-          LIVE
-        </span>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setIsSpeakerModalOpen(true)}
+            className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-[#FDE047] text-[8px] font-bold hover:bg-amber-500/25 transition-all cursor-pointer flex items-center gap-1"
+          >
+            <Mic className="w-2.5 h-2.5" />
+            <span>Apply to Speak</span>
+          </button>
+          <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase">
+            LIVE
+          </span>
+        </div>
       </div>
 
       {/* Content */}
@@ -804,7 +1350,7 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
         {/* Main Live Debate Video Card */}
         <div 
           onClick={onSelectDebate}
-          className="rounded-2xl overflow-hidden bg-[#141419] border border-red-500/40 shadow-lg cursor-pointer group"
+          className="rounded-2xl overflow-hidden bg-[#141419] border border-red-500/40 shadow-lg cursor-pointer group hover:border-red-500/80 transition-all active:scale-[0.99]"
         >
           <div className="relative h-28 w-full overflow-hidden">
             <img 
@@ -818,72 +1364,132 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
             <div className="absolute top-1.5 left-1.5 right-1.5 flex items-center justify-between">
               <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[8px] font-extrabold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                LIVE
+                LIVE NOW
               </span>
               <span className="px-1.5 py-0.2 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
                 <Eye className="w-2.5 h-2.5 text-red-400" />
-                12.4K
+                12.4K Watching
               </span>
+            </div>
+
+            {/* Play Button Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-9 h-9 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <Play className="w-4 h-4 fill-current ml-0.5" />
+              </div>
             </div>
           </div>
 
-          <div className="p-2">
-            <h3 className="font-telugu text-[11px] font-bold text-white line-clamp-1">
-              2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
-            </h3>
-            <p className="text-[8px] text-gray-400 mt-0.5">
-              Political Debate | Experts | Public Opinion
-            </p>
+          <div className="p-2 flex items-center justify-between">
+            <div>
+              <h3 className="font-telugu text-[11px] font-bold text-white line-clamp-1">
+                2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
+              </h3>
+              <p className="text-[8px] text-gray-400 mt-0.5">
+                Political Debate • 4 Experts • Public Q&A
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectDebate();
+              }}
+              className="px-2.5 py-1 rounded-full bg-red-600 text-white text-[9px] font-extrabold shadow-sm hover:brightness-110 shrink-0 cursor-pointer"
+            >
+              Watch Live →
+            </button>
           </div>
         </div>
 
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5">
-          {['Live Now', 'Upcoming', 'Past'].map((item, idx) => (
-            <button
-              key={idx}
-              onClick={() => setFilter(item.toLowerCase())}
-              className={`px-2.5 py-0.8 rounded-full text-[9px] font-bold transition-all ${
-                idx === 0 
-                  ? 'bg-[#F5C754] text-black shadow-xs' 
-                  : 'bg-[#181820] text-gray-400 hover:text-white'
-              }`}
-            >
-              {item}
-            </button>
-          ))}
+          {['Live Now', 'Upcoming', 'Past'].map((tabName) => {
+            const isActive = filter === tabName;
+            return (
+              <button
+                key={tabName}
+                type="button"
+                onClick={() => setFilter(tabName)}
+                className={`px-3 py-1 rounded-full text-[9px] font-bold transition-all cursor-pointer ${
+                  isActive 
+                    ? 'bg-[#F5C754] text-black shadow-xs font-black' 
+                    : 'bg-[#181820] text-gray-400 hover:text-white hover:bg-[#202028]'
+                }`}
+              >
+                {tabName}
+              </button>
+            );
+          })}
         </div>
 
         {/* Debates List */}
         <div className="space-y-1.5">
-          {LIVE_DEBATES.slice(1).map((item) => (
-            <div
-              key={item.id}
-              onClick={onSelectDebate}
-              className="p-1.5 rounded-xl bg-[#141419] border border-[#222228] flex items-center gap-2 cursor-pointer hover:border-gray-600"
-            >
-              <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 relative">
-                <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
-                {item.isLive && (
-                  <span className="absolute top-0.5 left-0.5 px-1 rounded bg-red-600 text-white text-[7px] font-black">
-                    LIVE
-                  </span>
+          {filteredDebates.length === 0 ? (
+            <div className="p-4 text-center rounded-xl bg-[#141419] border border-[#222228] text-gray-400 text-[10px]">
+              No debates currently under "{filter}". Check "Live Now" or "Upcoming".
+            </div>
+          ) : (
+            filteredDebates.map((item) => (
+              <div
+                key={item.id}
+                onClick={onSelectDebate}
+                className="p-1.5 rounded-xl bg-[#141419] border border-[#222228] flex items-center gap-2 cursor-pointer hover:border-amber-500/50 transition-all group"
+              >
+                <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 relative">
+                  <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  {item.isLive ? (
+                    <span className="absolute top-0.5 left-0.5 px-1 rounded bg-red-600 text-white text-[7px] font-black">
+                      LIVE
+                    </span>
+                  ) : (
+                    <span className="absolute top-0.5 left-0.5 px-1 rounded bg-black/70 text-amber-400 text-[7px] font-bold">
+                      UPCOMING
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-telugu text-[10px] font-bold text-white truncate group-hover:text-amber-300">
+                    {item.title}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-0.5 text-[8px] text-gray-400">
+                    <span className="flex items-center gap-0.5">
+                      <Clock className="w-2.5 h-2.5 text-amber-400" />
+                      {item.time}
+                    </span>
+                    <span>{item.views}</span>
+                  </div>
+                </div>
+
+                {/* Reminder or Watch CTA */}
+                {!item.isLive ? (
+                  <button
+                    type="button"
+                    onClick={(e) => toggleReminder(e, item.id, item.title)}
+                    className={`px-2 py-1 rounded-full text-[8px] font-bold transition-all shrink-0 cursor-pointer ${
+                      reminders[item.id]
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-[#1C1C26] text-amber-400 border border-amber-400/30 hover:bg-amber-500/20'
+                    }`}
+                  >
+                    {reminders[item.id] ? 'Reminder Set ✓' : 'Remind 🔔'}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectDebate();
+                    }}
+                    className="p-1.5 rounded-full bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white transition-colors shrink-0 cursor-pointer"
+                    title="Watch Stream"
+                  >
+                    <Play className="w-3 h-3 fill-current" />
+                  </button>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-telugu text-[10px] font-bold text-white truncate">
-                  {item.title}
-                </h4>
-                <div className="flex items-center gap-2 mt-0.5 text-[8px] text-gray-400">
-                  <span className="flex items-center gap-0.5">
-                    <Clock className="w-2.5 h-2.5" />
-                    {item.time}
-                  </span>
-                  <span>{item.views}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -894,45 +1500,140 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
 
 // 5. SCREEN 5: SHORT VIDEOS FEED SCREEN
 export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
-  const [filter, setFilter] = useState('foryou');
+  const [activeTab, setActiveTab] = useState('For You');
+  const [likedShorts, setLikedShorts] = useState({});
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const toggleLikeShort = (e, id) => {
+    e.stopPropagation();
+    setLikedShorts(prev => ({ ...prev, [id]: !prev[id] }));
+    showToast(!likedShorts[id] ? 'Liked short video! ❤️' : 'Removed like');
+  };
+
+  const handleShareShort = (e, title) => {
+    e.stopPropagation();
+    showToast(`📋 Link copied for: "${title.slice(0, 20)}..."`);
+  };
+
+  // Filter videos
+  const videosList = SHORT_VIDEOS_FEED.filter(video => {
+    if (activeTab === 'For You') return true;
+    if (activeTab === 'Politics') return video.title.includes('సమస్యలు') || video.badge.includes('Voice');
+    if (activeTab === 'Trending') return video.views.includes('12.') || video.views.includes('8.');
+    if (activeTab === 'Local') return video.badge.includes('Local') || video.badge.includes('Village');
+    return true;
+  });
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Upload Modal */}
+      {isUploadOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <div className="flex items-center gap-1.5">
+                <Video className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-bold text-white">Upload Citizen Short Video</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsUploadOpen(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <p className="text-[10px] text-gray-300">
+              Share 60-second video of your local issues, opinions, or village events.
+            </p>
+
+            <div className="p-4 rounded-xl border border-dashed border-amber-400/40 bg-[#181822] text-center flex flex-col items-center justify-center gap-2">
+              <span className="text-2xl">📹</span>
+              <span className="text-[10px] font-bold text-white">Select Video from Phone</span>
+              <span className="text-[8px] text-gray-400">MP4, MOV (Max 60s, up to 50MB)</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsUploadOpen(false);
+                showToast('🚀 Video uploaded! Under editorial review.');
+              }}
+              className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs shadow-md cursor-pointer hover:brightness-110"
+            >
+              Publish to NowNine Feed
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="px-3 py-2 flex items-center gap-2 border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
-        <button onClick={onBack} className="p-1 text-gray-300 hover:text-white">
-          <ChevronLeft className="w-4 h-4" />
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
+        <div className="flex items-center gap-2">
+          <button 
+            type="button"
+            onClick={onBack} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <h2 className="text-xs font-extrabold text-white">Short Videos</h2>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsUploadOpen(true)}
+          className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-[#FDE047] text-[8px] font-bold hover:bg-amber-500/25 transition-all cursor-pointer flex items-center gap-1"
+        >
+          <span>+ Upload</span>
         </button>
-        <h2 className="text-xs font-extrabold text-white">Short Videos</h2>
       </div>
 
       {/* Filter Tabs */}
       <div className="px-3 py-1.5 flex items-center gap-1.5 border-b border-[#16161C] overflow-x-auto phone-scroll shrink-0">
-        {['For You', 'Politics', 'Trending', 'Local'].map((item, idx) => (
-          <button
-            key={idx}
-            className={`px-2.5 py-0.8 rounded-full text-[9px] font-bold shrink-0 transition-all ${
-              idx === 0 
-                ? 'bg-[#F5C754] text-black shadow-xs' 
-                : 'bg-[#16161D] text-gray-400 hover:text-white'
-            }`}
-          >
-            {item}
-          </button>
-        ))}
+        {['For You', 'Politics', 'Trending', 'Local'].map((tabName) => {
+          const isActive = activeTab === tabName;
+          return (
+            <button
+              key={tabName}
+              type="button"
+              onClick={() => setActiveTab(tabName)}
+              className={`px-3 py-0.8 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
+                isActive 
+                  ? 'bg-[#F5C754] text-black shadow-xs font-black' 
+                  : 'bg-[#16161D] text-gray-400 hover:text-white hover:bg-[#202028]'
+              }`}
+            >
+              {tabName}
+            </button>
+          );
+        })}
       </div>
 
       {/* Video Cards Feed */}
-      <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-2 pb-6">
-        {SHORT_VIDEOS_FEED.map((item) => (
+      <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-2.5 pb-6">
+        {videosList.map((item) => (
           <div
             key={item.id}
             onClick={onSelectShort}
-            className="rounded-2xl overflow-hidden bg-[#141419] border border-[#23232C] cursor-pointer group relative"
+            className="rounded-2xl overflow-hidden bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer group relative transition-all active:scale-[0.99]"
           >
-            <div className="relative h-24 w-full overflow-hidden">
+            <div className="relative h-28 w-full overflow-hidden">
               <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent"></div>
               
@@ -942,19 +1643,50 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
               </span>
 
               {/* Views badge */}
-              <span className="absolute bottom-1.5 right-1.5 text-[8px] text-gray-300 flex items-center gap-0.5">
+              <span className="absolute bottom-1.5 left-2 text-[8px] text-gray-300 flex items-center gap-0.5">
                 <Eye className="w-2.5 h-2.5 text-amber-400" />
                 {item.views}
               </span>
+
+              {/* Quick Play Icon */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-amber-400" />
+                </div>
+              </div>
             </div>
 
-            <div className="p-2">
-              <span className="inline-block px-1.5 py-0.2 rounded bg-amber-500/15 border border-amber-400/30 text-[#FDE047] text-[8px] font-bold mb-1">
-                {item.badge}
-              </span>
-              <h3 className="font-telugu text-[10px] font-bold text-white line-clamp-1">
-                {item.title}
-              </h3>
+            <div className="p-2 flex items-center justify-between">
+              <div className="flex-1 min-w-0 pr-2">
+                <span className="inline-block px-1.5 py-0.2 rounded bg-amber-500/15 border border-amber-400/30 text-[#FDE047] text-[8px] font-bold mb-1">
+                  {item.badge}
+                </span>
+                <h3 className="font-telugu text-[10px] font-bold text-white line-clamp-1 group-hover:text-amber-300">
+                  {item.title}
+                </h3>
+              </div>
+
+              {/* Quick Card Action Buttons */}
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={(e) => toggleLikeShort(e, item.id)}
+                  className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                    likedShorts[item.id] ? 'text-red-500 bg-red-500/20' : 'text-gray-400 hover:text-white bg-[#1C1C24]'
+                  }`}
+                  title="Like"
+                >
+                  <Heart className={`w-3.5 h-3.5 ${likedShorts[item.id] ? 'fill-current' : ''}`} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handleShareShort(e, item.title)}
+                  className="p-1.5 rounded-full text-gray-400 hover:text-white bg-[#1C1C24] transition-colors cursor-pointer"
+                  title="Share"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -967,58 +1699,180 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
 
 // 6. SCREEN 6: COMMON PEOPLE SCREEN
 export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
-  const [filter, setFilter] = useState('all');
+  const [filterRole, setFilterRole] = useState('All');
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordTimer, setRecordTimer] = useState(0);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleStartRecord = () => {
+    setIsRecording(true);
+    setRecordTimer(1);
+    const interval = setInterval(() => {
+      setRecordTimer(t => {
+        if (t >= 15) {
+          clearInterval(interval);
+          setIsRecording(false);
+          return 15;
+        }
+        return t + 1;
+      });
+    }, 1000);
+  };
+
+  const handleSubmitVoiceStory = () => {
+    setIsRecordModalOpen(false);
+    setIsRecording(false);
+    setRecordTimer(0);
+    showToast('🎙️ మీ వాయిస్ నోట్ విజయవంతంగా అందింది! (Voice Recorded)');
+  };
+
+  // Filter logic
+  const filteredStories = COMMON_PEOPLE_STORIES.filter(story => {
+    if (filterRole === 'All') return true;
+    if (filterRole === 'Farmers') return story.role.toLowerCase().includes('farmer');
+    if (filterRole === 'Students') return story.role.toLowerCase().includes('student');
+    if (filterRole === 'Women') return story.role.toLowerCase().includes('housewife') || story.role.toLowerCase().includes('women');
+    return true;
+  });
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
-      {/* Header */}
-      <div className="px-3 py-2 flex items-center gap-2 border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
-        <button onClick={onBack} className="p-1 text-gray-300 hover:text-white">
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <div>
-          <h2 className="text-xs font-extrabold text-white">Common People</h2>
-          <p className="text-[8px] text-[#F5C754] font-medium leading-none mt-0.5">
-            Real People • Real Opinions
-          </p>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
         </div>
+      )}
+
+      {/* Voice Record Modal */}
+      {isRecordModalOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <div className="flex items-center gap-1.5">
+                <Mic className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-xs font-bold text-white">మీ ప్రాంత సమస్య చెప్పండి (Record Issue)</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsRecordModalOpen(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <p className="text-[10px] text-gray-300">
+              రైతులు, విద్యార్థులు, మహిళల గళం నేరుగా ప్రజలకు, నాయకులకు చేరుతుంది.
+            </p>
+
+            <div className="p-4 rounded-xl bg-[#181822] border border-[#262632] text-center flex flex-col items-center justify-center gap-2">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-all ${
+                isRecording ? 'bg-red-600/30 border-2 border-red-500 animate-pulse text-red-400' : 'bg-emerald-600/20 border border-emerald-400 text-emerald-400'
+              }`}>
+                {isRecording ? '🔴' : '🎙️'}
+              </div>
+              <span className="text-xs font-bold text-white">
+                {isRecording ? `Recording... 00:${recordTimer < 10 ? '0' + recordTimer : recordTimer}` : 'Tap below to start speaking'}
+              </span>
+              <span className="text-[8px] text-gray-400">Clear voice in Telugu / English</span>
+            </div>
+
+            {!isRecording && recordTimer === 0 ? (
+              <button
+                type="button"
+                onClick={handleStartRecord}
+                className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Start Recording Voice Note</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmitVoiceStory}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-extrabold text-xs shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Done & Send to NowNine 🚀</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
+        <div className="flex items-center gap-2">
+          <button 
+            type="button"
+            onClick={onBack} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h2 className="text-xs font-extrabold text-white">Common People</h2>
+            <p className="text-[8px] text-[#F5C754] font-medium leading-none mt-0.5">
+              Real People • Real Opinions
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsRecordModalOpen(true)}
+          className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-400 text-[8px] font-extrabold hover:bg-emerald-500/25 transition-all cursor-pointer flex items-center gap-1"
+        >
+          <Mic className="w-2.5 h-2.5" />
+          <span>సమస్య చెప్పండి 🎙️</span>
+        </button>
       </div>
 
       {/* Filters */}
       <div className="px-3 py-1.5 flex items-center gap-1.5 border-b border-[#16161C] overflow-x-auto phone-scroll shrink-0">
-        {['All', 'Farmers', 'Students', 'Women'].map((item, idx) => (
-          <button
-            key={idx}
-            className={`px-2.5 py-0.8 rounded-full text-[9px] font-bold shrink-0 transition-all ${
-              idx === 0 
-                ? 'bg-[#F5C754] text-black shadow-xs' 
-                : 'bg-[#16161D] text-gray-400 hover:text-white'
-            }`}
-          >
-            {item}
-          </button>
-        ))}
+        {['All', 'Farmers', 'Students', 'Women'].map((roleName) => {
+          const isActive = filterRole === roleName;
+          return (
+            <button
+              key={roleName}
+              type="button"
+              onClick={() => setFilterRole(roleName)}
+              className={`px-3 py-0.8 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
+                isActive 
+                  ? 'bg-[#F5C754] text-black shadow-xs font-black' 
+                  : 'bg-[#16161D] text-gray-400 hover:text-white hover:bg-[#202028]'
+              }`}
+            >
+              {roleName}
+            </button>
+          );
+        })}
       </div>
 
       {/* Stories List */}
       <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-2 pb-6">
-        {COMMON_PEOPLE_STORIES.map((item) => (
+        {filteredStories.map((item) => (
           <div
             key={item.id}
             onClick={onSelectStory}
-            className="p-2 rounded-xl bg-[#141419] border border-[#23232C] flex items-center gap-2.5 cursor-pointer hover:border-gray-600"
+            className="p-2 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/40 flex items-center gap-2.5 cursor-pointer transition-all active:scale-[0.99] group"
           >
             <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 relative">
-              <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+              <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
               <span className="absolute bottom-0.5 right-0.5 text-[7px] px-0.8 rounded bg-black/70 text-white font-mono">
                 {item.duration}
               </span>
             </div>
 
             <div className="flex-1 min-w-0">
-              <h4 className="font-telugu text-[10px] font-bold text-white line-clamp-1">
+              <h4 className="font-telugu text-[10px] font-bold text-white line-clamp-1 group-hover:text-amber-300">
                 {item.title}
               </h4>
               <div className="flex items-center justify-between mt-1 text-[8px] text-gray-400">
@@ -1027,11 +1881,23 @@ export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
                   <span className="font-semibold">{item.role}</span>
                 </span>
                 <span className="flex items-center gap-0.5">
-                  <Eye className="w-2.5 h-2.5" />
+                  <Eye className="w-2.5 h-2.5 text-amber-400" />
                   {item.views}
                 </span>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectStory();
+              }}
+              className="p-1 rounded-full bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-black transition-colors shrink-0"
+              title="Play Story"
+            >
+              <Play className="w-3 h-3 fill-current ml-0.5" />
+            </button>
           </div>
         ))}
       </div>
@@ -1042,201 +1908,515 @@ export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
 }
 
 // 7. SCREEN 7: AREA SPECIALS SCREEN
-export function Screen7AreaSpecials({ onBack, onNavigate }) {
+export function Screen7AreaSpecials({ onBack, onNavigate, onSelectUpdate = null }) {
   const [selectedArea, setSelectedArea] = useState('Hyderabad');
+  const [isAreaDropdownOpen, setIsAreaDropdownOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [issueText, setIssueText] = useState('');
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const areasList = ['Hyderabad', 'Vijayawada', 'Warangal', 'Visakhapatnam', 'Tirupati', 'Guntur'];
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleSelectArea = (area) => {
+    setSelectedArea(area);
+    setIsAreaDropdownOpen(false);
+    showToast(`📍 Selected Area: ${area}`);
+  };
+
+  const handleReportIssue = (e) => {
+    e.preventDefault();
+    if (!issueText.trim()) return;
+    setIsReportModalOpen(false);
+    setIssueText('');
+    showToast(`🚨 Issue submitted for ${selectedArea} Municipal Desk!`);
+  };
+
+  const handleOpenItem = (item) => {
+    if (onSelectUpdate) onSelectUpdate(item);
+    else if (onNavigate) onNavigate('video-player');
+  };
+
+  // Filter updates
+  const filteredUpdates = AREA_SPECIALS_UPDATES.filter(item => {
+    if (activeCategory === 'All') return true;
+    return item.category.toLowerCase() === activeCategory.toLowerCase();
+  });
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
-      {/* Header */}
-      <div className="px-3 py-2 flex items-center gap-2 border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
-        <button onClick={onBack} className="p-1 text-gray-300 hover:text-white">
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <div>
-          <h2 className="text-xs font-extrabold text-white">Area Specials</h2>
-          <p className="text-[8px] text-gray-400 leading-none mt-0.5">
-            Your Area • Your Updates
-          </p>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
         </div>
+      )}
+
+      {/* Report Issue Modal */}
+      {isReportModalOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-bold text-white">Report Issue in {selectedArea}</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsReportModalOpen(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleReportIssue} className="space-y-2.5">
+              <div>
+                <label className="text-[9px] font-bold text-gray-400 block mb-1">
+                  Issue Description (రోడ్డు, డ్రైనేజ్, తాగునీరు, కరెంట్ మొదలైనవి)
+                </label>
+                <textarea 
+                  rows={3} 
+                  value={issueText} 
+                  onChange={(e) => setIssueText(e.target.value)} 
+                  placeholder={`Describe what needs attention in ${selectedArea}...`}
+                  className="w-full bg-[#181820] border border-[#2B2B35] rounded-xl p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-400" 
+                  required 
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 text-white font-extrabold text-xs shadow-md cursor-pointer hover:brightness-110"
+              >
+                Submit Citizen Report 🚨
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
+        <div className="flex items-center gap-2">
+          <button 
+            type="button"
+            onClick={onBack} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h2 className="text-xs font-extrabold text-white">Area Specials</h2>
+            <p className="text-[8px] text-gray-400 leading-none mt-0.5">
+              Your Area • Your Updates
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsReportModalOpen(true)}
+          className="px-2 py-0.5 rounded-full bg-red-600/15 border border-red-500/30 text-red-400 text-[8px] font-bold hover:bg-red-600/25 transition-all cursor-pointer flex items-center gap-1"
+        >
+          <span>Report Issue 🚨</span>
+        </button>
       </div>
 
       {/* Area Selector Dropdown Box */}
-      <div className="px-3 pt-2 shrink-0">
-        <div className="p-2 rounded-xl bg-[#141419] border border-[#23232C]">
-          <span className="text-[8px] font-semibold text-gray-400 block mb-0.5">
-            Select Your Area
-          </span>
-          <div className="flex items-center justify-between font-bold text-xs text-white">
-            <span className="flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-[#F5C754]" />
-              {selectedArea}
+      <div className="px-3 pt-2 shrink-0 relative">
+        <div 
+          onClick={() => setIsAreaDropdownOpen(!isAreaDropdownOpen)}
+          className="p-2 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-400/50 cursor-pointer transition-all flex items-center justify-between"
+        >
+          <div>
+            <span className="text-[8px] font-semibold text-gray-400 block mb-0.5">
+              Select Your Area
             </span>
-            <span className="text-gray-400 text-[10px]">▼</span>
+            <div className="flex items-center gap-1 font-bold text-xs text-white">
+              <MapPin className="w-3.5 h-3.5 text-[#F5C754]" />
+              <span>{selectedArea}</span>
+            </div>
           </div>
+          <span className="text-amber-400 text-[10px] p-1 rounded-md bg-[#1B1B24]">
+            {isAreaDropdownOpen ? '▲ Close' : '▼ Change Area'}
+          </span>
         </div>
+
+        {/* Dropdown Options Popup */}
+        {isAreaDropdownOpen && (
+          <div className="absolute top-full left-3 right-3 z-40 mt-1 bg-[#16161E] border border-amber-500/40 rounded-xl shadow-2xl p-1.5 grid grid-cols-2 gap-1 animate-fadeIn">
+            {areasList.map((area) => (
+              <button
+                key={area}
+                type="button"
+                onClick={() => handleSelectArea(area)}
+                className={`p-1.5 text-left text-[11px] font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
+                  selectedArea === area ? 'bg-amber-500 text-black font-black' : 'text-gray-200 hover:bg-[#20202C]'
+                }`}
+              >
+                <span>📍</span>
+                <span>{area}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Filter Chips */}
       <div className="px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto phone-scroll shrink-0">
-        {['All', 'News', 'Events', 'Development', 'Alerts'].map((item, idx) => (
-          <button
-            key={idx}
-            className={`px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 transition-all ${
-              idx === 0 
-                ? 'bg-[#F5C754] text-black shadow-xs' 
-                : 'bg-[#16161D] text-gray-400 hover:text-white'
-            }`}
-          >
-            {item}
-          </button>
-        ))}
+        {['All', 'News', 'Events', 'Development', 'Alerts'].map((catName) => {
+          const isActive = activeCategory === catName;
+          return (
+            <button
+              key={catName}
+              type="button"
+              onClick={() => setActiveCategory(catName)}
+              className={`px-2.5 py-0.8 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
+                isActive 
+                  ? 'bg-[#F5C754] text-black shadow-xs font-black' 
+                  : 'bg-[#16161D] text-gray-400 hover:text-white hover:bg-[#202028]'
+              }`}
+            >
+              {catName}
+            </button>
+          );
+        })}
       </div>
 
       {/* Area Feed Cards */}
       <div className="flex-1 min-h-0 px-3 py-1 overflow-y-auto phone-scroll touch-pan-y space-y-2 pb-6">
-        {AREA_SPECIALS_UPDATES.map((item) => (
-          <div
-            key={item.id}
-            className="p-2 rounded-xl bg-[#141419] border border-[#23232C] flex items-center gap-2.5 cursor-pointer hover:border-gray-600"
-          >
-            <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
-              <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className={`px-1.5 py-0.2 rounded text-[7px] font-extrabold text-white ${item.badgeColor}`}>
-                  {item.category}
-                </span>
-                <span className="text-[8px] text-gray-400">{item.time}</span>
-              </div>
-              <h4 className="font-telugu text-[10px] font-bold text-white line-clamp-2 leading-tight">
-                {item.title}
-              </h4>
-            </div>
+        {filteredUpdates.length === 0 ? (
+          <div className="p-4 text-center rounded-xl bg-[#141419] border border-[#222228] text-gray-400 text-[10px]">
+            No updates under category "{activeCategory}" in {selectedArea}.
           </div>
-        ))}
+        ) : (
+          filteredUpdates.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => handleOpenItem(item)}
+              className="p-2 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-400/40 flex items-center gap-2.5 cursor-pointer transition-all active:scale-[0.99] group"
+            >
+              <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
+                <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className={`px-1.5 py-0.2 rounded text-[7px] font-extrabold text-white ${item.badgeColor}`}>
+                    {item.category}
+                  </span>
+                  <span className="text-[8px] text-gray-400">{item.time}</span>
+                </div>
+                <h4 className="font-telugu text-[10px] font-bold text-white line-clamp-2 leading-tight group-hover:text-amber-300">
+                  {item.title}
+                </h4>
+              </div>
+
+              <div className="shrink-0 text-amber-400 text-xs p-1">
+                →
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
-      <BottomNavBar activeTab="home" onTabChange={onNavigate} />
+      <BottomNavBar activeTab="area-specials" onTabChange={onNavigate} />
     </div>
   );
 }
 
 // 8. SCREEN 8: FULLSCREEN SHORT VIDEO PLAYER
-export function Screen8ShortVideoPlayer({ onBack }) {
+export function Screen8ShortVideoPlayer({ onBack, onNavigate = null }) {
+  const [videoIndex, setVideoIndex] = useState(0);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(8900);
   const [saved, setSaved] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState([
+    { id: 1, user: 'Suresh Kumar', text: 'నిజమైన సమస్యలను లేవనెత్తారు! 👌', time: '10m ago' },
+    { id: 2, user: 'Kavitha P', text: 'యువత రాజకీయాల్లోకి రావడం చాలా ముఖ్యం.', time: '25m ago' },
+    { id: 3, user: 'Venkatesh Rao', text: 'మా గ్రామంలో కూడా ఇదే పరిస్థితి.', time: '1h ago' }
+  ]);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const currentVideo = SHORT_VIDEOS_FEED[videoIndex] || SHORT_VIDEOS_FEED[0];
 
   const toggleLike = () => {
     setLiked(!liked);
     setLikesCount(prev => liked ? prev - 1 : prev + 1);
+    showToast(!liked ? 'Liked this video! ❤️' : 'Removed like');
+  };
+
+  const toggleSave = () => {
+    setSaved(!saved);
+    showToast(!saved ? 'Saved to bookmarks! 🔖' : 'Removed bookmark');
+  };
+
+  const toggleFollow = () => {
+    setIsFollowing(!isFollowing);
+    showToast(!isFollowing ? 'Following @nownine ✓' : 'Unfollowed @nownine');
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    showToast(!isMuted ? 'Audio Muted 🔇' : 'Audio Unmuted 🔊');
+  };
+
+  const handleShare = () => {
+    showToast('Video link copied to clipboard! 📋');
+  };
+
+  const handleAddComment = (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    setComments(prev => [
+      ...prev,
+      {
+        id: Date.now(),
+        user: 'You',
+        text: newComment,
+        time: 'Just now'
+      }
+    ]);
+    setNewComment('');
+    showToast('Comment posted! 💬');
+  };
+
+  const handleNextVideo = () => {
+    setVideoIndex((prev) => (prev + 1) % SHORT_VIDEOS_FEED.length);
+    setLiked(false);
+    showToast('Next Short Video 🎬');
+  };
+
+  const handlePrevVideo = () => {
+    setVideoIndex((prev) => (prev - 1 + SHORT_VIDEOS_FEED.length) % SHORT_VIDEOS_FEED.length);
+    setLiked(false);
+    showToast('Previous Short Video 🎬');
   };
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-black text-white select-none">
       {/* Background Fullscreen Video / Photo */}
       <img 
-        src="/assets/youth_speaker_mic.jpg" 
-        alt="Youth speaker" 
-        className="absolute inset-0 w-full h-full object-cover"
+        src={currentVideo.img} 
+        alt={currentVideo.title} 
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
       />
       {/* Gradients */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/90 pointer-events-none"></div>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-12 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Slide-Up Comment Drawer */}
+      {isCommentsOpen && (
+        <div className="absolute inset-x-0 bottom-0 top-1/3 z-50 bg-[#121217] border-t border-[#2B2B38] rounded-t-3xl shadow-2xl flex flex-col justify-between p-3 animate-slideUp">
+          <div>
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>Comments</span>
+                <span className="text-[10px] text-gray-400">({comments.length})</span>
+              </span>
+              <button 
+                type="button"
+                onClick={() => setIsCommentsOpen(false)}
+                className="p-1 text-gray-400 hover:text-white rounded-full hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="mt-2 space-y-2 max-h-48 overflow-y-auto phone-scroll">
+              {comments.map((c) => (
+                <div key={c.id} className="p-2 rounded-xl bg-[#181822] border border-[#22222A]">
+                  <div className="flex items-center justify-between text-[9px] mb-0.5">
+                    <span className="font-bold text-amber-400">{c.user}</span>
+                    <span className="text-gray-500 font-mono text-[8px]">{c.time}</span>
+                  </div>
+                  <p className="font-telugu text-[10px] text-gray-200 leading-tight">
+                    {c.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <form onSubmit={handleAddComment} className="pt-2 border-t border-[#202028] flex items-center gap-1.5">
+            <input 
+              type="text" 
+              value={newComment} 
+              onChange={(e) => setNewComment(e.target.value)} 
+              placeholder="Add a citizen comment..." 
+              className="flex-1 bg-[#181820] border border-[#262630] rounded-full px-3 py-1.5 text-[10px] text-white focus:outline-none focus:border-amber-400"
+            />
+            <button
+              type="submit"
+              className="px-3 py-1.5 rounded-full bg-[#F5C754] text-black font-bold text-[10px] hover:brightness-110 cursor-pointer shadow-sm"
+            >
+              Post
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Top Header */}
       <div className="absolute top-0 left-0 right-0 z-30">
         <PhoneStatusBar />
         <div className="px-3 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={onBack} className="p-1 rounded-full bg-black/40 text-white">
+            <button 
+              type="button"
+              onClick={onBack} 
+              className="p-1 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors cursor-pointer"
+              title="Back"
+            >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="text-xs font-bold text-white drop-shadow">Short Video</span>
           </div>
 
-          <span className="px-2 py-0.5 rounded-full bg-black/40 border border-white/20 text-[9px] font-semibold text-white flex items-center gap-1 backdrop-blur-xs">
-            <MapPin className="w-2.5 h-2.5 text-[#F5C754]" />
-            Hyderabad
-          </span>
+          <div className="flex items-center gap-1.5">
+            {/* Audio Mute/Unmute */}
+            <button
+              type="button"
+              onClick={toggleMute}
+              className="p-1.5 rounded-full bg-black/50 border border-white/20 text-white hover:bg-black/80 transition-colors cursor-pointer"
+              title={isMuted ? 'Unmute' : 'Mute'}
+            >
+              {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-amber-400" />}
+            </button>
+
+            {/* City Badge Button */}
+            <button
+              type="button"
+              onClick={() => onNavigate && onNavigate('area-specials')}
+              className="px-2 py-0.5 rounded-full bg-black/50 border border-white/20 text-[9px] font-semibold text-white flex items-center gap-1 backdrop-blur-xs hover:border-amber-400 transition-colors cursor-pointer"
+            >
+              <MapPin className="w-2.5 h-2.5 text-[#F5C754]" />
+              <span>Hyderabad</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Right Floating Interaction Column */}
-      <div className="absolute right-2 bottom-16 z-30 flex flex-col items-center gap-3">
-        {/* Heart */}
-        <button onClick={toggleLike} className="flex flex-col items-center group">
-          <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-xs flex items-center justify-center">
-            <Heart className={`w-4 h-4 transition-transform group-hover:scale-110 ${liked ? 'text-red-500 fill-current' : 'text-white'}`} />
+      <div className="absolute right-2 bottom-14 z-30 flex flex-col items-center gap-3">
+        {/* Next / Prev Video Arrows */}
+        <div className="flex flex-col gap-1 mb-1">
+          <button 
+            type="button"
+            onClick={handlePrevVideo} 
+            className="w-7 h-7 rounded-full bg-black/50 border border-white/20 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition-colors cursor-pointer"
+            title="Previous Short"
+          >
+            <ChevronUp className="w-4 h-4" />
+          </button>
+          <button 
+            type="button"
+            onClick={handleNextVideo} 
+            className="w-7 h-7 rounded-full bg-black/50 border border-white/20 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition-colors cursor-pointer"
+            title="Next Short"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Heart Like */}
+        <button type="button" onClick={toggleLike} className="flex flex-col items-center group cursor-pointer">
+          <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center hover:scale-110 transition-transform">
+            <Heart className={`w-4 h-4 ${liked ? 'text-red-500 fill-current' : 'text-white'}`} />
           </div>
           <span className="text-[8px] font-bold mt-0.5">{(likesCount / 1000).toFixed(1)}K</span>
         </button>
 
         {/* Comment */}
-        <div className="flex flex-col items-center">
-          <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-xs flex items-center justify-center">
+        <button 
+          type="button" 
+          onClick={() => setIsCommentsOpen(!isCommentsOpen)} 
+          className="flex flex-col items-center group cursor-pointer"
+        >
+          <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center hover:scale-110 transition-transform">
             <MessageCircle className="w-4 h-4 text-white" />
           </div>
-          <span className="text-[8px] font-bold mt-0.5">432</span>
-        </div>
+          <span className="text-[8px] font-bold mt-0.5">{comments.length}</span>
+        </button>
 
         {/* Share */}
-        <div className="flex flex-col items-center">
-          <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-xs flex items-center justify-center">
+        <button type="button" onClick={handleShare} className="flex flex-col items-center group cursor-pointer">
+          <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center hover:scale-110 transition-transform">
             <Share2 className="w-4 h-4 text-white" />
           </div>
           <span className="text-[8px] font-bold mt-0.5">Share</span>
-        </div>
+        </button>
 
         {/* Save */}
-        <button onClick={() => setSaved(!saved)} className="flex flex-col items-center">
-          <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-xs flex items-center justify-center">
+        <button type="button" onClick={toggleSave} className="flex flex-col items-center group cursor-pointer">
+          <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-xs flex items-center justify-center hover:scale-110 transition-transform">
             <Bookmark className={`w-4 h-4 ${saved ? 'text-amber-400 fill-current' : 'text-white'}`} />
           </div>
           <span className="text-[8px] font-bold mt-0.5">Save</span>
         </button>
-
-        {/* Duration badge */}
-        <span className="text-[8px] font-mono px-1 py-0.2 rounded bg-black/60 text-gray-300">
-          1:20
-        </span>
       </div>
 
       {/* Bottom Video Details Overlay */}
-      <div className="absolute left-3 right-14 bottom-3 z-30">
+      <div className="absolute left-3 right-16 bottom-3 z-30">
         {/* Author & Follow */}
         <div className="flex items-center gap-2 mb-1.5">
           <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center font-black text-[9px] text-black">
             9
           </div>
           <span className="text-xs font-bold text-white">@nownine</span>
-          <button className="px-2 py-0.5 rounded-full bg-[#F5C754] text-black text-[9px] font-extrabold shadow-sm">
-            Follow
+          <button 
+            type="button"
+            onClick={toggleFollow}
+            className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold shadow-sm transition-all cursor-pointer ${
+              isFollowing ? 'bg-emerald-500 text-black' : 'bg-[#F5C754] text-black hover:brightness-110'
+            }`}
+          >
+            {isFollowing ? 'Following ✓' : 'Follow'}
           </button>
         </div>
 
         {/* Telugu Title */}
         <p className="font-telugu text-[11px] font-bold text-white drop-shadow mb-1 leading-snug">
-          యువతకు రాజకీయాల్లో అవకాశం ఎంత వరకు?
+          {currentVideo.title}
         </p>
 
-        {/* Hashtags */}
-        <p className="text-[9px] text-gray-300 font-medium">
-          #Youth #Politics #India #nownine
+        {/* Badge & Hashtags */}
+        <p className="text-[9px] text-amber-300 font-medium">
+          <span className="mr-1">{currentVideo.badge}</span>
+          <span>#Youth #Politics #India #nownine</span>
         </p>
 
         {/* Audio tag */}
         <div className="flex items-center gap-1.5 mt-1 text-[8px] text-gray-300">
           <Music2 className="w-3 h-3 text-[#F5C754] animate-spin" />
-          <span>Original Sound - nownine</span>
+          <span>Original Voice Audio • NowNine Citizen Stream</span>
         </div>
 
         {/* Video progress scrubber */}
         <div className="w-full h-0.5 bg-white/30 rounded-full mt-2 overflow-hidden">
-          <div className="w-2/5 h-full bg-[#F5C754]"></div>
+          <div className="w-3/5 h-full bg-[#F5C754] animate-pulse"></div>
         </div>
       </div>
     </div>
@@ -1244,9 +2424,22 @@ export function Screen8ShortVideoPlayer({ onBack }) {
 }
 
 // 9. SCREEN 9: LIVE DEBATE DETAIL / BROADCAST PLAYER
-export function Screen9LiveDebateDetail({ onBack }) {
+export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState(LIVE_CHAT_MESSAGES);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [selectedPanelist, setSelectedPanelist] = useState(null);
+  const [isEmojiBarOpen, setIsEmojiBarOpen] = useState(false);
+  const [isQueueJoined, setIsQueueJoined] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const emojis = ['👍', '❤️', '👏', '🔥', '🇮🇳', '🗳️', '📢'];
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -1264,27 +2457,103 @@ export function Screen9LiveDebateDetail({ onBack }) {
     setChatInput('');
   };
 
+  const handleEmojiClick = (emoji) => {
+    setChatInput(prev => prev + emoji);
+    showToast(`Reaction sent: ${emoji}`);
+  };
+
+  const toggleQueue = () => {
+    setIsQueueJoined(!isQueueJoined);
+    showToast(!isQueueJoined ? '🙋‍♂️ Joined Speaker Queue (#2)! Moderator notified.' : 'Exited Speaker Queue');
+  };
+
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
       <PhoneStatusBar />
 
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Panelist Bio Modal */}
+      {selectedPanelist && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
+              <div className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-full bg-gradient-to-tr ${selectedPanelist.color} flex items-center justify-center font-bold text-xs text-white`}>
+                  {selectedPanelist.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-white">{selectedPanelist.name}</h3>
+                  <span className="text-[9px] text-amber-400 font-semibold">{selectedPanelist.role}</span>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setSelectedPanelist(null)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <p className="text-[10px] text-gray-300 leading-relaxed">
+              Leading regular prime-time analysis on constitutional governance, state budget, and citizen development priorities in Telugu states.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setChatInput(`@${selectedPanelist.name} `);
+                setSelectedPanelist(null);
+                showToast(`Tagging @${selectedPanelist.name} in chat`);
+              }}
+              className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs shadow-md cursor-pointer hover:brightness-110"
+            >
+              Ask Question to {selectedPanelist.name} 💬
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
         <div className="flex items-center gap-2">
-          <button onClick={onBack} className="p-1 text-gray-300 hover:text-white">
+          <button 
+            type="button"
+            onClick={onBack} 
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+          >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <h2 className="text-xs font-extrabold text-white">Live Debate</h2>
+          <h2 className="text-xs font-extrabold text-white">Live Debate Studio</h2>
         </div>
-        <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase">
-          LIVE
-        </span>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={toggleQueue}
+            className={`px-2 py-0.5 rounded-full text-[8px] font-bold transition-all cursor-pointer ${
+              isQueueJoined 
+                ? 'bg-emerald-600 text-white' 
+                : 'bg-amber-500/15 border border-amber-400/30 text-[#FDE047] hover:bg-amber-500/25'
+            }`}
+          >
+            {isQueueJoined ? 'In Queue #2 ✓' : 'Speak 🙋‍♂️'}
+          </button>
+          <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase">
+            LIVE
+          </span>
+        </div>
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 min-h-0 overflow-y-auto phone-scroll touch-pan-y pb-6">
+      <div className="flex-1 min-h-0 overflow-y-auto phone-scroll touch-pan-y pb-2">
         {/* Video Player */}
-        <div className="relative w-full h-36 bg-black overflow-hidden shrink-0">
+        <div className="relative w-full h-36 bg-black overflow-hidden shrink-0 group">
           <img 
             src="/assets/news_debate_studio.jpg" 
             alt="Live Debate Broadcast" 
@@ -1296,10 +2565,32 @@ export function Screen9LiveDebateDetail({ onBack }) {
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
               LIVE
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
-              <Eye className="w-2.5 h-2.5 text-red-400" />
-              12.4K
-            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setIsMuted(!isMuted)}
+                className="p-1 rounded bg-black/60 text-white hover:text-amber-400 cursor-pointer"
+                title="Mute/Unmute"
+              >
+                {isMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3" />}
+              </button>
+              <span className="px-1.5 py-0.2 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
+                <Eye className="w-2.5 h-2.5 text-red-400" />
+                12.4K
+              </span>
+            </div>
+          </div>
+
+          {/* Play/Pause Control Overlay */}
+          <div 
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/40 transition-colors"
+          >
+            {!isPlaying && (
+              <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg">
+                <Play className="w-5 h-5 fill-current ml-0.5" />
+              </div>
+            )}
           </div>
         </div>
 
@@ -1317,18 +2608,26 @@ export function Screen9LiveDebateDetail({ onBack }) {
               Today, 07:30 PM
             </span>
             <span>•</span>
-            <span>Live from Hyderabad</span>
+            <span>Live from Hyderabad Studio</span>
           </div>
         </div>
 
         {/* Panelists Horizontal Scroll */}
         <div className="p-3 border-b border-[#1A1A22]">
-          <span className="text-[10px] font-bold text-white block mb-1.5">
-            Panelists
-          </span>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold text-white">
+              Panelists (Click for bio)
+            </span>
+            <span className="text-[8px] text-amber-400 font-semibold">4 Experts Active</span>
+          </div>
           <div className="flex items-center gap-3 overflow-x-auto phone-scroll pb-1">
             {DEBATE_PANELISTS.map((panelist) => (
-              <div key={panelist.id} className="flex flex-col items-center text-center shrink-0 w-16">
+              <button 
+                key={panelist.id} 
+                type="button"
+                onClick={() => setSelectedPanelist(panelist)}
+                className="flex flex-col items-center text-center shrink-0 w-16 cursor-pointer hover:scale-105 transition-transform"
+              >
                 <div className={`w-9 h-9 rounded-full bg-gradient-to-tr ${panelist.color} flex items-center justify-center font-bold text-xs text-white shadow-sm mb-1`}>
                   {panelist.name.charAt(0)}
                 </div>
@@ -1338,7 +2637,7 @@ export function Screen9LiveDebateDetail({ onBack }) {
                 <span className="text-[7px] text-gray-400 truncate w-full">
                   {panelist.role}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -1371,21 +2670,44 @@ export function Screen9LiveDebateDetail({ onBack }) {
         </div>
       </div>
 
+      {/* Quick Emoji Bar (Toggled with Smile button) */}
+      {isEmojiBarOpen && (
+        <div className="px-3 py-1.5 bg-[#14141C] border-t border-[#22222E] flex items-center justify-around animate-fadeIn shrink-0">
+          {emojis.map((emoji) => (
+            <button
+              key={emoji}
+              type="button"
+              onClick={() => handleEmojiClick(emoji)}
+              className="text-base hover:scale-125 transition-transform cursor-pointer p-1"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Bottom Live Chat Input Bar */}
       <form onSubmit={handleSendMessage} className="p-2 border-t border-[#1C1C22] bg-[#0E0E12] flex items-center gap-1.5 shrink-0">
-        <button type="button" className="text-gray-400 hover:text-white p-1">
+        <button 
+          type="button" 
+          onClick={() => setIsEmojiBarOpen(!isEmojiBarOpen)}
+          className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+            isEmojiBarOpen ? 'text-amber-400 bg-amber-500/20' : 'text-gray-400 hover:text-white'
+          }`}
+          title="Insert Reaction Emoji"
+        >
           <Smile className="w-4 h-4" />
         </button>
         <input
           type="text"
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
-          placeholder="Type a message..."
+          placeholder="Type citizen reaction..."
           className="flex-1 bg-[#181820] border border-[#262630] rounded-full px-3 py-1 text-[10px] text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
         />
         <button 
           type="submit" 
-          className="w-7 h-7 rounded-full bg-[#F5C754] text-black flex items-center justify-center shrink-0 hover:brightness-110 shadow-xs cursor-pointer"
+          className="w-7 h-7 rounded-full bg-[#F5C754] text-black flex items-center justify-center shrink-0 hover:brightness-110 shadow-xs cursor-pointer active:scale-95"
         >
           <Send className="w-3.5 h-3.5" />
         </button>

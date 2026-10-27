@@ -35,14 +35,15 @@ export default function NowNineUnifiedApp() {
           <ScreenLogin 
             onLoginSuccess={() => handleNav('home')} 
             onSkipToHome={() => handleNav('home')} 
+            onNavigate={handleNav}
           />
         );
       case 'splash':
-        return <Screen1Splash onGetStarted={() => handleNav('login')} />;
+        return <Screen1Splash onGetStarted={() => handleNav('login')} onNavigate={handleNav} />;
       case 'home':
         return <Screen2Home onNavigate={handleNav} />;
       case 'survey':
-        return <Screen3Survey onBack={() => handleNav('home')} onNext={() => handleNav('home')} />;
+        return <Screen3Survey onBack={() => handleNav('home')} onFinish={() => handleNav('home')} onNavigate={handleNav} />;
       case 'live-debates':
         return <Screen4LiveDebates onBack={() => handleNav('home')} onSelectDebate={() => handleNav('debate-detail')} onNavigate={handleNav} />;
       case 'short-videos':
@@ -50,16 +51,17 @@ export default function NowNineUnifiedApp() {
       case 'common-people':
         return <Screen6CommonPeople onBack={() => handleNav('home')} onSelectStory={() => handleNav('video-player')} onNavigate={handleNav} />;
       case 'area-specials':
-        return <Screen7AreaSpecials onBack={() => handleNav('home')} onNavigate={handleNav} />;
+        return <Screen7AreaSpecials onBack={() => handleNav('home')} onNavigate={handleNav} onSelectUpdate={() => handleNav('video-player')} />;
       case 'video-player':
-        return <Screen8ShortVideoPlayer onBack={() => handleNav('short-videos')} />;
+        return <Screen8ShortVideoPlayer onBack={() => handleNav('short-videos')} onNavigate={handleNav} />;
       case 'debate-detail':
-        return <Screen9LiveDebateDetail onBack={() => handleNav('live-debates')} />;
+        return <Screen9LiveDebateDetail onBack={() => handleNav('live-debates')} onNavigate={handleNav} />;
       default:
         return (
           <ScreenLogin 
             onLoginSuccess={() => handleNav('home')} 
             onSkipToHome={() => handleNav('home')} 
+            onNavigate={handleNav}
           />
         );
     }
