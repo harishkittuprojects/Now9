@@ -19,63 +19,65 @@ import {
   Screen9LiveDebateDetail, 
   PhoneFrame 
 } from './NowNineReferenceScreens';
-import { DEFAULT_DETECTED_LOCATION, CONSTITUENCY_DATABASE } from '../data/locationConstituencyData';
+import { 
+  DEFAULT_DETECTED_LOCATION, 
+  CONSTITUENCY_DATABASE,
+  fetchLiveUserAddress,
+  resolveConstituencyAndParties 
+} from '../data/locationConstituencyData';
 
 export default function NowNineUnifiedApp() {
   // Directly start on the Login screen on entry as requested
   const [activeScreenId, setActiveScreenId] = useState('login');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(DEFAULT_DETECTED_LOCATION);
-  const [isLocating, setIsLocating] = useState(true);
+  const [isLocating, setIsLocating] = useState(false);
   const [locationToast, setLocationToast] = useState(null);
 
-  // Automatic GPS Location Detection on Open
-  useEffect(() => {
+  // Live GPS Location Detection and Reverse Geocoding
+  const detectLiveGpsLocation = () => {
     setIsLocating(true);
     setLocationToast({
-      title: '🛰️ Automatically locating your address via GPS...',
-      subtitle: 'Mapping your constituency and local political parties'
+      title: '🛰️ Detecting live device coordinates...',
+      subtitle: 'Reverse-geocoding your exact street & constituency via GPS'
     });
 
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setIsLocating(false);
-          const detected = {
-            ...DEFAULT_DETECTED_LOCATION,
-            gpsCoordinates: `${pos.coords.latitude.toFixed(4)}° N, ${pos.coords.longitude.toFixed(4)}° E`,
-            detectionMethod: 'Auto-detected via Live Device GPS 🛰️'
-          };
-          setCurrentLocation(detected);
-          setLocationToast({
-            title: `📍 Located: ${detected.locality}, ${detected.city}`,
-            subtitle: `${detected.assembly} • ${detected.parties.length} Political Parties Active`
-          });
-          setTimeout(() => setLocationToast(null), 4500);
-        },
-        () => {
-          // Graceful fallback to default high-accuracy network constituency
-          setTimeout(() => {
+        async (pos) => {
+          try {
+            const resolved = await fetchLiveUserAddress(pos.coords.latitude, pos.coords.longitude);
             setIsLocating(false);
+            setCurrentLocation(resolved);
             setLocationToast({
-              title: `📍 Auto-located: ${DEFAULT_DETECTED_LOCATION.locality}, ${DEFAULT_DETECTED_LOCATION.city}`,
-              subtitle: `${DEFAULT_DETECTED_LOCATION.assembly} • ${DEFAULT_DETECTED_LOCATION.parties.length} Political Parties Active`
+              title: `📍 Located: ${resolved.locality || resolved.city}, ${resolved.city}`,
+              subtitle: `${resolved.assembly} • ${resolved.parties?.length || 0} Political Parties Active`
             });
-            setTimeout(() => setLocationToast(null), 4500);
-          }, 800);
+            setTimeout(() => setLocationToast(null), 5000);
+          } catch (e) {
+            console.warn('Reverse geocode error:', e);
+            setIsLocating(false);
+          }
         },
-        { timeout: 3500, enableHighAccuracy: true }
+        (err) => {
+          console.warn('Geolocation error / permission denied:', err);
+          setIsLocating(false);
+          setLocationToast({
+            title: `📍 Current Area: ${currentLocation.locality}, ${currentLocation.city}`,
+            subtitle: `${currentLocation.assembly} • Tap "Change Address" to search your exact area`
+          });
+          setTimeout(() => setLocationToast(null), 5000);
+        },
+        { timeout: 7000, enableHighAccuracy: true, maximumAge: 60000 }
       );
     } else {
-      setTimeout(() => {
-        setIsLocating(false);
-        setLocationToast({
-          title: `📍 Auto-located: ${DEFAULT_DETECTED_LOCATION.locality}, ${DEFAULT_DETECTED_LOCATION.city}`,
-          subtitle: `${DEFAULT_DETECTED_LOCATION.assembly} • ${DEFAULT_DETECTED_LOCATION.parties.length} Political Parties Active`
-        });
-        setTimeout(() => setLocationToast(null), 4500);
-      }, 800);
+      setIsLocating(false);
     }
+  };
+
+  // Run auto-locate on initial app load
+  useEffect(() => {
+    detectLiveGpsLocation();
   }, []);
 
   // Render active screen
@@ -94,6 +96,7 @@ export default function NowNineUnifiedApp() {
             currentLocation={currentLocation}
             onLocationChange={setCurrentLocation}
             isLocating={isLocating}
+            onDetectLiveGps={detectLiveGpsLocation}
           />
         );
       case 'splash':
@@ -105,6 +108,7 @@ export default function NowNineUnifiedApp() {
             currentLocation={currentLocation}
             onLocationChange={setCurrentLocation}
             isLocating={isLocating}
+            onDetectLiveGps={detectLiveGpsLocation}
           />
         );
       case 'survey':
@@ -138,6 +142,7 @@ export default function NowNineUnifiedApp() {
             currentLocation={currentLocation}
             onLocationChange={setCurrentLocation}
             isLocating={isLocating}
+            onDetectLiveGps={detectLiveGpsLocation}
           />
         );
     }

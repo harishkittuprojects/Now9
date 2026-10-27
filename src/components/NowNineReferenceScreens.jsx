@@ -52,7 +52,11 @@ import {
   LIVE_CHAT_MESSAGES 
 } from '../data/nowNineCompleteAppData';
 import { SURVEY_QUESTIONS, PARTIES } from '../data/nowNineAppFlowData';
-import { DEFAULT_DETECTED_LOCATION, CONSTITUENCY_DATABASE } from '../data/locationConstituencyData';
+import { 
+  DEFAULT_DETECTED_LOCATION, 
+  CONSTITUENCY_DATABASE, 
+  resolveConstituencyAndParties 
+} from '../data/locationConstituencyData';
 
 // Phone Status Bar (Cellular, Wifi, Battery without time)
 export function PhoneStatusBar() {
@@ -131,6 +135,205 @@ export function IndiaFlag() {
   );
 }
 
+// REUSABLE CONSTITUENCY & ADDRESS PICKER MODAL
+export function ConstituencyPickerModal({
+  isOpen,
+  onClose,
+  currentLocation,
+  onLocationChange,
+  onDetectLiveGps,
+  isLocating
+}) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [customInput, setCustomInput] = useState('');
+
+  if (!isOpen) return null;
+
+  const filteredConstituencies = (CONSTITUENCY_DATABASE || []).filter(item => {
+    // Region tab filter
+    if (activeFilter === 'Hyderabad') {
+      if (!item.city.toLowerCase().includes('hyderabad')) return false;
+    } else if (activeFilter === 'Andhra Pradesh') {
+      if (!item.state.toLowerCase().includes('andhra')) return false;
+    } else if (activeFilter === 'Telangana') {
+      if (!item.state.toLowerCase().includes('telangana') || item.city.toLowerCase().includes('hyderabad')) return false;
+    }
+
+    // Search query
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return item.locality.toLowerCase().includes(q) ||
+           item.city.toLowerCase().includes(q) ||
+           item.assembly.toLowerCase().includes(q) ||
+           (item.pincode && item.pincode.includes(q)) ||
+           (item.exactAddress && item.exactAddress.toLowerCase().includes(q));
+  });
+
+  const handleApplyCustom = (e) => {
+    e.preventDefault();
+    if (!customInput.trim()) return;
+    const resolved = resolveConstituencyAndParties({
+      exactAddress: customInput.trim(),
+      locality: customInput.trim().split(',')[0],
+      city: customInput.toLowerCase().includes('hyderabad') ? 'Hyderabad' : 'Vijayawada',
+      state: customInput.toLowerCase().includes('andhra') ? 'Andhra Pradesh' : 'Telangana',
+      method: 'Manually Entered Address 📍'
+    });
+    onLocationChange(resolved);
+    onClose();
+  };
+
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-3 bg-black/85 backdrop-blur-xs animate-fadeIn">
+      <div className="w-full max-h-[90%] bg-[#121217] border border-amber-500/50 rounded-2xl p-3 shadow-2xl flex flex-col justify-between space-y-2">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-1.5 border-b border-[#22222E]">
+          <div className="flex items-center gap-1.5">
+            <MapPin className="w-4 h-4 text-[#F5C754]" />
+            <div>
+              <h3 className="text-xs font-black text-white">Select or Detect Your Address</h3>
+              <p className="text-[8px] text-gray-400">Maps your local Assembly Constituency & Political Parties</p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onClick={onClose}
+            className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* 1. GPS Auto-Detect Button */}
+        <button
+          type="button"
+          onClick={() => {
+            if (onDetectLiveGps) onDetectLiveGps();
+            onClose();
+          }}
+          disabled={isLocating}
+          className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-400/20 to-yellow-600/20 border border-amber-400 text-amber-300 font-extrabold text-[10px] flex items-center justify-center gap-2 hover:bg-amber-400/30 transition-all cursor-pointer shadow-md"
+        >
+          <span className="text-sm">🛰️</span>
+          <span>{isLocating ? 'Detecting via Device GPS...' : 'Auto-Detect My Live Address via GPS'}</span>
+        </button>
+
+        {/* 2. Search Locality Input */}
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="🔍 Search area, road, or pincode (e.g. Kukatpally, Benz Circle, 500072)..."
+            className="w-full bg-[#181822] border border-[#2B2B38] focus:border-amber-400 rounded-xl px-3 py-1.5 text-[10px] text-white placeholder-gray-500 focus:outline-none"
+          />
+          {searchQuery && (
+            <button 
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Filter Region Chips */}
+        <div className="flex items-center gap-1 overflow-x-auto phone-scroll text-[8px] pb-0.5">
+          {['All', 'Hyderabad', 'Telangana', 'Andhra Pradesh'].map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveFilter(tab)}
+              className={`px-2 py-0.5 rounded-full font-bold shrink-0 transition-all cursor-pointer ${
+                activeFilter === tab 
+                  ? 'bg-amber-400 text-black font-black' 
+                  : 'bg-[#181820] text-gray-400 hover:text-white'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* 3. Filtered Constituency List */}
+        <div className="space-y-1.5 overflow-y-auto phone-scroll max-h-44 pr-0.5">
+          {filteredConstituencies.length === 0 ? (
+            <div className="p-3 text-center rounded-xl bg-[#181820] text-gray-400 text-[9px]">
+              No pre-listed areas match "{searchQuery}". You can enter your exact address below!
+            </div>
+          ) : (
+            filteredConstituencies.map((item) => {
+              const isSelected = item.id === currentLocation?.id;
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => {
+                    onLocationChange(item);
+                    onClose();
+                  }}
+                  className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                    isSelected 
+                      ? 'bg-amber-500/20 border-amber-400 text-white shadow-sm' 
+                      : 'bg-[#181820] border-[#252532] text-gray-300 hover:border-amber-400/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-white flex items-center gap-1">
+                      <span>📍</span> {item.locality}, {item.city}
+                    </span>
+                    {isSelected ? (
+                      <span className="text-[7px] font-black px-1.5 py-0.2 rounded-full bg-amber-400 text-black">
+                        SELECTED
+                      </span>
+                    ) : (
+                      <span className="text-[7px] text-amber-400/80 font-mono">
+                        {(item.parties || []).length} Parties
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[8px] text-gray-400 mt-0.5 leading-tight">{item.exactAddress || item.formattedAddress}</p>
+                  <div className="mt-1 flex items-center gap-2 text-[7px] text-amber-300/80 font-medium">
+                    <span>🏛️ {item.assembly}</span>
+                    <span>•</span>
+                    <span>{item.state}</span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* 4. Custom Address Direct Entry */}
+        <form onSubmit={handleApplyCustom} className="pt-1 border-t border-[#22222E] flex items-center gap-1.5">
+          <input
+            type="text"
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            placeholder="Or type exact colony / street address..."
+            className="flex-1 bg-[#181822] border border-[#2B2B38] focus:border-amber-400 rounded-xl px-2.5 py-1.5 text-[9px] text-white placeholder-gray-500 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-[9px] font-extrabold cursor-pointer transition-colors shrink-0"
+          >
+            Apply 📍
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full py-1.5 rounded-xl bg-[#1C1C24] border border-[#2B2B38] text-[9px] font-bold text-gray-300 hover:text-white cursor-pointer"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // LOGIN SCREEN
 export function ScreenLogin({ 
   onLoginSuccess, 
@@ -138,7 +341,8 @@ export function ScreenLogin({
   onNavigate = null,
   currentLocation = DEFAULT_DETECTED_LOCATION,
   onLocationChange = () => {},
-  isLocating = false
+  isLocating = false,
+  onDetectLiveGps = () => {}
 }) {
   const [phoneNumber, setPhoneNumber] = useState('9876543210');
   const [otpStep, setOtpStep] = useState(false);
@@ -146,6 +350,7 @@ export function ScreenLogin({
   const [touchStartY, setTouchStartY] = useState(null);
   const [resendTimer, setResendTimer] = useState(28);
   const [toastMessage, setToastMessage] = useState(null);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -237,26 +442,54 @@ export function ScreenLogin({
           </div>
 
           {/* Auto-Located Address & Contesting Political Parties Banner */}
-          <div className="mt-3 p-2.5 rounded-2xl bg-gradient-to-r from-[#1C1A12] via-[#241F10] to-[#161410] border border-amber-500/40 shadow-md text-left">
-            <div className="flex items-center justify-between mb-1">
+          <div className="mt-3 p-2.5 rounded-2xl bg-gradient-to-r from-[#1C1A12] via-[#241F10] to-[#161410] border border-amber-500/40 shadow-md text-left space-y-2">
+            <div className="flex items-center justify-between">
               <span className="text-[8px] font-extrabold uppercase text-amber-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                {isLocating ? 'Locating your address via GPS...' : '📍 Auto-located Address'}
+                <span className={`w-1.5 h-1.5 rounded-full ${isLocating ? 'bg-amber-400 animate-ping' : 'bg-emerald-400 animate-pulse'}`}></span>
+                {isLocating ? 'Locating your exact GPS...' : '📍 Auto-located Address'}
               </span>
-              <span className="text-[8px] text-gray-400 font-mono">
-                PIN: {currentLocation?.pincode || '500033'}
-              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onDetectLiveGps) onDetectLiveGps();
+                    showToast('🛰️ Detecting Live Device Coordinates...');
+                  }}
+                  className="px-1.5 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[7px] font-bold hover:bg-amber-500/25 cursor-pointer flex items-center gap-0.5"
+                  title="Re-detect GPS Coordinates"
+                >
+                  <span>🛰️</span>
+                  <span>Re-detect</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsAddressModalOpen(true)}
+                  className="px-1.5 py-0.5 rounded-md bg-yellow-500/20 border border-yellow-400/50 text-[#FDE047] text-[7px] font-bold hover:bg-yellow-500/30 cursor-pointer flex items-center gap-0.5"
+                  title="Search or select your exact area"
+                >
+                  <span>✏️</span>
+                  <span>Change / Search</span>
+                </button>
+              </div>
             </div>
-            <p className="text-[11px] font-extrabold text-white leading-tight">
-              {currentLocation?.formattedAddress || currentLocation?.exactAddress || 'Road No. 36, Jubilee Hills, Hyderabad'}
-            </p>
-            <p className="text-[8px] text-[#FDE047] font-semibold mt-0.5">
-              {currentLocation?.assembly || 'Jubilee Hills Assembly'} • {currentLocation?.ward || 'Ward No. 98'}
-            </p>
 
-            <div className="mt-2 pt-1.5 border-t border-[#2A261C] flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-extrabold text-white leading-tight">
+                {currentLocation?.exactAddress || currentLocation?.formattedAddress || 'Road No. 36, Jubilee Hills, Hyderabad'}
+              </p>
+              <div className="flex items-center justify-between mt-0.5">
+                <p className="text-[8px] text-[#FDE047] font-semibold">
+                  {currentLocation?.assembly || 'Assembly Constituency'} • {currentLocation?.ward || 'Ward'}
+                </p>
+                <span className="text-[7px] text-gray-400 font-mono">
+                  PIN: {currentLocation?.pincode || '500033'}
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-1.5 border-t border-[#2A261C] flex items-center justify-between">
               <div className="flex items-center gap-1 overflow-x-auto phone-scroll">
-                <span className="text-[8px] text-gray-400 shrink-0">Parties:</span>
+                <span className="text-[8px] text-gray-400 shrink-0">Contesting Parties:</span>
                 {(currentLocation?.parties || []).map(p => (
                   <span 
                     key={p.id} 
@@ -507,6 +740,16 @@ export function ScreenLogin({
       <div className="w-full pb-1 flex justify-center z-20 shrink-0">
         <div className="w-24 h-1 bg-white/20 rounded-full"></div>
       </div>
+
+      {/* Constituency & Address Picker Modal */}
+      <ConstituencyPickerModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        currentLocation={currentLocation}
+        onLocationChange={onLocationChange}
+        onDetectLiveGps={onDetectLiveGps}
+        isLocating={isLocating}
+      />
     </div>
   );
 }
@@ -640,7 +883,8 @@ export function Screen2Home({
   onNavigate, 
   currentLocation = DEFAULT_DETECTED_LOCATION, 
   onLocationChange = () => {}, 
-  isLocating = false 
+  isLocating = false,
+  onDetectLiveGps = () => {}
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -880,22 +1124,37 @@ export function Screen2Home({
           <div className="flex items-center justify-between pb-1.5 border-b border-[#22222E]">
             <div className="flex items-center gap-1.5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isLocating ? 'bg-amber-400' : 'bg-emerald-400'} opacity-75`}></span>
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${isLocating ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
               </span>
               <span className="text-[10px] font-black tracking-wide text-[#FDE047] uppercase">
-                {isLocating ? 'Locating via GPS...' : 'Auto-Located Address'}
+                {isLocating ? 'Detecting via GPS...' : 'Auto-Located Address'}
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsConstituencyModalOpen(true)}
-              className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:bg-amber-500/25 transition-all text-[8px] font-bold flex items-center gap-1 cursor-pointer"
-            >
-              <MapPin className="w-2.5 h-2.5 text-[#F5C754]" />
-              <span>Change Address 📍</span>
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onDetectLiveGps) onDetectLiveGps();
+                  setVoteToast('🛰️ Requesting Live Device GPS Coordinates...');
+                  setTimeout(() => setVoteToast(null), 3000);
+                }}
+                className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 hover:bg-amber-500/25 transition-all text-[8px] font-bold flex items-center gap-1 cursor-pointer"
+                title="Re-detect live GPS coordinates"
+              >
+                <span>🛰️ GPS</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsConstituencyModalOpen(true)}
+                className="px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-400/50 text-[#FDE047] hover:bg-yellow-500/30 transition-all text-[8px] font-bold flex items-center gap-1 cursor-pointer"
+                title="Search or change address"
+              >
+                <MapPin className="w-2.5 h-2.5 text-[#F5C754]" />
+                <span>Change / Search 📍</span>
+              </button>
+            </div>
           </div>
 
           {/* Detected Address Details Card */}
@@ -1201,75 +1460,18 @@ export function Screen2Home({
       )}
 
       {/* Constituency Switcher Modal */}
-      {isConstituencyModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-xs animate-fadeIn">
-          <div className="w-full max-h-[85%] bg-[#121217] border border-amber-500/40 rounded-2xl p-3.5 shadow-2xl flex flex-col justify-between space-y-2.5">
-            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-[#F5C754]" />
-                <div>
-                  <h3 className="text-xs font-black text-white">Select Your Address</h3>
-                  <p className="text-[8px] text-gray-400">View political parties contesting in your area</p>
-                </div>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setIsConstituencyModalOpen(false)}
-                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="space-y-1.5 overflow-y-auto phone-scroll max-h-60 pr-0.5">
-              {(CONSTITUENCY_DATABASE || []).map((item) => {
-                const isSelected = item.id === currentLocation?.id;
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      onLocationChange(item);
-                      setIsConstituencyModalOpen(false);
-                      setVoteToast(`📍 Address changed to: ${item.locality}, ${item.city}`);
-                      setTimeout(() => setVoteToast(null), 3000);
-                    }}
-                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                      isSelected 
-                        ? 'bg-amber-500/20 border-amber-400 text-white' 
-                        : 'bg-[#181820] border-[#252532] text-gray-300 hover:border-amber-400/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-white flex items-center gap-1">
-                        <span>📍</span> {item.locality}, {item.city}
-                      </span>
-                      {isSelected && (
-                        <span className="text-[8px] font-black px-1.5 py-0.2 rounded-full bg-amber-400 text-black">
-                          SELECTED
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[8px] text-gray-400 mt-0.5 leading-tight">{item.exactAddress || item.formattedAddress}</p>
-                    <div className="mt-1 flex items-center gap-2 text-[7px] text-amber-300 font-medium">
-                      <span>🏛️ {item.assembly}</span>
-                      <span>•</span>
-                      <span>🗳️ {(item.parties || []).length} Parties Contesting</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setIsConstituencyModalOpen(false)}
-              className="w-full py-2 rounded-xl bg-[#1C1C24] border border-[#2B2B38] text-xs font-bold text-gray-300 hover:text-white cursor-pointer"
-            >
-              Done / Close
-            </button>
-          </div>
-        </div>
-      )}
+      <ConstituencyPickerModal
+        isOpen={isConstituencyModalOpen}
+        onClose={() => setIsConstituencyModalOpen(false)}
+        currentLocation={currentLocation}
+        onLocationChange={(item) => {
+          onLocationChange(item);
+          setVoteToast(`📍 Address set to: ${item.locality}, ${item.city}`);
+          setTimeout(() => setVoteToast(null), 3000);
+        }}
+        onDetectLiveGps={onDetectLiveGps}
+        isLocating={isLocating}
+      />
 
       {/* Local Party Manifesto Modal */}
       {selectedManifestoParty && (
