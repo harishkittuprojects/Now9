@@ -83,14 +83,14 @@ export function PhoneStatusBar() {
   );
 }
 
-// Bottom Navigation Bar (Home, Survey, Live, Shorts, Community)
+// Bottom Navigation Bar (Home, Survey, Live, Shorts, Area)
 export function BottomNavBar({ activeTab = 'home', onTabChange = () => {} }) {
   const tabs = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'survey', label: 'Survey', icon: FileText },
     { id: 'live-debates', label: 'Live', icon: Radio },
     { id: 'short-videos', label: 'Shorts', icon: Video },
-    { id: 'common-people', label: 'Community', icon: Users },
+    { id: 'area-specials', label: 'Area', icon: MapPin },
   ];
 
   return (
@@ -803,13 +803,12 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
           <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0D]/70 via-transparent to-transparent"></div>
         </div>
 
-        {/* 5 Feature Icons Row */}
+        {/* 4 Feature Icons Row */}
         <div className="w-full px-3 py-2 flex items-center justify-around text-center border-t border-b border-white/5 bg-[#101014]/80">
           {[
             { label: 'Survey', icon: '📝', id: 'survey' },
             { label: 'Live Debates', icon: '🎙️', id: 'live-debates' },
             { label: 'Short Videos', icon: '🎬', id: 'short-videos' },
-            { label: 'Community', icon: '👥', id: 'common-people' },
             { label: 'Area Specials', icon: '📍', id: 'area-specials' },
           ].map((item, idx) => (
             <button 
@@ -1051,7 +1050,6 @@ export function Screen2Home({
                   { label: 'Political Survey', icon: FileText, target: 'survey', color: 'text-amber-400' },
                   { label: 'Live Debates', icon: Radio, target: 'live-debates', color: 'text-red-400' },
                   { label: 'Short Videos', icon: Video, target: 'short-videos', color: 'text-amber-400' },
-                  { label: 'Common People Voice', icon: Users, target: 'common-people', color: 'text-sky-400' },
                   { label: 'Area Specials', icon: MapPin, target: 'area-specials', color: 'text-emerald-400' },
                 ].map((item) => {
                   const Icon = item.icon;
@@ -1284,8 +1282,8 @@ export function Screen2Home({
           </div>
         </div>
 
-        {/* 4 Feature Tiles Grid (2x2) */}
-        <div className="grid grid-cols-2 gap-2">
+        {/* Feature Tiles Grid */}
+        <div className="grid grid-cols-3 gap-2">
           {/* Tile 1: Live Debates */}
           <button 
             type="button"
@@ -1296,8 +1294,8 @@ export function Screen2Home({
               <Play className="w-3.5 h-3.5 fill-current" />
             </div>
             <div>
-              <h3 className="font-bold text-[11px] text-white leading-tight">Live Debates</h3>
-              <p className="text-[8px] text-gray-400 mt-0.5">Watch • Listen • Discuss</p>
+              <h3 className="font-bold text-[10.5px] text-white leading-tight">Live Debates</h3>
+              <p className="text-[7.5px] text-gray-400 mt-0.5">Watch & Discuss</p>
             </div>
           </button>
 
@@ -1311,27 +1309,12 @@ export function Screen2Home({
               <Video className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h3 className="font-bold text-[11px] text-white leading-tight">Short Videos</h3>
-              <p className="text-[8px] text-gray-400 mt-0.5">Trending • Local • Viral</p>
+              <h3 className="font-bold text-[10.5px] text-white leading-tight">Short Videos</h3>
+              <p className="text-[7.5px] text-gray-400 mt-0.5">Viral Updates</p>
             </div>
           </button>
 
-          {/* Tile 3: Common People */}
-          <button 
-            type="button"
-            onClick={() => onNavigate('common-people')}
-            className="p-2.5 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer transition-all flex flex-col justify-between text-left group active:scale-[0.98]"
-          >
-            <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-400 mb-1.5 group-hover:scale-105 transition-transform">
-              <Users className="w-3.5 h-3.5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-[11px] text-white leading-tight">Common People</h3>
-              <p className="text-[8px] text-gray-400 mt-0.5">Real Voices • Real Stories</p>
-            </div>
-          </button>
-
-          {/* Tile 4: Area Specials */}
+          {/* Tile 3: Area Specials */}
           <button 
             type="button"
             onClick={() => onNavigate('area-specials')}
@@ -1341,8 +1324,8 @@ export function Screen2Home({
               <MapPin className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h3 className="font-bold text-[11px] text-white leading-tight">Area Specials</h3>
-              <p className="text-[8px] text-gray-400 mt-0.5">Your Area • Your Updates</p>
+              <h3 className="font-bold text-[10.5px] text-white leading-tight">Area Specials</h3>
+              <p className="text-[7.5px] text-gray-400 mt-0.5">Your Area</p>
             </div>
           </button>
         </div>
@@ -2160,125 +2143,12 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
   );
 }
 
-// 6. SCREEN 6: COMMON PEOPLE SCREEN
-export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
-  const [filterRole, setFilterRole] = useState('All');
-  const [toastMessage, setToastMessage] = useState(null);
-
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 2500);
-  };
-
-  // Filter logic
-  const filteredStories = COMMON_PEOPLE_STORIES.filter(story => {
-    if (filterRole === 'All') return true;
-    if (filterRole === 'Farmers') return story.role.toLowerCase().includes('farmer');
-    if (filterRole === 'Students') return story.role.toLowerCase().includes('student');
-    if (filterRole === 'Women') return story.role.toLowerCase().includes('housewife') || story.role.toLowerCase().includes('women');
-    return true;
-  });
-
-  return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
-      <PhoneStatusBar />
-
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
-        <div className="flex items-center gap-2">
-          <button 
-            type="button"
-            onClick={onBack} 
-            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <div>
-            <h2 className="text-xs font-extrabold text-white">Common People</h2>
-            <p className="text-[8px] text-[#F5C754] font-medium leading-none mt-0.5">
-              Real People • Real Opinions
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="px-3 py-1.5 flex items-center gap-1.5 border-b border-[#16161C] overflow-x-auto phone-scroll shrink-0">
-        {['All', 'Farmers', 'Students', 'Women'].map((roleName) => {
-          const isActive = filterRole === roleName;
-          return (
-            <button
-              key={roleName}
-              type="button"
-              onClick={() => setFilterRole(roleName)}
-              className={`px-3 py-0.8 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
-                isActive 
-                  ? 'bg-[#F5C754] text-black shadow-xs font-black' 
-                  : 'bg-[#16161D] text-gray-400 hover:text-white hover:bg-[#202028]'
-              }`}
-            >
-              {roleName}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Stories List */}
-      <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-2 pb-6">
-        {filteredStories.map((item) => (
-          <div
-            key={item.id}
-            onClick={onSelectStory}
-            className="p-2 rounded-xl bg-[#141419] border border-[#23232C] hover:border-amber-500/40 flex items-center gap-2.5 cursor-pointer transition-all active:scale-[0.99] group"
-          >
-            <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 relative">
-              <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-              <span className="absolute bottom-0.5 right-0.5 text-[7px] px-0.8 rounded bg-black/70 text-white font-mono">
-                {item.duration}
-              </span>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <h4 className="font-telugu text-[10px] font-bold text-white line-clamp-1 group-hover:text-amber-300">
-                {item.title}
-              </h4>
-              <div className="flex items-center justify-between mt-1 text-[8px] text-gray-400">
-                <span className="flex items-center gap-1 text-[#F5C754]">
-                  <span>{item.icon}</span>
-                  <span className="font-semibold">{item.role}</span>
-                </span>
-                <span className="flex items-center gap-0.5">
-                  <Eye className="w-2.5 h-2.5 text-amber-400" />
-                  {item.views}
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelectStory();
-              }}
-              className="p-1 rounded-full bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-black transition-colors shrink-0"
-              title="Play Story"
-            >
-              <Play className="w-3 h-3 fill-current ml-0.5" />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <BottomNavBar activeTab="common-people" onTabChange={onNavigate} />
-    </div>
-  );
+// 6. SCREEN 6: COMMON PEOPLE SCREEN (Removed per user request)
+export function Screen6CommonPeople({ onNavigate = () => {} }) {
+  React.useEffect(() => {
+    onNavigate('home');
+  }, [onNavigate]);
+  return null;
 }
 
 // 7. SCREEN 7: AREA SPECIALS SCREEN

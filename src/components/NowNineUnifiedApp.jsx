@@ -128,7 +128,8 @@ export default function NowNineUnifiedApp() {
       case 'short-videos':
         return <Screen5ShortVideos onBack={() => handleNav('home')} onSelectShort={() => handleNav('video-player')} onNavigate={handleNav} />;
       case 'common-people':
-        return <Screen6CommonPeople onBack={() => handleNav('home')} onSelectStory={() => handleNav('video-player')} onNavigate={handleNav} />;
+        handleNav('home');
+        return null;
       case 'area-specials':
         return (
           <Screen7AreaSpecials 
