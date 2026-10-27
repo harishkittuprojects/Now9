@@ -25,6 +25,7 @@ export default function Navbar({
   }, []);
 
   const navItems = [
+    { id: 'app-flow', label: 'Live Vote App UI (10 Screens)', isHighlight: true },
     { id: 'home', label: 'Home' },
     { id: 'regional', label: 'District Radar' },
     { id: 'categories', label: 'Categories' },
@@ -86,6 +87,22 @@ export default function Navbar({
           <nav className="hidden md:flex items-center gap-1 lg:gap-2">
             {navItems.map((item) => {
               const isActive = activePage === item.id;
+              if (item.isHighlight) {
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all duration-200 flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-[#EAB308] text-black shadow-md shadow-amber-500/30 ring-2 ring-amber-400'
+                        : 'bg-gradient-to-r from-amber-50 to-yellow-100 text-amber-900 border border-amber-300 hover:border-amber-500 hover:shadow-xs'
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                    <span>{item.label}</span>
+                  </button>
+                );
+              }
               return (
                 <button
                   key={item.id}
@@ -106,7 +123,15 @@ export default function Navbar({
           </nav>
 
           {/* Desktop Right Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2.5">
+            <button
+              onClick={() => handleNavClick('app-flow')}
+              className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#F5C754] to-[#EAB308] hover:brightness-105 text-black font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-sm transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-black" />
+              <span>10 Screens App UI</span>
+            </button>
+
             <button
               onClick={onOpenLiveStream}
               className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-xs transition-colors"
@@ -125,8 +150,17 @@ export default function Navbar({
             </button>
           </div>
 
-          {/* Mobile Right Bar: Live Pill + Hamburger (Fit within 360px without stretching) */}
+          {/* Mobile Right Bar: Live App Button + Live Pill + Hamburger */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:hidden shrink-0">
+            {/* Quick 10 Screens Button on Mobile */}
+            <button
+              onClick={() => handleNavClick('app-flow')}
+              className="inline-flex items-center gap-1 bg-gradient-to-r from-[#F5C754] to-[#EAB308] text-black text-[11px] font-extrabold px-2 py-1 rounded-full shadow-xs"
+            >
+              <Sparkles className="w-3 h-3 text-black" />
+              <span>App UI</span>
+            </button>
+
             {/* Quick Live Button on Mobile Topbar */}
             <button
               onClick={onOpenLiveStream}
