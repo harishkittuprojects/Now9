@@ -862,7 +862,6 @@ export function Screen2Home({
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [appLang, setAppLang] = useState('తెలుగు');
   const [isConstituencyModalOpen, setIsConstituencyModalOpen] = useState(false);
-  const [selectedManifestoParty, setSelectedManifestoParty] = useState(null);
   const [userLocalVotes, setUserLocalVotes] = useState({});
   const [voteToast, setVoteToast] = useState(null);
   const [notifs, setNotifs] = useState([
@@ -1223,12 +1222,12 @@ export function Screen2Home({
                       </div>
                     </div>
 
-                    {/* Action buttons: Vote Local and Manifesto */}
-                    <div className="flex items-center gap-1.5 pt-0.5">
+                    {/* Action button: Vote Local */}
+                    <div className="pt-0.5">
                       <button
                         type="button"
                         onClick={() => handleVoteLocalParty(party.id, party.name)}
-                        className={`flex-1 py-1 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                        className={`w-full py-1.5 px-3 rounded-lg text-[9.5px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                           hasVoted 
                             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
                             : 'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110 shadow-xs'
@@ -1236,15 +1235,6 @@ export function Screen2Home({
                       >
                         <Vote className="w-2.5 h-2.5" />
                         <span>{hasVoted ? 'Voted Locally ✓' : 'Vote Local 🗳️'}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setSelectedManifestoParty(party)}
-                        className="py-1 px-2.5 rounded-lg bg-[#1C1C26] hover:bg-[#252535] border border-[#2B2B38] text-gray-200 text-[8px] font-bold transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <FileText className="w-2.5 h-2.5 text-amber-400" />
-                        <span>Manifesto 📑</span>
                       </button>
                     </div>
                   </div>
@@ -1437,70 +1427,6 @@ export function Screen2Home({
         isLocating={isLocating}
       />
 
-      {/* Local Party Manifesto Modal */}
-      {selectedManifestoParty && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-xs animate-fadeIn">
-          <div className="w-full max-h-[85%] bg-[#121217] border border-amber-500/50 rounded-2xl p-3.5 shadow-2xl flex flex-col justify-between space-y-2.5">
-            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
-              <div className="flex items-center gap-2">
-                <span className="text-xl p-1.5 rounded-xl bg-[#1C1C28] border border-[#2B2B3B]">
-                  {selectedManifestoParty.symbol}
-                </span>
-                <div>
-                  <h3 className="text-xs font-black text-white">{selectedManifestoParty.name}</h3>
-                  <p className="text-[8px] text-amber-300">
-                    Candidate: {selectedManifestoParty.candidate} • {currentLocation.assembly}
-                  </p>
-                </div>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setSelectedManifestoParty(null)}
-                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="space-y-2 overflow-y-auto phone-scroll max-h-56 pr-0.5">
-              <span className="text-[9px] font-black text-amber-400 uppercase tracking-wider block">
-                Local Promises for {currentLocation?.locality || 'Your Area'}:
-              </span>
-              <div className="space-y-1.5">
-                {(selectedManifestoParty?.manifestoPromises || selectedManifestoParty?.promises || []).map((promise, idx) => (
-                  <div key={idx} className="p-2 rounded-xl bg-[#181822] border border-[#252535] flex items-start gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                    <span className="font-telugu text-[10px] text-gray-200 leading-tight">
-                      {promise}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 pt-1 border-t border-[#22222E]">
-              <button
-                type="button"
-                onClick={() => {
-                  handleVoteLocalParty(selectedManifestoParty.id, selectedManifestoParty.name);
-                  setSelectedManifestoParty(null);
-                }}
-                className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs shadow-md hover:brightness-110 cursor-pointer flex items-center justify-center gap-1"
-              >
-                <Vote className="w-3 h-3" />
-                <span>Support this Manifesto</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedManifestoParty(null)}
-                className="px-3 py-2 rounded-xl bg-[#1C1C24] text-xs font-bold text-gray-300 hover:text-white cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <BottomNavBar activeTab="home" onTabChange={onNavigate} />
     </div>
