@@ -2163,36 +2163,11 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
 // 6. SCREEN 6: COMMON PEOPLE SCREEN
 export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
   const [filterRole, setFilterRole] = useState('All');
-  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordTimer, setRecordTimer] = useState(0);
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
-  };
-
-  const handleStartRecord = () => {
-    setIsRecording(true);
-    setRecordTimer(1);
-    const interval = setInterval(() => {
-      setRecordTimer(t => {
-        if (t >= 15) {
-          clearInterval(interval);
-          setIsRecording(false);
-          return 15;
-        }
-        return t + 1;
-      });
-    }, 1000);
-  };
-
-  const handleSubmitVoiceStory = () => {
-    setIsRecordModalOpen(false);
-    setIsRecording(false);
-    setRecordTimer(0);
-    showToast('🎙️ మీ వాయిస్ నోట్ విజయవంతంగా అందింది! (Voice Recorded)');
   };
 
   // Filter logic
@@ -2215,61 +2190,6 @@ export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
         </div>
       )}
 
-      {/* Voice Record Modal */}
-      {isRecordModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
-              <div className="flex items-center gap-1.5">
-                <Mic className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-bold text-white">మీ ప్రాంత సమస్య చెప్పండి (Record Issue)</h3>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setIsRecordModalOpen(false)}
-                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <p className="text-[10px] text-gray-300">
-              రైతులు, విద్యార్థులు, మహిళల గళం నేరుగా ప్రజలకు, నాయకులకు చేరుతుంది.
-            </p>
-
-            <div className="p-4 rounded-xl bg-[#181822] border border-[#262632] text-center flex flex-col items-center justify-center gap-2">
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl transition-all ${
-                isRecording ? 'bg-red-600/30 border-2 border-red-500 animate-pulse text-red-400' : 'bg-emerald-600/20 border border-emerald-400 text-emerald-400'
-              }`}>
-                {isRecording ? '🔴' : '🎙️'}
-              </div>
-              <span className="text-xs font-bold text-white">
-                {isRecording ? `Recording... 00:${recordTimer < 10 ? '0' + recordTimer : recordTimer}` : 'Tap below to start speaking'}
-              </span>
-              <span className="text-[8px] text-gray-400">Clear voice in Telugu / English</span>
-            </div>
-
-            {!isRecording && recordTimer === 0 ? (
-              <button
-                type="button"
-                onClick={handleStartRecord}
-                className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-md cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <span>Start Recording Voice Note</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSubmitVoiceStory}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-extrabold text-xs shadow-md cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <span>Done & Send to NowNine 🚀</span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
         <div className="flex items-center gap-2">
@@ -2287,15 +2207,6 @@ export function Screen6CommonPeople({ onBack, onSelectStory, onNavigate }) {
             </p>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={() => setIsRecordModalOpen(true)}
-          className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-400 text-[8px] font-extrabold hover:bg-emerald-500/25 transition-all cursor-pointer flex items-center gap-1"
-        >
-          <Mic className="w-2.5 h-2.5" />
-          <span>సమస్య చెప్పండి 🎙️</span>
-        </button>
       </div>
 
       {/* Filters */}
