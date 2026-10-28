@@ -863,6 +863,7 @@ export function Screen2Home({
   const [isConstituencyModalOpen, setIsConstituencyModalOpen] = useState(false);
   const [userLocalVotes, setUserLocalVotes] = useState({});
   const [voteToast, setVoteToast] = useState(null);
+  const [showSurveyParties, setShowSurveyParties] = useState(false);
   const [notifs, setNotifs] = useState([
     { id: 1, title: 'Live Debate: 2026 ఎన్నికలు - ఎవరికి అవకాశాలు?', subtitle: '12.4K watching now', time: 'Just now', target: 'debate-detail', isUnread: true },
     { id: 2, title: 'Political Survey: 12,400+ Citizens Voted', subtitle: 'Cast your vote on governance & leadership', time: '1h ago', target: 'survey', isUnread: true },
@@ -880,9 +881,13 @@ export function Screen2Home({
     if (onSelectSurveyParty) {
       onSelectSurveyParty(found || { id: partyId, name: partyName });
     }
-    if (onNavigate) {
-      onNavigate('survey');
-    }
+    setVoteToast(`🎉 ${partyName} ఎంపిక చేయబడింది! Survey Starting...`);
+    setTimeout(() => {
+      setVoteToast(null);
+      if (onNavigate) {
+        onNavigate('survey');
+      }
+    }, 450);
   };
 
   return (
@@ -1120,44 +1125,120 @@ export function Screen2Home({
           <p className="text-[10px] text-gray-400">Stay informed. Stay ahead.</p>
         </div>
 
-        {/* Hero Card: Political Survey */}
-        <div 
-          onClick={() => onNavigate('survey')}
-          className="relative rounded-2xl p-3.5 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group hover:border-amber-400 transition-all"
-        >
-          <div className="relative z-10 max-w-[68%]">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-[9px] font-bold text-amber-300 uppercase tracking-wider">
-                Live Constituency Survey
+        {/* Hero Card: Political Survey with Expandable 2x2 Party Boxes */}
+        <div className="space-y-2">
+          <div 
+            onClick={() => setShowSurveyParties(prev => !prev)}
+            className="relative rounded-2xl p-3.5 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group hover:border-amber-400 transition-all"
+          >
+            <div className="relative z-10 max-w-[68%]">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="text-[9px] font-bold text-amber-300 uppercase tracking-wider">
+                  Live Constituency Survey
+                </span>
+              </div>
+              <span className="text-xs font-black text-[#FDE047] block leading-tight">
+                Political Survey & Local Voting
               </span>
+              <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
+                Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSurveyParties(prev => !prev);
+                  }}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[9.5px] shadow-sm group-hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Vote className="w-2.5 h-2.5" />
+                  <span>{showSurveyParties ? 'Hide Parties' : 'Take Survey & Vote Local'}</span>
+                  <ChevronDown className={`w-3 h-3 stroke-[3] transition-transform duration-200 ${showSurveyParties ? 'rotate-180' : ''}`} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onNavigate('survey');
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-[9px] border border-white/20 transition-all cursor-pointer"
+                  title="Open full survey flow"
+                >
+                  <span>Full Survey</span>
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
             </div>
-            <span className="text-xs font-black text-[#FDE047] block leading-tight">
-              Political Survey & Local Voting
-            </span>
-            <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
-              Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
-            </span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNavigate('survey');
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[9.5px] shadow-sm group-hover:brightness-110 active:scale-95 transition-all cursor-pointer"
-            >
-              <Vote className="w-2.5 h-2.5" />
-              <span>Take Survey & Vote Local</span>
-              <ChevronRight className="w-3 h-3 stroke-[3]" />
-            </button>
+
+            {/* Hand dropping ballot icon illustration */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 flex items-center justify-center opacity-85 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl shadow-inner">
+                🗳️
+              </div>
+            </div>
           </div>
 
-          {/* Hand dropping ballot icon illustration */}
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 flex items-center justify-center opacity-85 group-hover:scale-110 transition-transform">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl shadow-inner">
-              🗳️
+          {/* When survey is pressed: Contesting Local Parties displayed in 2x2 boxes like reference */}
+          {showSurveyParties && (
+            <div className="space-y-1.5 animate-fadeIn">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] font-bold text-amber-300 flex items-center gap-1">
+                  <span>🏛️ Select Party to Vote & Rate:</span>
+                </span>
+                <span className="text-[8px] text-gray-400">
+                  {currentLocation?.assembly || 'Constituency'}
+                </span>
+              </div>
+
+              {/* 2x2 Party Tiles Grid styled exactly like the reference boxes below */}
+              <div className="grid grid-cols-2 gap-2.5">
+                {(currentLocation?.parties || []).map((party) => {
+                  const hasVoted = Boolean(userLocalVotes[party.id]);
+                  const partyStatus = party.status || party.role || 'Contestant';
+                  return (
+                    <button
+                      key={party.id}
+                      type="button"
+                      onClick={() => handleVoteLocalParty(party.id, party.name)}
+                      className={`p-3.5 rounded-2xl bg-[#0C1421] border cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40 relative ${
+                        hasVoted
+                          ? 'border-[#F5C754] bg-[#0E1A2C] shadow-lg shadow-[#F5C754]/20 ring-1 ring-[#F5C754]'
+                          : 'border-[#1B2A41] hover:border-[#F5C754]/60'
+                      }`}
+                    >
+                      {hasVoted && (
+                        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-[#F5C754] text-black text-[7px] font-black shadow-xs flex items-center gap-0.5">
+                          ✓ Voted
+                        </span>
+                      )}
+
+                      <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                        <span className="text-xl select-none leading-none">
+                          {party.symbol || '🗳️'}
+                        </span>
+                      </div>
+
+                      <h3 className="font-black text-[12px] text-white leading-tight">
+                        {party.name}
+                      </h3>
+
+                      <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight line-clamp-1">
+                        {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'MLA'} • Local`}
+                      </p>
+
+                      <div className="mt-2 flex items-center gap-1">
+                        <span className="text-[7.5px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-amber-300 font-mono">
+                          {party.voteShare}% Approval
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* 2x2 Feature Tiles Grid */}
@@ -1521,84 +1602,53 @@ export function Screen3Survey({
                 </span>
               </div>
 
-              {/* List of parties */}
-              <div className="space-y-2">
+              {/* Contesting Political Parties in 2x2 Boxes Matching Reference */}
+              <div className="grid grid-cols-2 gap-2.5 pt-1">
                 {partiesList.map((party) => {
                   const hasVoted = Boolean(userLocalVotes[party.id]) || chosenParty?.id === party.id;
                   const partyStatus = party.status || party.role || 'Contestant';
-                  const isHighlight = partyStatus.includes('Incumbent') || partyStatus.includes('Ruling') || partyStatus.includes('Sitting');
                   return (
-                    <div 
+                    <button
                       key={party.id}
-                      className={`p-2.5 rounded-xl border transition-all space-y-1.5 ${
-                        hasVoted 
-                          ? 'bg-[#181824] border-amber-400/60 shadow-md shadow-amber-500/10' 
-                          : 'bg-[#111117] border-[#22222E] hover:border-amber-400/30'
+                      type="button"
+                      onClick={() => handleVoteAndSelectParty(party)}
+                      className={`p-3.5 rounded-2xl bg-[#0C1421] border cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40 relative ${
+                        hasVoted
+                          ? 'border-[#F5C754] bg-[#0E1A2C] shadow-lg shadow-[#F5C754]/20 ring-1 ring-[#F5C754]'
+                          : 'border-[#1B2A41] hover:border-[#F5C754]/60'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-base p-1 rounded-lg bg-[#181822] border border-[#282834]">
-                            {party.symbol || '🗳️'}
-                          </span>
-                          <div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] font-black text-white">{party.name}</span>
-                              <span className="text-[8px] font-mono px-1 rounded bg-[#20202C] text-gray-300">
-                                {party.code || party.id?.toUpperCase()}
-                              </span>
-                            </div>
-                            <span className="text-[8.5px] font-bold text-amber-300 block">
-                              👤 {party.candidate}
-                            </span>
-                          </div>
-                        </div>
+                      {/* Voted badge */}
+                      {hasVoted && (
+                        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-[#F5C754] text-black text-[7px] font-black shadow-xs flex items-center gap-0.5 animate-fadeIn">
+                          ✓ Voted
+                        </span>
+                      )}
 
-                        <span className={`text-[7px] font-extrabold px-1.5 py-0.5 rounded-full border ${
-                          isHighlight
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                            : 'bg-blue-500/15 text-blue-300 border-blue-500/30'
-                        }`}>
-                          {partyStatus}
+                      {/* Golden circular outline icon matching reference */}
+                      <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                        <span className="text-xl select-none leading-none">
+                          {party.symbol || '🗳️'}
                         </span>
                       </div>
 
-                      {/* Ward Focus */}
-                      <p className="text-[8px] text-gray-300 bg-[#161620] px-2 py-0.5 rounded-md leading-tight">
-                        <span className="text-gray-400 font-semibold">🎯 Ward Focus: </span>
-                        {party.keyFocus || party.focus || 'Local civic improvements'}
+                      {/* Party Name */}
+                      <h3 className="font-black text-[12px] text-white leading-tight">
+                        {party.name}
+                      </h3>
+
+                      {/* Subtitle matching reference format: Candidate • Role */}
+                      <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight line-clamp-1">
+                        {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'Party'} • Local`}
                       </p>
 
-                      {/* Vote share bar */}
-                      <div>
-                        <div className="flex justify-between text-[8px] mb-0.5">
-                          <span className="text-gray-400">Locality Approval:</span>
-                          <span className="font-extrabold font-mono text-white">{party.voteShare}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-[#1F1F2B] rounded-full overflow-hidden">
-                          <div 
-                            className="h-full rounded-full transition-all duration-500" 
-                            style={{ width: `${party.voteShare}%`, backgroundColor: party.color || '#F59E0B' }}
-                          ></div>
-                        </div>
+                      {/* Approval / Vote share pill */}
+                      <div className="mt-2 flex items-center gap-1">
+                        <span className="text-[7.5px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-amber-300 font-mono">
+                          {party.voteShare}% Approval
+                        </span>
                       </div>
-
-                      {/* Action button: Vote Local */}
-                      <div className="pt-0.5">
-                        <button
-                          type="button"
-                          onClick={() => handleVoteAndSelectParty(party)}
-                          className={`w-full py-1.5 px-3 rounded-lg text-[9.5px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                            hasVoted 
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
-                              : 'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110 shadow-xs'
-                          }`}
-                        >
-                          <Vote className="w-2.5 h-2.5" />
-                          <span>{hasVoted ? '✓ Selected & Voted • Take Survey →' : 'Vote Local 🗳️'}</span>
-                        </button>
-                      </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
