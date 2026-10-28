@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -809,7 +809,7 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
             { label: 'Live Debates', icon: '🎙️', id: 'live-debates' },
             { label: 'News', icon: '📰', id: 'news' },
             { label: 'Common People', icon: '👥', id: 'common-people' },
-            { label: 'Short Videos', icon: '🎬', id: 'short-videos' },
+            { label: 'Big Boss', icon: '👁️', id: 'big-boss' },
           ].map((item, idx) => (
             <button 
               key={idx}
@@ -855,15 +855,24 @@ export function Screen2Home({
   onLocationChange = () => {}, 
   isLocating = false,
   onDetectLiveGps = () => {},
+  selectedParty = null,
   onSelectSurveyParty = () => {}
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [appLang, setAppLang] = useState('తెలుగు');
   const [isConstituencyModalOpen, setIsConstituencyModalOpen] = useState(false);
-  const [userLocalVotes, setUserLocalVotes] = useState({});
+  // Single selected party (strictly one party at a time)
+  const [selectedPartyId, setSelectedPartyId] = useState(() => selectedParty?.id || null);
   const [voteToast, setVoteToast] = useState(null);
   const [showSurveyParties, setShowSurveyParties] = useState(false);
+
+  useEffect(() => {
+    if (selectedParty?.id) {
+      setSelectedPartyId(selectedParty.id);
+    }
+  }, [selectedParty]);
+
   const [notifs, setNotifs] = useState([
     { id: 1, title: 'Live Debate: 2026 ఎన్నికలు - ఎవరికి అవకాశాలు?', subtitle: '12.4K watching now', time: 'Just now', target: 'debate-detail', isUnread: true },
     { id: 2, title: 'Political Survey: 12,400+ Citizens Voted', subtitle: 'Cast your vote on governance & leadership', time: '1h ago', target: 'survey', isUnread: true },
@@ -873,13 +882,12 @@ export function Screen2Home({
   const unreadCount = notifs.filter(n => n.isUnread).length;
 
   const handleVoteLocalParty = (partyId, partyName) => {
-    setUserLocalVotes(prev => ({
-      ...prev,
-      [partyId]: true
-    }));
+    // Strictly select only ONE party
+    setSelectedPartyId(partyId);
     const found = (currentLocation?.parties || []).find(p => p.id === partyId);
+    const chosen = found || { id: partyId, name: partyName };
     if (onSelectSurveyParty) {
-      onSelectSurveyParty(found || { id: partyId, name: partyName });
+      onSelectSurveyParty(chosen);
     }
     setVoteToast(`🎉 ${partyName} ఎంపిక చేయబడింది! Survey Starting...`);
     setTimeout(() => {
@@ -1055,7 +1063,7 @@ export function Screen2Home({
                   { label: 'Political Survey', icon: FileText, target: 'survey', color: 'text-amber-400' },
                   { label: 'NowNine News', icon: Newspaper, target: 'news', color: 'text-[#F5C754]' },
                   { label: 'Live Debates', icon: Radio, target: 'live-debates', color: 'text-red-400' },
-                  { label: 'Short Videos', icon: Video, target: 'short-videos', color: 'text-amber-400' },
+                  { label: 'Big Boss', icon: Eye, target: 'big-boss', color: 'text-amber-400' },
                   { label: 'Common People', icon: Users, target: 'common-people', color: 'text-emerald-400' },
                 ].map((item) => {
                   const Icon = item.icon;
@@ -1119,240 +1127,291 @@ export function Screen2Home({
 
       {/* Scrollable Main Area */}
       <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-16">
-        {/* Greeting */}
-        <div>
-          <h2 className="text-sm font-extrabold text-white">Good Evening!</h2>
-          <p className="text-[10px] text-gray-400">Stay informed. Stay ahead.</p>
-        </div>
-
-        {/* Hero Card: Political Survey with Expandable 2x2 Party Boxes */}
-        <div className="space-y-2">
-          <div 
-            onClick={() => setShowSurveyParties(prev => !prev)}
-            className="relative rounded-2xl p-3.5 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group hover:border-amber-400 transition-all"
-          >
-            <div className="relative z-10 max-w-[68%]">
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="text-[9px] font-bold text-amber-300 uppercase tracking-wider">
-                  Live Constituency Survey
-                </span>
-              </div>
-              <span className="text-xs font-black text-[#FDE047] block leading-tight">
-                Political Survey & Local Voting
-              </span>
-              <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
-                Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
-              </span>
-              <div className="flex items-center gap-1.5">
+        {showSurveyParties ? (
+          /* DEDICATED SURVEY PARTIES VIEW - ONLY PARTIES, NO OTHER SECTIONS */
+          <div className="space-y-3 animate-fadeIn pb-4">
+            {/* Top Navigation Bar for Survey Mode */}
+            <div className="flex items-center justify-between pb-2 border-b border-[#20202A]">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowSurveyParties(prev => !prev);
-                  }}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[9.5px] shadow-sm group-hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  onClick={() => setShowSurveyParties(false)}
+                  className="p-1.5 rounded-xl bg-[#14141E] hover:bg-[#1E1E2C] border border-[#282838] text-gray-300 hover:text-white transition-all cursor-pointer flex items-center gap-1 text-[10px] font-bold"
+                  title="Return to Home Feed"
                 >
-                  <Vote className="w-2.5 h-2.5" />
-                  <span>{showSurveyParties ? 'Hide Parties' : 'Take Survey & Vote Local'}</span>
-                  <ChevronDown className={`w-3 h-3 stroke-[3] transition-transform duration-200 ${showSurveyParties ? 'rotate-180' : ''}`} />
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Home</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onNavigate('survey');
-                  }}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-[9px] border border-white/20 transition-all cursor-pointer"
-                  title="Open full survey flow"
-                >
-                  <span>Full Survey</span>
-                  <ChevronRight className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-
-            {/* Hand dropping ballot icon illustration */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 flex items-center justify-center opacity-85 group-hover:scale-110 transition-transform">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl shadow-inner">
-                🗳️
-              </div>
-            </div>
-          </div>
-
-          {/* When survey is pressed: Contesting Local Parties displayed in 2x2 boxes like reference */}
-          {showSurveyParties && (
-            <div className="space-y-1.5 animate-fadeIn">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-[10px] font-bold text-amber-300 flex items-center gap-1">
-                  <span>🏛️ Select Party to Vote & Rate:</span>
-                </span>
-                <span className="text-[8px] text-gray-400">
-                  {currentLocation?.assembly || 'Constituency'}
-                </span>
-              </div>
-
-              {/* 2x2 Party Tiles Grid styled exactly like the reference boxes below */}
-              <div className="grid grid-cols-2 gap-2.5">
-                {(currentLocation?.parties || []).map((party) => {
-                  const hasVoted = Boolean(userLocalVotes[party.id]);
-                  const partyStatus = party.status || party.role || 'Contestant';
-                  return (
-                    <button
-                      key={party.id}
-                      type="button"
-                      onClick={() => handleVoteLocalParty(party.id, party.name)}
-                      className={`p-3.5 rounded-2xl bg-[#0C1421] border cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40 relative ${
-                        hasVoted
-                          ? 'border-[#F5C754] bg-[#0E1A2C] shadow-lg shadow-[#F5C754]/20 ring-1 ring-[#F5C754]'
-                          : 'border-[#1B2A41] hover:border-[#F5C754]/60'
-                      }`}
-                    >
-                      {hasVoted && (
-                        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-[#F5C754] text-black text-[7px] font-black shadow-xs flex items-center gap-0.5">
-                          ✓ Voted
-                        </span>
-                      )}
-
-                      <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-                        <span className="text-xl select-none leading-none">
-                          {party.symbol || '🗳️'}
-                        </span>
-                      </div>
-
-                      <h3 className="font-black text-[12px] text-white leading-tight">
-                        {party.name}
-                      </h3>
-
-                      <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight line-clamp-1">
-                        {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'MLA'} • Local`}
-                      </p>
-
-                      <div className="mt-2 flex items-center gap-1">
-                        <span className="text-[7.5px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-amber-300 font-mono">
-                          {party.voteShare}% Approval
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 2x2 Feature Tiles Grid */}
-        <div className="grid grid-cols-2 gap-2.5">
-          {/* Tile 1: Live Debates */}
-          <button 
-            type="button"
-            onClick={() => onNavigate('live-debates')}
-            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
-          >
-            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-              <Play className="w-4 h-4 fill-[#F5C754] stroke-[#F5C754] ml-0.5" />
-            </div>
-            <h3 className="font-black text-[12px] text-white leading-tight">Live Debates</h3>
-            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Watch • Listen • Discuss</p>
-          </button>
-
-          {/* Tile 2: News */}
-          <button 
-            type="button"
-            onClick={() => onNavigate('news')}
-            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
-          >
-            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-              <Newspaper className="w-4 h-4 text-[#F5C754]" />
-            </div>
-            <h3 className="font-black text-[12px] text-white leading-tight">News</h3>
-            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Breaking • State • Local</p>
-          </button>
-
-          {/* Tile 3: Common People */}
-          <button 
-            type="button"
-            onClick={() => onNavigate('common-people')}
-            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
-          >
-            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-              <Users className="w-4 h-4 text-[#F5C754]" />
-            </div>
-            <h3 className="font-black text-[12px] text-white leading-tight">Common People</h3>
-            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Real Voices • Real Stories</p>
-          </button>
-
-          {/* Tile 4: Short Videos */}
-          <button 
-            type="button"
-            onClick={() => onNavigate('short-videos')}
-            className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
-          >
-            <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-              <Video className="w-4 h-4 text-[#F5C754]" />
-            </div>
-            <h3 className="font-black text-[12px] text-white leading-tight">Short Videos</h3>
-            <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Trending • Local • Viral</p>
-          </button>
-        </div>
-
-        {/* Trending Now Section */}
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-bold text-white">Trending Now</span>
-            <button 
-              type="button"
-              onClick={() => onNavigate('short-videos')}
-              className="text-[9px] text-[#F5C754] font-semibold hover:underline cursor-pointer"
-            >
-              See All &gt;
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            {TRENDING_NOW.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => onNavigate('video-player')}
-                className="rounded-xl overflow-hidden bg-[#141418] border border-[#232328] hover:border-amber-500/40 cursor-pointer group transition-all"
-              >
-                <div className="h-16 w-full relative overflow-hidden">
-                  <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                  <span className="absolute bottom-1 right-1 text-[8px] px-1 rounded bg-black/60 text-white flex items-center gap-0.5">
-                    <Eye className="w-2.5 h-2.5 text-amber-400" />
-                    {item.views}
-                  </span>
-                </div>
-                <div className="p-1.5">
-                  <p className="font-telugu text-[9px] text-white font-medium line-clamp-1 leading-tight">
-                    {item.title}
+                <div>
+                  <h2 className="text-xs font-black text-white flex items-center gap-1.5">
+                    <span>🏛️ Local Political Parties</span>
+                    <span className="text-[7.5px] font-extrabold px-1.5 py-0.2 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                      1 Party Only
+                    </span>
+                  </h2>
+                  <p className="text-[8px] text-gray-400">
+                    {currentLocation?.locality || 'Your Area'} • {currentLocation?.assembly || 'Constituency'}
                   </p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Live Debate Spotlight Section */}
-        <div 
-          onClick={() => onNavigate('live-debates')}
-          className="p-3 rounded-2xl bg-gradient-to-r from-[#1A1212] via-[#241414] to-[#161214] border border-red-500/30 hover:border-red-500/60 cursor-pointer transition-all group"
-        >
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold text-white flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-              <span>Today's Big Debate (7:30 PM)</span>
-            </span>
-            <span className="text-[8px] text-red-400 font-semibold group-hover:underline">Join &gt;</span>
+              <button
+                type="button"
+                onClick={() => setShowSurveyParties(false)}
+                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                title="Close Survey"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Instruction banner */}
+            <div className="px-1 flex items-center justify-between">
+              <span className="text-[9.5px] font-bold text-gray-300">
+                Select your party to vote & evaluate:
+              </span>
+              <span className="text-[8px] text-amber-300 font-mono">
+                {(currentLocation?.parties || []).length} Contesting Parties
+              </span>
+            </div>
+
+            {/* 2x2 Party Tiles Grid styled exactly like the reference boxes */}
+            <div className="grid grid-cols-2 gap-2.5">
+              {(currentLocation?.parties || []).map((party) => {
+                const isSelected = selectedPartyId === party.id;
+                const partyStatus = party.status || party.role || 'Contestant';
+                return (
+                  <button
+                    key={party.id}
+                    type="button"
+                    onClick={() => handleVoteLocalParty(party.id, party.name)}
+                    className={`p-3.5 rounded-2xl bg-[#0C1421] border cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40 relative ${
+                      isSelected
+                        ? 'border-[#F5C754] bg-[#0E1A2C] shadow-lg shadow-[#F5C754]/20 ring-1 ring-[#F5C754]'
+                        : 'border-[#1B2A41] hover:border-[#F5C754]/60'
+                    }`}
+                  >
+                    {isSelected && (
+                      <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-[#F5C754] text-black text-[7px] font-black shadow-xs flex items-center gap-0.5 animate-fadeIn">
+                        ✓ Selected
+                      </span>
+                    )}
+
+                    <div className={`w-11 h-11 rounded-full border-2 flex items-center justify-center mb-2 transition-transform shadow-inner group-hover:scale-105 ${
+                      isSelected ? 'border-[#F5C754] bg-[#F5C754]/25 text-[#F5C754]' : 'border-[#F5C754] bg-[#F5C754]/10 text-[#F5C754]'
+                    }`}>
+                      <span className="text-xl select-none leading-none">
+                        {party.symbol || '🗳️'}
+                      </span>
+                    </div>
+
+                    <h3 className="font-black text-[12px] text-white leading-tight">
+                      {party.name}
+                    </h3>
+
+                    <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight line-clamp-1">
+                      {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'MLA'} • Local`}
+                    </p>
+
+                    <div className="mt-2 flex items-center gap-1">
+                      <span className="text-[7.5px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-amber-300 font-mono">
+                        {party.voteShare}% Approval
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Action Bar when a party is selected or to proceed to survey questions */}
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={() => onNavigate('survey')}
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[10px] shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Vote className="w-3.5 h-3.5" />
+                <span>
+                  {selectedPartyId 
+                    ? `Continue Survey with ${(currentLocation?.parties || []).find(p => p.id === selectedPartyId)?.name || 'Selected Party'} →`
+                    : 'Start 5-Question Governance Survey →'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowSurveyParties(false)}
+                className="w-full py-2 px-3 rounded-xl bg-[#14141E] hover:bg-[#1E1E2C] border border-[#262634] text-gray-400 hover:text-white text-[9.5px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <span>Close Survey & Return to Home Feed</span>
+              </button>
+            </div>
           </div>
-          <p className="font-telugu text-[10px] font-bold text-white leading-snug">
-            2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
-          </p>
-          <p className="text-[8px] text-gray-400 mt-0.5">
-            4 Panelists • Live Chat Stream Active
-          </p>
-        </div>
+        ) : (
+          /* NORMAL HOME FEED - SHOWN ONLY WHEN NOT IN SURVEY MODE */
+          <>
+            {/* Greeting */}
+            <div>
+              <h2 className="text-sm font-extrabold text-white">Good Evening!</h2>
+              <p className="text-[10px] text-gray-400">Stay informed. Stay ahead.</p>
+            </div>
+
+            {/* Hero Card: Political Survey */}
+            <div 
+              onClick={() => setShowSurveyParties(true)}
+              className="relative rounded-2xl p-3.5 bg-gradient-to-r from-[#1E1B14] via-[#2A2312] to-[#1A1813] border border-amber-500/40 shadow-lg cursor-pointer overflow-hidden group hover:border-amber-400 transition-all"
+            >
+              <div className="relative z-10 max-w-[68%]">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span className="text-[9px] font-bold text-amber-300 uppercase tracking-wider">
+                    Live Constituency Survey
+                  </span>
+                </div>
+                <span className="text-xs font-black text-[#FDE047] block leading-tight">
+                  Political Survey & Local Voting
+                </span>
+                <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
+                  Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSurveyParties(true);
+                    }}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[9.5px] shadow-sm group-hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Vote className="w-2.5 h-2.5" />
+                    <span>Take Survey & Vote Local</span>
+                    <ChevronRight className="w-3 h-3 stroke-[3]" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Hand dropping ballot icon illustration */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 flex items-center justify-center opacity-85 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl shadow-inner">
+                  🗳️
+                </div>
+              </div>
+            </div>
+
+            {/* 2x2 Feature Tiles Grid */}
+            <div className="grid grid-cols-2 gap-2.5">
+              {/* Tile 1: Live Debates */}
+              <button 
+                type="button"
+                onClick={() => onNavigate('live-debates')}
+                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+              >
+                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Play className="w-4 h-4 fill-[#F5C754] stroke-[#F5C754] ml-0.5" />
+                </div>
+                <h3 className="font-black text-[12px] text-white leading-tight">Live Debates</h3>
+                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Watch • Listen • Discuss</p>
+              </button>
+
+              {/* Tile 2: News */}
+              <button 
+                type="button"
+                onClick={() => onNavigate('news')}
+                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+              >
+                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Newspaper className="w-4 h-4 text-[#F5C754]" />
+                </div>
+                <h3 className="font-black text-[12px] text-white leading-tight">News</h3>
+                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Breaking • State • Local</p>
+              </button>
+
+              {/* Tile 3: Common People */}
+              <button 
+                type="button"
+                onClick={() => onNavigate('common-people')}
+                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+              >
+                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Users className="w-4 h-4 text-[#F5C754]" />
+                </div>
+                <h3 className="font-black text-[12px] text-white leading-tight">Common People</h3>
+                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Real Voices • Real Stories</p>
+              </button>
+
+              {/* Tile 4: Big Boss */}
+              <button 
+                type="button"
+                onClick={() => onNavigate('big-boss')}
+                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+              >
+                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Eye className="w-4 h-4 text-[#F5C754]" />
+                </div>
+                <h3 className="font-black text-[12px] text-white leading-tight">Big Boss</h3>
+                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Voting • Polls • Drama</p>
+              </button>
+            </div>
+
+            {/* Trending Now Section */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-bold text-white">Trending Now</span>
+                <button 
+                  type="button"
+                  onClick={() => onNavigate('short-videos')}
+                  className="text-[9px] text-[#F5C754] font-semibold hover:underline cursor-pointer"
+                >
+                  See All &gt;
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                {TRENDING_NOW.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => onNavigate('video-player')}
+                    className="rounded-xl overflow-hidden bg-[#141418] border border-[#232328] hover:border-amber-500/40 cursor-pointer group transition-all"
+                  >
+                    <div className="h-16 w-full relative overflow-hidden">
+                      <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                      <span className="absolute bottom-1 right-1 text-[8px] px-1 rounded bg-black/60 text-white flex items-center gap-0.5">
+                        <Eye className="w-2.5 h-2.5 text-amber-400" />
+                        {item.views}
+                      </span>
+                    </div>
+                    <div className="p-1.5">
+                      <p className="font-telugu text-[9px] text-white font-medium line-clamp-1 leading-tight">
+                        {item.title}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Live Debate Spotlight Section */}
+            <div 
+              onClick={() => onNavigate('live-debates')}
+              className="p-3 rounded-2xl bg-gradient-to-r from-[#1A1212] via-[#241414] to-[#161214] border border-red-500/30 hover:border-red-500/60 cursor-pointer transition-all group"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-bold text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                  <span>Today's Big Debate (7:30 PM)</span>
+                </span>
+                <span className="text-[8px] text-red-400 font-semibold group-hover:underline">Join &gt;</span>
+              </div>
+              <p className="font-telugu text-[10px] font-bold text-white leading-snug">
+                2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
+              </p>
+              <p className="text-[8px] text-gray-400 mt-0.5">
+                4 Panelists • Live Chat Stream Active
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Toast Notification for Local Voting */}
@@ -1399,13 +1458,19 @@ export function Screen3Survey({
 
   // Active view tab: 'parties' | 'questions' | 'results'
   const [activeTab, setActiveTab] = useState(() => (selectedParty ? 'questions' : 'parties'));
+  // Strictly single chosen party
   const [chosenParty, setChosenParty] = useState(selectedParty);
-  const [userLocalVotes, setUserLocalVotes] = useState({});
   const [currentStep, setCurrentStep] = useState(0); // 0 to 4
   const [answers, setAnswers] = useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [isConstituencyModalOpen, setIsConstituencyModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (selectedParty) {
+      setChosenParty(selectedParty);
+    }
+  }, [selectedParty]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -1413,8 +1478,8 @@ export function Screen3Survey({
   };
 
   const handleVoteAndSelectParty = (party) => {
+    // Strictly select only ONE party
     setChosenParty(party);
-    setUserLocalVotes(prev => ({ ...prev, [party.id]: true }));
     if (onSelectSurveyParty) {
       onSelectSurveyParty(party);
     }
@@ -1590,11 +1655,14 @@ export function Screen3Survey({
             <div className="space-y-1.5 pt-0.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[11px] font-extrabold text-white flex items-center gap-1">
+                  <h3 className="text-[11px] font-extrabold text-white flex items-center gap-1.5">
                     <span>Political Parties in {loc?.locality || 'Your Area'}</span>
+                    <span className="text-[7.5px] font-extrabold px-1.5 py-0.2 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                      1 Party Only
+                    </span>
                   </h3>
                   <p className="text-[8px] text-gray-400">
-                    Contesting MLA candidates & real-time citizen approval
+                    Contesting MLA candidates • Tap one party to vote & evaluate
                   </p>
                 </div>
                 <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-mono">
@@ -1605,7 +1673,7 @@ export function Screen3Survey({
               {/* Contesting Political Parties in 2x2 Boxes Matching Reference */}
               <div className="grid grid-cols-2 gap-2.5 pt-1">
                 {partiesList.map((party) => {
-                  const hasVoted = Boolean(userLocalVotes[party.id]) || chosenParty?.id === party.id;
+                  const isSelected = chosenParty?.id === party.id;
                   const partyStatus = party.status || party.role || 'Contestant';
                   return (
                     <button
@@ -1613,20 +1681,22 @@ export function Screen3Survey({
                       type="button"
                       onClick={() => handleVoteAndSelectParty(party)}
                       className={`p-3.5 rounded-2xl bg-[#0C1421] border cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40 relative ${
-                        hasVoted
+                        isSelected
                           ? 'border-[#F5C754] bg-[#0E1A2C] shadow-lg shadow-[#F5C754]/20 ring-1 ring-[#F5C754]'
                           : 'border-[#1B2A41] hover:border-[#F5C754]/60'
                       }`}
                     >
-                      {/* Voted badge */}
-                      {hasVoted && (
+                      {/* Single Selected badge */}
+                      {isSelected && (
                         <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-[#F5C754] text-black text-[7px] font-black shadow-xs flex items-center gap-0.5 animate-fadeIn">
-                          ✓ Voted
+                          ✓ Selected
                         </span>
                       )}
 
                       {/* Golden circular outline icon matching reference */}
-                      <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                      <div className={`w-11 h-11 rounded-full border-2 flex items-center justify-center mb-2 transition-transform shadow-inner group-hover:scale-105 ${
+                        isSelected ? 'border-[#F5C754] bg-[#F5C754]/25 text-[#F5C754]' : 'border-[#F5C754] bg-[#F5C754]/10 text-[#F5C754]'
+                      }`}>
                         <span className="text-xl select-none leading-none">
                           {party.symbol || '🗳️'}
                         </span>
@@ -1867,20 +1937,8 @@ export function Screen3Survey({
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-2 pt-1">
-            <button
-              type="button"
-              onClick={() => {
-                setIsSubmitted(false);
-                setActiveTab('parties');
-              }}
-              className="w-full py-2 px-3 rounded-xl bg-[#181822] border border-amber-400/40 text-amber-300 font-bold text-xs hover:bg-[#20202E] transition-all cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Vote for Another Candidate / Review Parties</span>
-            </button>
-
+          {/* Action Button */}
+          <div className="pt-2">
             <button
               type="button"
               onClick={() => onNavigate ? onNavigate('home') : onBack()}
@@ -3528,7 +3586,295 @@ export function ScreenNews({ onBack, onNavigate }) {
         ))}
       </div>
 
-      <BottomNavBar activeTab="news" onTabChange={onNavigate} />
+      <BottomNavBar activeTab="news" onTabChange={onNavigate || onBack} />
+    </div>
+  );
+}
+
+// 10. SCREEN 10: BIG BOSS TELUGU SCREEN (Elimination Voting, Polls & House Drama)
+export function ScreenBigBoss({ onBack, onNavigate }) {
+  const [activeTab, setActiveTab] = useState('voting'); // 'voting' | 'highlights' | 'contestants'
+  const [selectedContestant, setSelectedContestant] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
+  const [pollVotes, setPollVotes] = useState({ 1: null });
+
+  const [contestants] = useState([
+    { id: 'sivaji', name: 'Sivaji', teluguName: 'శివాజీ', role: 'Strong Contender', votes: 34.6, isNominated: true, avatar: '👑', status: 'Nominated', votesCount: '124.5K' },
+    { id: 'pallavi', name: 'Pallavi Prashanth', teluguName: 'పల్లవి ప్రశాంత్', role: 'Rythu Bidda', votes: 29.8, isNominated: true, avatar: '🌾', status: 'Nominated', votesCount: '107.2K' },
+    { id: 'amardeep', name: 'Amardeep Chowdary', teluguName: 'అమర్‌దీప్ చౌదరి', role: 'Serial Star', votes: 18.2, isNominated: true, avatar: '🎭', status: 'Nominated', votesCount: '65.4K' },
+    { id: 'shobha', name: 'Shobha Shetty', teluguName: 'శోభా శెట్టి', role: 'Fierce Player', votes: 17.4, isNominated: true, avatar: '🔥', status: 'Nominated', votesCount: '62.8K' },
+  ]);
+
+  const allHousemates = [
+    { id: 1, name: 'Sivaji', role: 'Leader / Veteran', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '👑' },
+    { id: 2, name: 'Pallavi Prashanth', role: 'Common Man / Rythu', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '🌾' },
+    { id: 3, name: 'Amardeep Chowdary', role: 'Actor / Performer', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '🎭' },
+    { id: 4, name: 'Shobha Shetty', role: 'Actress / Monitha', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '🔥' },
+    { id: 5, name: 'Prince Yawar', role: 'Fitness Model', status: 'Safe', badge: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40', avatar: '⚡' },
+    { id: 6, name: 'Priyanka Jain', role: 'Captain of the House', status: 'Captain 👑', badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40', avatar: '🌟' },
+  ];
+
+  const highlights = [
+    { id: 1, title: '🔥 కెప్టెన్సీ టాస్క్ హై-వోల్టేజ్ గొడవ! శివాజీ vs అమర్‌దీప్', views: '284K', time: '2h ago', duration: '03:45', thumbnail: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=400&q=80' },
+    { id: 2, title: '⚡ నామినేషన్స్ హీట్: శోభా శెట్టి తీవ్ర భావోద్వేగం!', views: '192K', time: '5h ago', duration: '04:12', thumbnail: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=400&q=80' },
+    { id: 3, title: '🎬 వీకెండ్ ఎపిసోడ్ ప్రోమో: హోస్ట్ స్పెషల్ వార్నింగ్!', views: '640K', time: 'Yesterday', duration: '01:30', thumbnail: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=400&q=80' },
+  ];
+
+  const handleVoteContestant = (c) => {
+    setSelectedContestant(c.id);
+    setToastMessage(`🎉 మీ ఓటు ${c.name} (${c.teluguName}) కి నమోదైంది! (Saved Vote Recorded)`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  return (
+    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
+      <PhoneStatusBar />
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="absolute top-10 left-4 right-4 z-50 bg-[#1A1810] border border-[#F5C754] text-[#FDE047] px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-2xl animate-fadeIn flex items-center justify-center gap-1.5">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0 z-20">
+        <div className="flex items-center gap-2">
+          <button 
+            type="button" 
+            onClick={onBack}
+            className="p-1 text-gray-300 hover:text-white rounded-lg hover:bg-[#1A1A22] transition-colors cursor-pointer"
+            title="Go Back"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-full border border-amber-400/80 bg-amber-400/15 flex items-center justify-center text-amber-300">
+              <Eye className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <h2 className="text-xs font-black text-white leading-tight flex items-center gap-1">
+                <span>Big Boss Telugu</span>
+                <span className="text-[7px] px-1 rounded bg-red-600 font-extrabold text-white animate-pulse">
+                  LIVE
+                </span>
+              </h2>
+              <p className="text-[8px] text-gray-400">2026 Season • Official Public Voting & Polls</p>
+            </div>
+          </div>
+        </div>
+
+        <span className="text-[8px] font-mono font-bold text-amber-300 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-400/30">
+          359K Votes
+        </span>
+      </div>
+
+      {/* Tabs */}
+      <div className="px-3 py-1.5 bg-[#0E0E12] border-b border-[#1C1C24] flex items-center justify-between gap-1 shrink-0">
+        {[
+          { id: 'voting', label: '🗳️ Live Voting' },
+          { id: 'highlights', label: '🎬 Highlights' },
+          { id: 'contestants', label: '👥 Housemates' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 py-1 px-2 rounded-lg text-[9.5px] font-bold transition-all text-center cursor-pointer ${
+              activeTab === tab.id
+                ? 'bg-[#F5C754] text-black shadow-xs font-black'
+                : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 min-h-0 px-3 py-2.5 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-6">
+        {/* VIEW 1: VOTING & POLLS */}
+        {activeTab === 'voting' && (
+          <div className="space-y-3">
+            {/* Elimination Banner Card */}
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-red-950/40 via-[#1C1214] to-[#14141A] border border-red-500/40 relative overflow-hidden">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9px] font-black text-red-400 uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                  <span>Week Elimination Voting</span>
+                </span>
+                <span className="text-[8px] text-gray-400">Ends Sunday 11:59 PM</span>
+              </div>
+              <h3 className="text-xs font-black text-white leading-tight">
+                మీ అభిమాన కంటెస్టెంట్‌ను సేవ్ చేయండి!
+              </h3>
+              <p className="text-[8px] text-gray-300 mt-0.5">
+                Tap on any nominated contestant below to cast your free official vote (1 Vote per day).
+              </p>
+            </div>
+
+            {/* 2x2 Nominated Contestant Cards */}
+            <div className="grid grid-cols-2 gap-2.5">
+              {contestants.map((c) => {
+                const isSelected = selectedContestant === c.id;
+                return (
+                  <div
+                    key={c.id}
+                    className={`p-3 rounded-2xl bg-[#0C1421] border transition-all duration-200 flex flex-col items-center justify-between text-center relative ${
+                      isSelected
+                        ? 'border-[#F5C754] bg-[#0E1A2C] shadow-lg shadow-[#F5C754]/20 ring-1 ring-[#F5C754]'
+                        : 'border-[#1B2A41] hover:border-[#F5C754]/50'
+                    }`}
+                  >
+                    {isSelected && (
+                      <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-[#F5C754] text-black text-[7px] font-black shadow-xs flex items-center gap-0.5 animate-fadeIn">
+                        ✓ Voted
+                      </span>
+                    )}
+
+                    {/* Circular Avatar */}
+                    <div className={`w-11 h-11 rounded-full border-2 flex items-center justify-center text-xl mb-1.5 shadow-inner ${
+                      isSelected ? 'border-[#F5C754] bg-[#F5C754]/20' : 'border-[#F5C754] bg-[#F5C754]/10'
+                    }`}>
+                      <span>{c.avatar}</span>
+                    </div>
+
+                    <h4 className="font-black text-[11px] text-white leading-tight">
+                      {c.name}
+                    </h4>
+                    <p className="text-[8px] text-amber-300 font-medium">
+                      {c.teluguName} • {c.role}
+                    </p>
+
+                    {/* Progress bar */}
+                    <div className="w-full mt-2 space-y-0.5">
+                      <div className="flex items-center justify-between text-[7.5px] text-gray-400">
+                        <span>Approval</span>
+                        <span className="font-mono font-bold text-white">{c.votes}%</span>
+                      </div>
+                      <div className="w-full h-1 bg-[#1A1A24] rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500"
+                          style={{ width: `${c.votes}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Vote to Save Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleVoteContestant(c)}
+                      className={`w-full mt-2.5 py-1 px-2 rounded-lg text-[9px] font-black transition-all cursor-pointer ${
+                        isSelected 
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
+                          : 'bg-[#F5C754] text-black hover:brightness-110 shadow-xs'
+                      }`}
+                    >
+                      {isSelected ? '✓ Voted to Save' : 'Vote to Save 🗳️'}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Daily House Instant Poll */}
+            <div className="p-3 rounded-2xl bg-[#121218] border border-[#23232E] space-y-2">
+              <div className="flex items-center justify-between pb-1 border-b border-[#1E1E28]">
+                <span className="text-[10px] font-black text-white flex items-center gap-1">
+                  <span>📊 Today's Housemate Poll</span>
+                </span>
+                <span className="text-[8px] text-amber-400 font-mono">Poll Live</span>
+              </div>
+              <p className="text-[9.5px] font-bold text-gray-200 leading-snug">
+                ఈ వారం బెస్ట్ ఎంటర్‌టైనర్ ఎవరు? (Who entertained best this week?)
+              </p>
+              <div className="space-y-1.5 pt-0.5">
+                {[
+                  { id: 1, name: 'Sivaji', percent: 48 },
+                  { id: 2, name: 'Pallavi Prashanth', percent: 32 },
+                  { id: 3, name: 'Prince Yawar', percent: 20 },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setPollVotes(prev => ({ ...prev, 1: opt.id }))}
+                    className={`w-full p-2 rounded-xl border text-left text-[9px] font-bold transition-all cursor-pointer flex items-center justify-between ${
+                      pollVotes[1] === opt.id
+                        ? 'bg-amber-500/20 border-amber-400 text-[#FDE047]'
+                        : 'bg-[#181822] border-[#262634] text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    <span>{opt.name}</span>
+                    <span className="font-mono text-[8.5px]">{opt.percent}%</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 2: HOUSE HIGHLIGHTS */}
+        {activeTab === 'highlights' && (
+          <div className="space-y-2.5">
+            {highlights.map((video) => (
+              <div
+                key={video.id}
+                onClick={() => onNavigate ? onNavigate('video-player') : null}
+                className="p-2 rounded-2xl bg-[#121218] border border-[#22222E] hover:border-amber-400/50 transition-all cursor-pointer group space-y-1.5"
+              >
+                <div className="h-28 w-full rounded-xl overflow-hidden relative">
+                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-full bg-[#F5C754] text-black flex items-center justify-center pl-0.5 shadow-lg group-hover:scale-110 transition-transform">
+                      <Play className="w-4 h-4 fill-black stroke-black" />
+                    </div>
+                  </div>
+                  <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-white font-mono text-[8px]">
+                    {video.duration}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
+                    {video.title}
+                  </h4>
+                  <div className="flex items-center gap-2 text-[8px] text-gray-400 mt-1">
+                    <span>{video.views} views</span>
+                    <span>•</span>
+                    <span>{video.time}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* VIEW 3: ALL HOUSEMATES DIRECTORY */}
+        {activeTab === 'contestants' && (
+          <div className="space-y-1.5">
+            {allHousemates.map((hm) => (
+              <div 
+                key={hm.id}
+                className="p-2.5 rounded-xl bg-[#121218] border border-[#22222E] flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-xl p-1 rounded-lg bg-[#181822] border border-[#2A2A38]">
+                    {hm.avatar}
+                  </span>
+                  <div>
+                    <h4 className="text-[10px] font-black text-white leading-tight">{hm.name}</h4>
+                    <p className="text-[8px] text-gray-400">{hm.role}</p>
+                  </div>
+                </div>
+                <span className={`text-[8px] font-extrabold px-2 py-0.5 rounded-full border ${hm.badge}`}>
+                  {hm.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <BottomNavBar activeTab="home" onTabChange={onNavigate || onBack} />
     </div>
   );
 }

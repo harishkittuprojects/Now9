@@ -18,6 +18,7 @@ import {
   Screen8ShortVideoPlayer, 
   Screen9LiveDebateDetail, 
   ScreenNews,
+  ScreenBigBoss,
   PhoneFrame 
 } from './NowNineReferenceScreens';
 import { 
@@ -111,6 +112,7 @@ export default function NowNineUnifiedApp() {
             onLocationChange={setCurrentLocation}
             isLocating={isLocating}
             onDetectLiveGps={detectLiveGpsLocation}
+            selectedParty={selectedSurveyParty}
             onSelectSurveyParty={setSelectedSurveyParty}
           />
         );
@@ -134,6 +136,9 @@ export default function NowNineUnifiedApp() {
         return <ScreenNews onBack={() => handleNav('home')} onNavigate={handleNav} />;
       case 'short-videos':
         return <Screen5ShortVideos onBack={() => handleNav('home')} onSelectShort={() => handleNav('video-player')} onNavigate={handleNav} />;
+      case 'big-boss':
+      case 'bigg-boss':
+        return <ScreenBigBoss onBack={() => handleNav('home')} onNavigate={handleNav} />;
       case 'common-people':
         return (
           <Screen6CommonPeople 
