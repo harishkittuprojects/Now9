@@ -70,9 +70,11 @@ export default function Navbar({
             className="flex items-center gap-2 sm:gap-2.5 text-left group focus:outline-none shrink-0"
             aria-label="Now 9 Home"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-black text-lg sm:text-xl shadow-sm transition-transform duration-200 group-hover:scale-105">
-              <span>9</span>
-            </div>
+            <img 
+              src="/now9_icon.png" 
+              alt="Now 9 Logo" 
+              className="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-xl shadow-sm transition-transform duration-200 group-hover:scale-105"
+            />
             <div className="flex flex-col">
               <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-ink-primary leading-none">
                 Now <span className="text-brand-500">9</span>

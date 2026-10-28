@@ -188,11 +188,11 @@ export default function NowNineUnifiedApp() {
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           {/* Logo & App title */}
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#B45309] via-[#F59E0B] to-[#FDE68A] p-[2px] flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
-              <div className="w-full h-full rounded-[10px] bg-[#121215] flex items-center justify-center font-black text-amber-400 text-sm">
-                9
-              </div>
-            </div>
+            <img 
+              src="/now9_icon.png" 
+              alt="now9 logo" 
+              className="w-8 h-8 object-contain rounded-lg shadow-md shrink-0 hover:scale-105 transition-transform"
+            />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-black text-sm text-white tracking-tight">

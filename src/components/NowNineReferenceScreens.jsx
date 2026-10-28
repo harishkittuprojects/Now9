@@ -387,27 +387,22 @@ export function ScreenLogin({
       <div className="flex-1 min-h-0 px-4 sm:px-5 pt-4 pb-2 flex flex-col justify-between z-10 overflow-y-auto phone-scroll">
         {/* Brand Logo & Header */}
         <div className="text-center pt-2 shrink-0">
-          {/* Golden 9 Logo */}
-          <div className="w-16 h-16 rounded-full border-2 border-[#F5C754] shadow-[0_0_24px_rgba(245,199,84,0.45)] bg-[#111116] p-[2px] flex items-center justify-center mx-auto mb-1 shrink-0">
-            <div className="w-full h-full rounded-full bg-[#101014] flex items-center justify-center relative overflow-hidden">
-              <span className="font-black text-3xl text-transparent bg-clip-text bg-gradient-to-b from-[#FFF1B0] via-[#F5C754] to-[#D49022] leading-none select-none">
-                9
-              </span>
-              <div className="absolute right-[22%] top-[34%] w-0 h-0 border-t-[3.5px] border-t-transparent border-b-[3.5px] border-b-transparent border-l-[6px] border-l-[#F5C754]"></div>
-            </div>
+          {/* Official Golden 9 Logo */}
+          <div className="flex items-center justify-center mb-1">
+            <img 
+              src="/now9_icon.png" 
+              alt="now9 logo" 
+              className="w-16 h-16 sm:w-18 sm:h-18 object-contain drop-shadow-[0_0_24px_rgba(245,199,84,0.45)] hover:scale-105 transition-transform"
+            />
           </div>
 
-          <h1 className="font-black text-2xl tracking-tight text-white leading-tight">
-            now<span className="text-[#F5C754]">nine</span>
-          </h1>
-
-          <div className="flex items-center justify-center gap-1.5 mt-0.5">
-            <span className="text-[9px] font-bold tracking-widest text-gray-300 uppercase">
-              YOUR VOTE <span className="text-[#F5C754]">|</span> YOUR VOICE
-            </span>
-            <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-black uppercase tracking-wider">
-              LIVE
-            </span>
+          {/* Official nownine Branding Banner */}
+          <div className="flex items-center justify-center px-2">
+            <img 
+              src="/now9_banner.png" 
+              alt="nownine - VOTE | WATCH | ENGAGE" 
+              className="w-52 sm:w-56 max-w-[95%] object-contain mx-auto"
+            />
           </div>
 
           {/* Location Selector Pill - Exact Match to Reference Mockup */}
@@ -646,29 +641,20 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
 
       {/* Brand Identity */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 pt-1 z-10 text-center">
-        {/* Golden 9 Logo */}
-        <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#B45309] via-[#F59E0B] to-[#FDE68A] p-[2.5px] shadow-lg shadow-amber-500/30 flex items-center justify-center mb-1">
-          <div className="w-full h-full rounded-full bg-[#101014] flex items-center justify-center relative overflow-hidden">
-            <span className="font-black text-4xl text-transparent bg-clip-text bg-gradient-to-b from-[#FFF1B0] via-[#F5C754] to-[#D49022] leading-none">
-              9
-            </span>
-            <div className="absolute right-[22%] top-[34%] w-0 h-0 border-t-[3.5px] border-t-transparent border-b-[3.5px] border-b-transparent border-l-[6px] border-l-[#F5C754]"></div>
-          </div>
-        </div>
+        {/* Official Golden 9 Logo */}
+        <img 
+          src="/now9_icon.png" 
+          alt="now9 logo" 
+          className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-[0_0_35px_rgba(245,199,84,0.55)] mb-3 animate-pulse hover:scale-105 transition-transform"
+        />
 
-        {/* nownine text */}
-        <h1 className="font-black text-3xl tracking-tight text-white leading-none">
-          now<span className="text-[#F5C754]">nine</span>
-        </h1>
-
-        {/* Subtitle with live badge */}
-        <div className="flex items-center gap-1.5 mt-1">
-          <span className="text-[9px] font-bold tracking-widest text-gray-300 uppercase">
-            YOUR VOTE <span className="text-[#F5C754]">|</span> YOUR VOICE
-          </span>
-          <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase">
-            LIVE
-          </span>
+        {/* Official nownine Brand Banner */}
+        <div className="flex items-center justify-center px-4 mb-2">
+          <img 
+            src="/now9_banner.png" 
+            alt="nownine - VOTE | WATCH | ENGAGE" 
+            className="w-64 sm:w-72 max-w-[95%] object-contain mx-auto"
+          />
         </div>
 
         {/* Golden Headline Pill */}
@@ -804,13 +790,13 @@ export function Screen2Home({
 
           <div 
             onClick={() => onNavigate('home')}
-            className="flex items-center gap-1 cursor-pointer"
+            className="flex items-center gap-1.5 cursor-pointer shrink-0"
           >
-            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#B45309] to-[#FDE68A] p-[1px] flex items-center justify-center shadow-xs shrink-0">
-              <div className="w-full h-full rounded-full bg-[#121214] flex items-center justify-center font-black text-[10px] text-[#F5C754]">
-                9
-              </div>
-            </div>
+            <img 
+              src="/now9_icon.png" 
+              alt="now9" 
+              className="w-6 h-6 object-contain rounded-full shadow-xs shrink-0 hover:scale-105 transition-transform" 
+            />
             <span className="font-extrabold text-xs text-white hidden xs:inline">
               now<span className="text-[#F5C754]">nine</span>
             </span>
@@ -923,11 +909,11 @@ export function Screen2Home({
               {/* Profile Card */}
               <div className="flex items-center justify-between pb-3 border-b border-[#22222E]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#B45309] to-[#FDE68A] p-[1.5px] flex items-center justify-center">
-                    <div className="w-full h-full rounded-full bg-[#121214] flex items-center justify-center font-black text-xs text-[#F5C754]">
-                      9
-                    </div>
-                  </div>
+                  <img 
+                    src="/now9_icon.png" 
+                    alt="now9" 
+                    className="w-9 h-9 object-contain rounded-full shadow-md"
+                  />
                   <div>
                     <h3 className="font-extrabold text-xs text-white">NowNine Citizen</h3>
                     <p className="text-[8px] text-amber-400 font-semibold flex items-center gap-1">
