@@ -1156,9 +1156,14 @@ export function Screen2Home({
                     Live Constituency Survey
                   </span>
                 </div>
-                <span className="text-xs font-black text-[#FDE047] block leading-tight">
-                  Political Survey & Local Voting
-                </span>
+                <div className="mb-1.5 leading-snug">
+                  <span className="text-base sm:text-[17px] font-black text-white tracking-tight inline-block mr-1.5">
+                    now9 pre poll
+                  </span>
+                  <span className="text-xs font-bold text-gray-200 font-telugu inline-block">
+                    ( పొలిటికల్ survey )
+                  </span>
+                </div>
                 <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
                   Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
                 </span>
