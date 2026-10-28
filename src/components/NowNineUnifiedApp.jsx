@@ -34,47 +34,53 @@ export default function NowNineUnifiedApp() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(DEFAULT_DETECTED_LOCATION);
   const [selectedSurveyParty, setSelectedSurveyParty] = useState(null);
-  const [isLocating, setIsLocating] = useState(false);
+  const [isLocating, setIsLocating] = useState(true);
   const [locationToast, setLocationToast] = useState(null);
 
-  // Live GPS Location Detection and Reverse Geocoding
+  // Live GPS Location Detection and Reverse Geocoding with guaranteed visibility
   const detectLiveGpsLocation = () => {
     setIsLocating(true);
-    setLocationToast({
-      title: '🛰️ Detecting live device coordinates...',
-      subtitle: 'Reverse-geocoding your exact street & constituency via GPS'
-    });
+    const startTime = Date.now();
+
+    const finishLocating = (resolvedLocation = null) => {
+      const elapsed = Date.now() - startTime;
+      const minDisplayDuration = 3200; // Guarantee "Locating..." is clearly visible for ~3 seconds after opening website
+      const remaining = Math.max(0, minDisplayDuration - elapsed);
+
+      setTimeout(() => {
+        if (resolvedLocation) {
+          setCurrentLocation(resolvedLocation);
+        }
+        setIsLocating(false);
+      }, remaining);
+    };
 
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           try {
             const resolved = await fetchLiveUserAddress(pos.coords.latitude, pos.coords.longitude);
-            setIsLocating(false);
-            setCurrentLocation(resolved);
-            setLocationToast({
-              title: `📍 Located: ${resolved.locality || resolved.city}, ${resolved.city}`,
-              subtitle: `${resolved.assembly} • ${resolved.parties?.length || 0} Political Parties Active`
-            });
-            setTimeout(() => setLocationToast(null), 5000);
+            finishLocating(resolved);
+            setTimeout(() => {
+              setLocationToast({
+                title: `📍 Located: ${resolved.locality || resolved.city}, ${resolved.city}`,
+                subtitle: `${resolved.assembly} • ${resolved.parties?.length || 0} Political Parties Active`
+              });
+              setTimeout(() => setLocationToast(null), 5000);
+            }, 3200);
           } catch (e) {
             console.warn('Reverse geocode error:', e);
-            setIsLocating(false);
+            finishLocating(null);
           }
         },
         (err) => {
-          console.warn('Geolocation error / permission denied:', err);
-          setIsLocating(false);
-          setLocationToast({
-            title: `📍 Current Area: ${currentLocation.locality}, ${currentLocation.city}`,
-            subtitle: `${currentLocation.assembly} • Tap "Change Address" to search your exact area`
-          });
-          setTimeout(() => setLocationToast(null), 5000);
+          console.warn('Geolocation error / permission denied, using default:', err);
+          finishLocating(null);
         },
         { timeout: 7000, enableHighAccuracy: true, maximumAge: 60000 }
       );
     } else {
-      setIsLocating(false);
+      finishLocating(null);
     }
   };
 
@@ -203,20 +209,23 @@ export default function NowNineUnifiedApp() {
           <button
             type="button"
             onClick={detectLiveGpsLocation}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161622] hover:bg-[#20202E] border border-amber-500/35 text-left transition-all cursor-pointer group shadow-sm hover:border-amber-400"
+            className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#121217] hover:bg-[#1A1A22] border border-amber-500/40 text-left transition-all cursor-pointer group shadow-sm hover:border-amber-400"
             title="Click to refresh live GPS location"
           >
-            <MapPin className="w-3.5 h-3.5 text-[#F5C754] shrink-0 group-hover:scale-110 transition-transform" />
+            <div className="w-6 h-6 rounded-full border border-[#F5C754] flex items-center justify-center shrink-0 text-[#F5C754]">
+              <MapPin className="w-3 h-3 text-[#F5C754]" />
+            </div>
             <div className="flex flex-col text-left leading-none">
               <span className="text-xs font-bold text-white group-hover:text-amber-300">
-                {currentLocation?.locality || currentLocation?.city || 'Locating...'}
+                {currentLocation?.locality || 'Jubilee Hills'}, {currentLocation?.city || 'Hyderabad'}
               </span>
               <span className="text-[9px] text-gray-400 mt-0.5">
-                {currentLocation?.assembly || currentLocation?.district || ''} • PIN {currentLocation?.pincode}
+                {currentLocation?.assembly || 'Jubilee Hills / Khairatabad Assembly'} • PIN {currentLocation?.pincode || '500033'}
               </span>
             </div>
-            <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold ml-1">
-              {isLocating ? 'Locating...' : 'GPS Live'}
+            <span className="text-[9px] px-2.5 py-0.5 rounded-full bg-[#1A170F] text-[#F5C754] border border-[#F5C754]/80 font-bold ml-1 flex items-center gap-1 shadow-xs">
+              <span className={isLocating ? 'animate-pulse' : ''}>🛰️</span>
+              <span>{isLocating ? 'Locating...' : 'GPS'}</span>
             </span>
           </button>
 

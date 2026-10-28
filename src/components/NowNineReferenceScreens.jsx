@@ -59,29 +59,9 @@ import {
   resolveConstituencyAndParties 
 } from '../data/locationConstituencyData';
 
-// Phone Status Bar (Cellular, Wifi, Battery without time)
+// Phone Status Bar (Cellular, Wifi, Battery icons removed as requested)
 export function PhoneStatusBar() {
-  return (
-    <div className="h-5 px-4 flex items-center justify-end text-white text-[11px] font-semibold tracking-tight z-30 select-none bg-transparent shrink-0">
-      <div className="flex items-center gap-1.5 opacity-90 ml-auto">
-        <div className="flex items-end gap-[1.5px] h-2.5">
-          <span className="w-[2px] h-1 bg-white rounded-2xs"></span>
-          <span className="w-[2px] h-1.5 bg-white rounded-2xs"></span>
-          <span className="w-[2px] h-2 bg-white rounded-2xs"></span>
-          <span className="w-[2px] h-2.5 bg-white rounded-2xs"></span>
-        </div>
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
-          <path d="M12 18.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-4.9-3.4a7.02 7.02 0 0 1 9.8 0l1.4-1.4a8.98 8.98 0 0 0-12.6 0l1.4 1.4zm-2.8-2.8a11 11 0 0 1 15.4 0l1.4-1.4a12.98 12.98 0 0 0-18.2 0l1.4 1.4z" />
-        </svg>
-        <div className="flex items-center gap-[1px]">
-          <div className="w-4 h-2 rounded-[2.5px] border border-white/80 p-[0.5px] flex items-center">
-            <div className="h-full w-full bg-white rounded-[1px]"></div>
-          </div>
-          <div className="w-[1px] h-0.8 bg-white/70 rounded-r-xs"></div>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }
 
 // Bottom Navigation Bar (Home, News, Live, Shorts)
@@ -347,29 +327,24 @@ export function ScreenLogin({
   const [phoneNumber, setPhoneNumber] = useState('9876543210');
   const [otpStep, setOtpStep] = useState(false);
   const [otpValues, setOtpValues] = useState(['9', '4', '1', '0']);
-  const [touchStartY, setTouchStartY] = useState(null);
   const [resendTimer, setResendTimer] = useState(28);
   const [toastMessage, setToastMessage] = useState(null);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [localLocating, setLocalLocating] = useState(true);
+
+  // Guarantee that "Locating..." is active when opening the website
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLocalLocating(false);
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const activeLocating = isLocating || localLocating;
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
-  };
-
-  // Swipe up gesture handler for mobile view response
-  const handleTouchStart = (e) => {
-    setTouchStartY(e.touches[0].clientY);
-  };
-
-  const handleTouchEnd = (e) => {
-    if (touchStartY === null) return;
-    const deltaY = touchStartY - e.changedTouches[0].clientY;
-    // If user swipes up by > 50px, respond immediately by entering home
-    if (deltaY > 50) {
-      onSkipToHome();
-    }
-    setTouchStartY(null);
   };
 
   const handleSendOtp = (e) => {
@@ -397,34 +372,28 @@ export function ScreenLogin({
   };
 
   return (
-    <div 
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0"
-    >
-      {/* Background glow */}
-      <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-amber-500/25 via-amber-600/10 to-transparent blur-2xl pointer-events-none"></div>
-
-      <PhoneStatusBar />
+    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0 select-none">
+      {/* Background ambient glow centered behind top brand logo */}
+      <div className="absolute top-0 left-0 right-0 h-48 bg-[radial-gradient(ellipse_at_top,_rgba(245,199,84,0.22)_0%,_rgba(180,83,9,0.10)_40%,_transparent_75%)] pointer-events-none"></div>
 
       {/* Floating Toast Notification */}
       {toastMessage && (
-        <div className="absolute top-7 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
+        <div className="absolute top-4 left-4 right-4 z-50 bg-[#1F1A10] border border-amber-400/80 text-amber-300 px-3 py-1.5 rounded-full text-[10px] font-bold text-center shadow-lg animate-fadeIn flex items-center justify-center gap-1.5">
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Main Content - Fully scrollable and touch responsive */}
-      <div className="flex-1 min-h-0 px-4 sm:px-5 py-3 flex flex-col z-10 overflow-y-auto phone-scroll touch-pan-y pb-8">
+      {/* Main Content - Clean, focused login experience */}
+      <div className="flex-1 min-h-0 px-4 sm:px-5 pt-4 pb-2 flex flex-col justify-between z-10 overflow-y-auto phone-scroll">
         {/* Brand Logo & Header */}
-        <div className="text-center pt-1 shrink-0">
+        <div className="text-center pt-2 shrink-0">
           {/* Golden 9 Logo */}
-          <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#B45309] via-[#F59E0B] to-[#FDE68A] p-[2px] shadow-lg shadow-amber-500/30 flex items-center justify-center mx-auto mb-1.5">
+          <div className="w-16 h-16 rounded-full border-2 border-[#F5C754] shadow-[0_0_24px_rgba(245,199,84,0.45)] bg-[#111116] p-[2px] flex items-center justify-center mx-auto mb-1 shrink-0">
             <div className="w-full h-full rounded-full bg-[#101014] flex items-center justify-center relative overflow-hidden">
-              <span className="font-black text-3xl text-transparent bg-clip-text bg-gradient-to-b from-[#FFF1B0] via-[#F5C754] to-[#D49022] leading-none">
+              <span className="font-black text-3xl text-transparent bg-clip-text bg-gradient-to-b from-[#FFF1B0] via-[#F5C754] to-[#D49022] leading-none select-none">
                 9
               </span>
-              <div className="absolute right-[22%] top-[34%] w-0 h-0 border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[5px] border-l-[#F5C754]"></div>
+              <div className="absolute right-[22%] top-[34%] w-0 h-0 border-t-[3.5px] border-t-transparent border-b-[3.5px] border-b-transparent border-l-[6px] border-l-[#F5C754]"></div>
             </div>
           </div>
 
@@ -436,51 +405,63 @@ export function ScreenLogin({
             <span className="text-[9px] font-bold tracking-widest text-gray-300 uppercase">
               YOUR VOTE <span className="text-[#F5C754]">|</span> YOUR VOICE
             </span>
-            <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-black uppercase">
+            <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-black uppercase tracking-wider">
               LIVE
             </span>
           </div>
 
-          {/* Sleek Compact Header Location Pill */}
-          <div className="mt-2.5 flex items-center justify-between px-3 py-1.5 rounded-full bg-[#15151E] border border-amber-500/35 shadow-sm text-left">
+          {/* Location Selector Pill - Exact Match to Reference Mockup */}
+          <div className="mt-3 flex items-center justify-between px-3.5 py-2 rounded-full bg-[#0E0E12] border border-amber-500/40 shadow-md text-left group">
             <button
               type="button"
               onClick={() => setIsAddressModalOpen(true)}
-              className="flex items-center gap-1.5 min-w-0 cursor-pointer text-left flex-1"
+              className="flex items-center gap-2.5 min-w-0 cursor-pointer text-left flex-1"
             >
-              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              {/* Circular yellow ring around MapPin icon */}
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#F5C754] flex items-center justify-center shrink-0 text-[#F5C754] bg-[#14120B]">
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#F5C754]" />
+              </div>
+
               <div className="min-w-0">
-                <div className="flex items-center gap-1">
-                  <span className="text-[10px] font-extrabold text-white truncate">
-                    {currentLocation?.locality || 'Locating...'}, {currentLocation?.city || ''}
+                <div className="flex items-center gap-1 leading-tight">
+                  <span className="text-xs sm:text-sm font-extrabold text-white truncate">
+                    {currentLocation?.locality || 'Jubilee Hills'}, {currentLocation?.city || 'Hyderabad'}
                   </span>
-                  <span className="text-[8px] text-amber-400">▾</span>
+                  <span className="text-[10px] text-[#F5C754] font-bold">▾</span>
                 </div>
-                <span className="text-[7.5px] text-gray-400 block truncate">
-                  {currentLocation?.assembly || 'Assembly Constituency'} • PIN {currentLocation?.pincode}
+                <span className="text-[9px] sm:text-[10px] text-gray-400 block truncate mt-0.5 font-medium">
+                  {currentLocation?.assembly || 'Jubilee Hills / Khairatabad Assembly'} • PIN {currentLocation?.pincode || '500033'}
                 </span>
               </div>
             </button>
-            <div className="flex items-center gap-1 shrink-0 ml-1">
+
+            {/* Right side: 🛰️ Locating... / 🛰️ GPS Button */}
+            <div className="flex items-center gap-1 shrink-0 ml-1.5">
               <button
                 type="button"
                 onClick={() => {
                   if (onDetectLiveGps) onDetectLiveGps();
+                  setLocalLocating(true);
+                  setTimeout(() => setLocalLocating(false), 3200);
                   showToast('🛰️ Detecting Live GPS Coordinates...');
                 }}
-                className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[8px] font-bold hover:bg-amber-500/25 cursor-pointer"
-                title="Re-detect live GPS"
+                className={`px-3 py-1 rounded-full border border-[#F5C754] bg-[#16140D] text-[#F5C754] text-[10px] sm:text-xs font-bold hover:bg-amber-500/20 cursor-pointer flex items-center gap-1.5 shadow-sm transition-all ${
+                  activeLocating ? 'animate-pulse ring-1 ring-amber-400/40' : ''
+                }`}
+                title="Detect live GPS"
               >
-                {isLocating ? 'Locating...' : '🛰️ GPS'}
+                <span className={activeLocating ? 'animate-bounce' : ''}>🛰️</span>
+                <span>{activeLocating ? 'Locating...' : 'GPS'}</span>
               </button>
             </div>
           </div>
 
-          <div className="mt-3 text-left">
-            <h2 className="text-base font-extrabold text-white">
+          {/* Heading */}
+          <div className="mt-3.5 text-left">
+            <h2 className="text-base sm:text-lg font-black text-white">
               {otpStep ? 'Verify OTP' : 'Login / Register'}
             </h2>
-            <p className="text-[10px] text-gray-400 mt-0.5 leading-snug">
+            <p className="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 leading-snug">
               {otpStep 
                 ? `Enter the 4-digit code sent to +91 ${phoneNumber}` 
                 : 'Enter your mobile number to vote and join live political discussions'}
@@ -489,15 +470,15 @@ export function ScreenLogin({
         </div>
 
         {/* Form Area */}
-        <div className="py-2.5 my-1 shrink-0">
+        <div className="py-2 shrink-0">
           {!otpStep ? (
             <form onSubmit={handleSendOtp} className="space-y-3">
               <div>
-                <label className="text-[10px] font-bold text-gray-300 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-bold text-gray-300 block mb-1">
                   Mobile Number
                 </label>
-                <div className="flex items-center rounded-xl bg-[#141419] border border-[#2A2A35] focus-within:border-amber-400 transition-colors overflow-hidden">
-                  <div className="px-2.5 py-2.5 bg-[#1B1B22] border-r border-[#2A2A35] flex items-center gap-1.5 text-xs font-bold text-gray-200">
+                <div className="flex items-center rounded-xl bg-[#131319] border border-[#2A2A38] focus-within:border-amber-400 transition-colors overflow-hidden">
+                  <div className="px-2.5 py-2.5 bg-[#1A1A22] border-r border-[#2A2A38] flex items-center gap-1.5 text-xs font-bold text-gray-200 shrink-0">
                     <IndiaFlag />
                     <span>+91</span>
                   </div>
@@ -507,7 +488,7 @@ export function ScreenLogin({
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                     placeholder="Enter 10-digit mobile"
-                    className="flex-1 bg-transparent px-3 py-2.5 text-xs font-bold text-white placeholder-gray-500 focus:outline-none"
+                    className="flex-1 bg-transparent px-3 py-2.5 text-xs sm:text-sm font-bold text-white placeholder-gray-500 focus:outline-none"
                     required
                   />
                   {phoneNumber.length > 0 && (
@@ -524,16 +505,16 @@ export function ScreenLogin({
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-md shadow-amber-500/25 flex items-center justify-center gap-1.5 hover:brightness-110 cursor-pointer transition-all active:scale-[0.99]"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs sm:text-sm shadow-md shadow-amber-500/25 flex items-center justify-center gap-1.5 hover:brightness-110 cursor-pointer transition-all active:scale-[0.99]"
               >
                 <span>Get OTP</span>
-                <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+                <ChevronRight className="w-4 h-4 stroke-[3]" />
               </button>
             </form>
           ) : (
             <form onSubmit={handleVerify} className="space-y-3">
               <div>
-                <label className="text-[10px] font-bold text-gray-300 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-bold text-gray-300 block mb-1">
                   4-Digit OTP Code
                 </label>
                 <div className="flex items-center justify-between gap-2">
@@ -552,7 +533,7 @@ export function ScreenLogin({
                     />
                   ))}
                 </div>
-                <div className="flex items-center justify-between mt-2 text-[9px]">
+                <div className="flex items-center justify-between mt-2 text-[9px] sm:text-[10px]">
                   <button 
                     type="button" 
                     onClick={handleResendOtp}
@@ -572,22 +553,22 @@ export function ScreenLogin({
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-md shadow-amber-500/25 flex items-center justify-center gap-1.5 hover:brightness-110 cursor-pointer transition-all active:scale-[0.99]"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs sm:text-sm shadow-md shadow-amber-500/25 flex items-center justify-center gap-1.5 hover:brightness-110 cursor-pointer transition-all active:scale-[0.99]"
               >
                 <span>Verify & Enter NowNine</span>
-                <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+                <ChevronRight className="w-4 h-4 stroke-[3]" />
               </button>
             </form>
           )}
 
           {/* Social / Guest Options */}
-          <div className="mt-3 pt-3 border-t border-[#1C1C24] space-y-2 text-center">
+          <div className="mt-3 space-y-2 text-center">
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full py-2 px-3 rounded-xl bg-[#14141A] border border-[#252530] text-gray-200 text-xs font-semibold hover:bg-[#1C1C24] transition-colors flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
+              className="w-full py-2.5 px-3 rounded-xl bg-[#14141A] border border-[#252530] text-gray-200 text-xs font-semibold hover:bg-[#1C1C24] transition-colors flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
@@ -599,7 +580,7 @@ export function ScreenLogin({
             <button
               type="button"
               onClick={onSkipToHome}
-              className="text-[10px] font-semibold text-gray-400 hover:text-[#F5C754] transition-colors inline-block mt-1 cursor-pointer"
+              className="text-[11px] font-semibold text-gray-400 hover:text-[#F5C754] transition-colors inline-block pt-0.5 cursor-pointer"
             >
               Skip & Continue as Guest →
             </button>
@@ -607,103 +588,10 @@ export function ScreenLogin({
         </div>
 
         {/* Security Assurance */}
-        <div className="py-1 text-center shrink-0">
-          <p className="text-[8px] text-gray-500 leading-tight">
+        <div className="py-2 text-center shrink-0">
+          <p className="text-[9px] text-gray-500 leading-tight">
             🔒 100% Anonymous Voting • Official Citizen Opinion Platform
           </p>
-        </div>
-
-        {/* Dynamic Swipe Up or Tap to Explore Indicator */}
-        <div 
-          onClick={onSkipToHome}
-          className="mt-3 py-2 flex flex-col items-center justify-center cursor-pointer group active:scale-95 transition-all text-amber-400 shrink-0"
-        >
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] font-bold text-[#FDE047] shadow-sm animate-bounce-up">
-            <span>Swipe up or tap to explore NowNine</span>
-            <ChevronRight className="w-3.5 h-3.5 rotate-[-90deg] stroke-[3]" />
-          </div>
-          <span className="text-[8px] text-gray-500 mt-1">Scroll down to preview live features</span>
-        </div>
-
-        {/* Rich Scrollable Preview Section (Guarantees smooth mobile scroll response) */}
-        <div className="mt-4 pt-4 border-t border-[#1C1C24] space-y-3.5">
-          <div className="text-left">
-            <span className="text-[9px] font-extrabold text-[#F5C754] uppercase tracking-wider block">
-              What's Inside NowNine
-            </span>
-            <h3 className="text-xs font-bold text-white mt-0.5">
-              India's #1 Citizen Voice & Political Opinion Platform
-            </h3>
-          </div>
-
-          {/* Live Political Pulse Card */}
-          <div 
-            onClick={() => onNavigate ? onNavigate('survey') : onSkipToHome()}
-            className="p-3 rounded-2xl bg-[#141419] border border-amber-500/30 shadow-md cursor-pointer hover:border-amber-400 transition-all group"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-white flex items-center gap-1.5">
-                <span>🗳️</span>
-                <span>Live Political Pulse (2026)</span>
-              </span>
-              <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[7px] font-black uppercase">
-                Take Poll →
-              </span>
-            </div>
-            <div className="space-y-1.5">
-              {[
-                { name: 'BJP', percent: '34.2%', color: 'bg-orange-500', width: '34%' },
-                { name: 'Congress', percent: '28.7%', color: 'bg-sky-500', width: '29%' },
-                { name: 'BRS', percent: '16.8%', color: 'bg-pink-500', width: '17%' },
-                { name: 'YSRCP', percent: '8.9%', color: 'bg-emerald-500', width: '9%' },
-              ].map((p) => (
-                <div key={p.name} className="flex items-center gap-2 text-[9px]">
-                  <span className="w-14 font-bold text-gray-300">{p.name}</span>
-                  <div className="flex-1 h-1.5 bg-[#202028] rounded-full overflow-hidden">
-                    <div className={`h-full ${p.color} rounded-full`} style={{ width: p.width }}></div>
-                  </div>
-                  <span className="w-8 text-right font-mono font-bold text-amber-400">{p.percent}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Live Debate Spotlight */}
-          <div 
-            onClick={() => onNavigate ? onNavigate('live-debates') : onSkipToHome()}
-            className="p-3 rounded-2xl bg-[#141419] border border-[#23232C] hover:border-amber-500/40 cursor-pointer transition-all group"
-          >
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-              <span className="text-[10px] font-bold text-white">Live News Debate Stream</span>
-              <span className="ml-auto text-[8px] text-amber-400 font-semibold group-hover:underline">Watch Live →</span>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <img 
-                src="/assets/news_debate_studio.jpg" 
-                alt="Debate Studio" 
-                className="w-16 h-12 rounded-lg object-cover shrink-0 border border-white/10"
-              />
-              <div>
-                <p className="font-telugu text-[10px] font-bold text-white line-clamp-1">
-                  2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
-                </p>
-                <p className="text-[8px] text-gray-400 mt-0.5">
-                  Top Political Analysts & Public Live Q&A
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Direct Enter Action */}
-          <button
-            type="button"
-            onClick={() => onNavigate ? onNavigate('home') : onSkipToHome()}
-            className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2 hover:brightness-110 cursor-pointer active:scale-[0.99]"
-          >
-            <span>Enter NowNine Experience</span>
-            <ChevronRight className="w-4 h-4 stroke-[3]" />
-          </button>
         </div>
       </div>
 
