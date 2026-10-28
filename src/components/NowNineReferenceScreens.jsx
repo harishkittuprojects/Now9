@@ -1197,24 +1197,24 @@ export function Screen2Home({
                       </span>
                     )}
 
-                    <div className={`w-11 h-11 rounded-full border-2 flex items-center justify-center mb-2 transition-transform shadow-inner group-hover:scale-105 ${
+                    <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-2 transition-transform shadow-inner group-hover:scale-105 ${
                       isSelected ? 'border-[#F5C754] bg-[#F5C754]/25 text-[#F5C754]' : 'border-[#F5C754] bg-[#F5C754]/10 text-[#F5C754]'
                     }`}>
-                      <span className="text-xl select-none leading-none">
+                      <span className="text-2xl select-none leading-none">
                         {party.symbol || '🗳️'}
                       </span>
                     </div>
 
-                    <h3 className="font-black text-[12px] text-white leading-tight">
+                    <h3 className="font-black text-[13.5px] sm:text-[14px] text-white leading-snug tracking-tight">
                       {party.name}
                     </h3>
 
-                    <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight line-clamp-1">
+                    <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1">
                       {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'MLA'} • Local`}
                     </p>
 
                     <div className="mt-2 flex items-center gap-1">
-                      <span className="text-[7.5px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-amber-300 font-mono">
+                      <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-white/10 border border-amber-400/30 text-amber-300 font-mono">
                         {party.voteShare}% Approval
                       </span>
                     </div>
@@ -1304,52 +1304,68 @@ export function Screen2Home({
               <button 
                 type="button"
                 onClick={() => onNavigate('live-debates')}
-                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
               >
-                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-                  <Play className="w-4 h-4 fill-[#F5C754] stroke-[#F5C754] ml-0.5" />
+                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Play className="w-5 h-5 fill-[#F5C754] stroke-[#F5C754] ml-0.5" />
                 </div>
-                <h3 className="font-black text-[12px] text-white leading-tight">Live Debates</h3>
-                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Watch • Listen • Discuss</p>
+                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
+                  Live Debates
+                </h3>
+                <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
+                  Watch • Listen • Discuss
+                </p>
               </button>
 
               {/* Tile 2: News */}
               <button 
                 type="button"
                 onClick={() => onNavigate('news')}
-                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
               >
-                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-                  <Newspaper className="w-4 h-4 text-[#F5C754]" />
+                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Newspaper className="w-5 h-5 text-[#F5C754]" />
                 </div>
-                <h3 className="font-black text-[12px] text-white leading-tight">News</h3>
-                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Breaking • State • Local</p>
+                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
+                  News
+                </h3>
+                <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
+                  Breaking • State • Local
+                </p>
               </button>
 
               {/* Tile 3: Common People */}
               <button 
                 type="button"
                 onClick={() => onNavigate('common-people')}
-                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
               >
-                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-                  <Users className="w-4 h-4 text-[#F5C754]" />
+                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Users className="w-5 h-5 text-[#F5C754]" />
                 </div>
-                <h3 className="font-black text-[12px] text-white leading-tight">Common People</h3>
-                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Real Voices • Real Stories</p>
+                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
+                  Common People
+                </h3>
+                <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
+                  Real Voices • Real Stories
+                </p>
               </button>
 
               {/* Tile 4: Big Boss */}
               <button 
                 type="button"
                 onClick={() => onNavigate('big-boss')}
-                className="p-3.5 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
               >
-                <div className="w-11 h-11 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
-                  <Eye className="w-4 h-4 text-[#F5C754]" />
+                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                  <Eye className="w-5 h-5 text-[#F5C754]" />
                 </div>
-                <h3 className="font-black text-[12px] text-white leading-tight">Big Boss</h3>
-                <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight">Voting • Polls • Drama</p>
+                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
+                  Big Boss
+                </h3>
+                <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
+                  Voting • Polls • Drama
+                </p>
               </button>
             </div>
 
@@ -1694,27 +1710,27 @@ export function Screen3Survey({
                       )}
 
                       {/* Golden circular outline icon matching reference */}
-                      <div className={`w-11 h-11 rounded-full border-2 flex items-center justify-center mb-2 transition-transform shadow-inner group-hover:scale-105 ${
+                      <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-2 transition-transform shadow-inner group-hover:scale-105 ${
                         isSelected ? 'border-[#F5C754] bg-[#F5C754]/25 text-[#F5C754]' : 'border-[#F5C754] bg-[#F5C754]/10 text-[#F5C754]'
                       }`}>
-                        <span className="text-xl select-none leading-none">
+                        <span className="text-2xl select-none leading-none">
                           {party.symbol || '🗳️'}
                         </span>
                       </div>
 
                       {/* Party Name */}
-                      <h3 className="font-black text-[12px] text-white leading-tight">
+                      <h3 className="font-black text-[13.5px] sm:text-[14px] text-white leading-snug tracking-tight">
                         {party.name}
                       </h3>
 
                       {/* Subtitle matching reference format: Candidate • Role */}
-                      <p className="text-[8px] text-gray-400 mt-1 font-medium tracking-tight line-clamp-1">
+                      <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1">
                         {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'Party'} • Local`}
                       </p>
 
                       {/* Approval / Vote share pill */}
                       <div className="mt-2 flex items-center gap-1">
-                        <span className="text-[7.5px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-amber-300 font-mono">
+                        <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-white/10 border border-amber-400/30 text-amber-300 font-mono">
                           {party.voteShare}% Approval
                         </span>
                       </div>
@@ -3733,22 +3749,22 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
                     )}
 
                     {/* Circular Avatar */}
-                    <div className={`w-11 h-11 rounded-full border-2 flex items-center justify-center text-xl mb-1.5 shadow-inner ${
+                    <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-2xl mb-2 shadow-inner ${
                       isSelected ? 'border-[#F5C754] bg-[#F5C754]/20' : 'border-[#F5C754] bg-[#F5C754]/10'
                     }`}>
                       <span>{c.avatar}</span>
                     </div>
 
-                    <h4 className="font-black text-[11px] text-white leading-tight">
+                    <h4 className="font-black text-[13.5px] sm:text-[14px] text-white leading-snug tracking-tight">
                       {c.name}
                     </h4>
-                    <p className="text-[8px] text-amber-300 font-medium">
+                    <p className="text-[10px] text-amber-300 font-semibold font-telugu mt-0.5 leading-normal">
                       {c.teluguName} • {c.role}
                     </p>
 
                     {/* Progress bar */}
                     <div className="w-full mt-2 space-y-0.5">
-                      <div className="flex items-center justify-between text-[7.5px] text-gray-400">
+                      <div className="flex items-center justify-between text-[8.5px] text-slate-300 font-medium">
                         <span>Approval</span>
                         <span className="font-mono font-bold text-white">{c.votes}%</span>
                       </div>
@@ -3764,7 +3780,7 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
                     <button
                       type="button"
                       onClick={() => handleVoteContestant(c)}
-                      className={`w-full mt-2.5 py-1 px-2 rounded-lg text-[9px] font-black transition-all cursor-pointer ${
+                      className={`w-full mt-2.5 py-1.5 px-2 rounded-xl text-[10px] font-black tracking-normal transition-all cursor-pointer ${
                         isSelected 
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' 
                           : 'bg-[#F5C754] text-black hover:brightness-110 shadow-xs'
