@@ -21,6 +21,7 @@ import {
   ScreenBigBoss,
   PhoneFrame 
 } from './NowNineReferenceScreens';
+import ScreenAdminPanel from './ScreenAdminPanel';
 import { 
   DEFAULT_DETECTED_LOCATION, 
   CONSTITUENCY_DATABASE,
@@ -160,6 +161,14 @@ export default function NowNineUnifiedApp() {
         return <Screen8ShortVideoPlayer onBack={() => handleNav('short-videos')} onNavigate={handleNav} />;
       case 'debate-detail':
         return <Screen9LiveDebateDetail onBack={() => handleNav('live-debates')} onNavigate={handleNav} />;
+      case 'admin':
+        return (
+          <ScreenAdminPanel 
+            onBack={() => handleNav('home')} 
+            onNavigate={handleNav} 
+            currentLocation={currentLocation} 
+          />
+        );
       default:
         return (
           <ScreenLogin 
@@ -231,6 +240,20 @@ export default function NowNineUnifiedApp() {
 
           {/* Header Actions */}
           <div className="flex items-center gap-2">
+            {/* Admin Panel Toggle Button */}
+            <button
+              onClick={() => setActiveScreenId(activeScreenId === 'admin' ? 'home' : 'admin')}
+              className={`p-1.5 px-2.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeScreenId === 'admin'
+                  ? 'bg-amber-500/25 border-amber-400 text-amber-300 shadow-md shadow-amber-500/20'
+                  : 'bg-[#181820] border-amber-500/40 text-amber-300 hover:bg-[#20202C] hover:border-amber-400'
+              }`}
+              title="Open Election Admin Panel"
+            >
+              <span>🛡️</span>
+              <span>{activeScreenId === 'admin' ? 'Exit Admin' : 'Admin Panel'}</span>
+            </button>
+
             {/* Reset to Login Button */}
             <button
               onClick={() => setActiveScreenId('login')}

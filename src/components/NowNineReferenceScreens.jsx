@@ -683,7 +683,7 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
             { label: 'Live Debates', icon: '🎙️', id: 'live-debates' },
             { label: 'News', icon: '📰', id: 'news' },
             { label: 'Common People', icon: '👥', id: 'common-people' },
-            { label: 'Big Boss', icon: '👁️', id: 'big-boss' },
+            { label: 'Boss of House', icon: '👁️', id: 'big-boss' },
           ].map((item, idx) => (
             <button 
               key={idx}
@@ -937,8 +937,9 @@ export function Screen2Home({
                   { label: 'Political Survey', icon: FileText, target: 'survey', color: 'text-amber-400' },
                   { label: 'NowNine News', icon: Newspaper, target: 'news', color: 'text-[#F5C754]' },
                   { label: 'Live Debates', icon: Radio, target: 'live-debates', color: 'text-red-400' },
-                  { label: 'Big Boss', icon: Eye, target: 'big-boss', color: 'text-amber-400' },
+                  { label: 'Boss of House', icon: Eye, target: 'big-boss', color: 'text-amber-400' },
                   { label: 'Common People', icon: Users, target: 'common-people', color: 'text-emerald-400' },
+                  { label: 'Admin Dashboard', icon: ShieldCheck, target: 'admin', color: 'text-[#F5C754]' },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
@@ -1142,13 +1143,10 @@ export function Screen2Home({
                     Live Constituency Survey
                   </span>
                 </div>
-                <div className="mb-1.5 leading-snug">
-                  <span className="text-base sm:text-[17px] font-black text-white tracking-tight inline-block mr-1.5">
-                    now9 pre poll
-                  </span>
-                  <span className="text-xs font-bold text-gray-200 font-telugu inline-block">
-                    ( పొలిటికల్ survey )
-                  </span>
+                <div className="mb-1.5 leading-tight">
+                  <h3 className="text-lg sm:text-[20px] font-black text-white tracking-wide">
+                    Now 9 VOTING
+                  </h3>
                 </div>
                 <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
                   Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
@@ -1230,7 +1228,7 @@ export function Screen2Home({
                 </p>
               </button>
 
-              {/* Tile 4: Big Boss */}
+              {/* Tile 4: Boss of House */}
               <button 
                 type="button"
                 onClick={() => onNavigate('big-boss')}
@@ -1240,7 +1238,7 @@ export function Screen2Home({
                   <Eye className="w-5 h-5 text-[#F5C754]" />
                 </div>
                 <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
-                  Big Boss
+                  Boss of House
                 </h3>
                 <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
                   Voting • Polls • Drama
@@ -1397,13 +1395,13 @@ export function Screen3Survey({
       setCurrentStep(prev => prev + 1);
     } else {
       setIsSubmitted(true);
-      setActiveTab('results');
+      setActiveTab('submitted');
       showToast('🎉 మీ ఓటు విజయవంతంగా నమోదైంది! (Vote Recorded)');
     }
   };
 
   const handlePrev = () => {
-    if (isSubmitted || activeTab === 'results') {
+    if (isSubmitted || activeTab === 'submitted') {
       setIsSubmitted(false);
       setActiveTab('questions');
     } else if (activeTab === 'questions') {
@@ -1441,19 +1439,19 @@ export function Screen3Survey({
           </button>
           <div>
             <h2 className="text-xs font-extrabold text-white leading-tight">
-              {activeTab === 'parties'
-                ? 'Local Parties & Candidates'
-                : (isSubmitted || activeTab === 'results')
-                  ? 'సర్వే ఫలితాలు (Survey Results)' 
+              {isSubmitted || activeTab === 'submitted'
+                ? 'ఓటు నమోదైంది (Vote Submitted)' 
+                : activeTab === 'parties'
+                  ? 'Local Parties & Candidates'
                   : chosenParty 
                     ? `Vote Survey • ${chosenParty.name}` 
                     : 'Political Survey'}
             </h2>
             <p className="text-[8px] text-gray-400 leading-none mt-0.5">
-              {activeTab === 'parties'
-                ? `${loc?.locality || 'Your Area'} • ${loc?.assembly || 'Assembly'}`
-                : (isSubmitted || activeTab === 'results')
-                  ? 'Official Citizen Sentiment 2026' 
+              {isSubmitted || activeTab === 'submitted'
+                ? 'Official Citizen Sentiment 2026 • Confidential' 
+                : activeTab === 'parties'
+                  ? `${loc?.locality || 'Your Area'} • ${loc?.assembly || 'Assembly'}`
                   : chosenParty 
                     ? `${chosenParty.candidate || loc?.locality} • Question ${currentStep + 1} of 5` 
                     : `Question ${currentStep + 1} of 5 • Your Opinion Matters`}
@@ -1468,53 +1466,50 @@ export function Screen3Survey({
         </span>
       </div>
 
-      {/* Survey Workflow Steps / Tabs */}
-      <div className="px-3 py-1.5 bg-[#0E0E12] border-b border-[#1C1C24] flex items-center justify-between gap-1 shrink-0">
-        <button
-          type="button"
-          onClick={() => setActiveTab('parties')}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-            activeTab === 'parties'
-              ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
-              : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
-          }`}
-        >
-          <Vote className="w-3 h-3" />
-          <span>1. Parties ({partiesList.length})</span>
-        </button>
+      {/* Survey Workflow Steps / Tabs - Public results tab removed as requested */}
+      {isSubmitted || activeTab === 'submitted' ? (
+        <div className="px-3 py-1.5 bg-[#0E0E12] border-b border-[#1C1C24] flex items-center justify-between shrink-0">
+          <span className="text-[9.5px] font-bold text-emerald-400 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>✓ Survey Completed • Confidential Ballot</span>
+          </span>
+          <span className="text-[8px] text-gray-400 font-mono">Status: Recorded ✓</span>
+        </div>
+      ) : (
+        <div className="px-3 py-1.5 bg-[#0E0E12] border-b border-[#1C1C24] flex items-center justify-between gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveTab('parties')}
+            className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+              activeTab === 'parties'
+                ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
+                : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
+            }`}
+          >
+            <Vote className="w-3 h-3" />
+            <span>1. Parties ({partiesList.length})</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('questions')}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-            activeTab === 'questions'
-              ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
-              : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
-          }`}
-        >
-          <FileText className="w-3 h-3" />
-          <span>2. Survey ({currentStep + 1}/5)</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            if (isSubmitted) {
-              setActiveTab('results');
-            } else {
-              showToast('⚠️ Complete the survey or vote to view official pulse');
-            }
-          }}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-            activeTab === 'results'
-              ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
-              : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
-          }`}
-        >
-          <TrendingUp className="w-3 h-3" />
-          <span>3. Results</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (chosenParty) {
+                setActiveTab('questions');
+              } else {
+                showToast('⚠️ Pick a party or candidate first');
+              }
+            }}
+            className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+              activeTab === 'questions'
+                ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-xs'
+                : 'text-gray-400 hover:text-white hover:bg-[#16161E]'
+            }`}
+          >
+            <FileText className="w-3 h-3" />
+            <span>2. Survey ({currentStep + 1}/5)</span>
+          </button>
+        </div>
+      )}
 
       {/* Main Body */}
       {/* VIEW 1: POLITICAL PARTIES & LOCAL CANDIDATES */}
@@ -1768,72 +1763,83 @@ export function Screen3Survey({
       )}
 
       {/* VIEW 3: SUBMITTED LIVE PULSE RESULTS */}
-      {(isSubmitted || activeTab === 'results') && (
+      {/* VIEW 3: SUBMITTED CONFIRMATION (VOTING RESULTS REMOVED AS REQUESTED; NOW SHOWN IN ADMIN PANEL) */}
+      {(isSubmitted || activeTab === 'submitted') && (
         <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-6">
-          <div className="text-center p-3 rounded-2xl bg-gradient-to-b from-[#1E1B12] to-[#121217] border border-amber-500/40 shadow-lg">
-            <div className="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-400 text-amber-400 flex items-center justify-center mx-auto mb-1.5 shadow-inner">
-              <CheckCircle2 className="w-5 h-5 text-[#F5C754]" />
+          {/* Main Success Card */}
+          <div className="text-center p-4 rounded-2xl bg-gradient-to-b from-[#1E1B12] via-[#14141A] to-[#0E0E14] border border-amber-500/40 shadow-2xl relative overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/20 border-2 border-emerald-400 text-emerald-400 flex items-center justify-center mx-auto mb-2 shadow-inner">
+              <CheckCircle2 className="w-7 h-7 text-emerald-400 stroke-[2.5]" />
             </div>
-            <h3 className="font-telugu text-xs font-bold text-white">
+
+            <h3 className="font-telugu text-sm font-black text-white leading-snug">
               ధన్యవాదాలు! మీ అభిప్రాయం రికార్డయింది.
             </h3>
-            <p className="text-[9px] text-gray-400 mt-0.5">
-              {chosenParty 
-                ? `Your vote for ${chosenParty.name} (${chosenParty.candidate || loc?.locality}) has been recorded.` 
-                : "Your anonymous opinion has been added to the 2026 People's Pulse."}
+            <p className="text-[10px] text-emerald-300 font-semibold mt-1">
+              ✓ Vote Successfully Recorded & Encrypted
             </p>
-          </div>
+            <p className="text-[9px] text-gray-400 mt-1 leading-relaxed">
+              {chosenParty 
+                ? `Your anonymous vote for ${chosenParty.name} (${chosenParty.candidate || loc?.locality}) has been recorded.` 
+                : "Your anonymous opinion has been securely added to the 2026 People's Pulse."}
+            </p>
 
-          {/* Party Breakdown Bars */}
-          <div className="p-3 rounded-2xl bg-[#141419] border border-[#23232C] space-y-2">
-            <div className="flex items-center justify-between pb-1.5 border-b border-[#202028]">
-              <span className="text-[10px] font-bold text-white">Live Party Standings ({loc?.locality || 'Telangana & AP'})</span>
-              <span className="text-[8px] text-amber-400 font-mono">12,418 Votes</span>
-            </div>
-
-            {partiesList.length > 0 ? (
-              partiesList.map((party) => (
-                <div key={party.id} className="space-y-0.5">
-                  <div className="flex items-center justify-between text-[9px]">
-                    <span className="font-bold text-white flex items-center gap-1">
-                      <span>{party.symbol || '🗳️'}</span>
-                      <span>{party.name}</span>
-                      <span className="text-[8px] text-gray-400">({party.candidate})</span>
-                    </span>
-                    <span className="font-mono font-bold text-amber-400">{party.voteShare}%</span>
-                  </div>
-                  <div className="h-1.5 bg-[#1F1F28] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-500" 
-                      style={{ width: `${party.voteShare}%`, backgroundColor: party.color || '#F59E0B' }}
-                    ></div>
+            {/* Selected Choice Summary Card */}
+            {chosenParty && (
+              <div className="mt-3 p-2.5 rounded-xl bg-[#0D0D12] border border-white/10 flex items-center justify-between text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{chosenParty.symbol || '🗳️'}</span>
+                  <div>
+                    <h4 className="text-[11px] font-black text-white leading-tight">{chosenParty.name}</h4>
+                    <p className="text-[8px] text-gray-400">{chosenParty.candidate} • {loc?.locality || 'Local'}</p>
                   </div>
                 </div>
-              ))
-            ) : (
-              PARTIES.map((party) => (
-                <div key={party.id} className="space-y-0.5">
-                  <div className="flex items-center justify-between text-[9px]">
-                    <span className="font-bold text-white flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: party.color }}></span>
-                      <span>{party.name}</span>
-                      <span className="text-[8px] text-gray-400">({party.teluguName.slice(0, 8)}...)</span>
-                    </span>
-                    <span className="font-mono font-bold text-amber-400">{party.resultPercent}%</span>
-                  </div>
-                  <div className="h-1.5 bg-[#1F1F28] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-500" 
-                      style={{ width: `${party.resultPercent}%`, backgroundColor: party.color }}
-                    ></div>
-                  </div>
-                </div>
-              ))
+                <span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                  Confirmed ✓
+                </span>
+              </div>
             )}
           </div>
 
+          {/* Official Secret Ballot Notice - Explaining results are held securely in Admin Panel */}
+          <div className="p-3 rounded-2xl bg-[#121218] border border-amber-500/25 space-y-1.5">
+            <div className="flex items-center gap-2 text-amber-400">
+              <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
+                🔒 రహస్య బ్యాలెట్ • Confidential Survey
+              </span>
+            </div>
+            <p className="font-telugu text-[9px] text-gray-300 leading-relaxed">
+              ఎన్నికల నియమావళి ప్రకారం సర్వే ఫలితాలు అంతర్గతంగా భద్రపరచబడతాయి. సమగ్ర విశ్లేషణ మరియు ఫలితాలు అడ్మిన్ ప్యానెల్ ద్వారా మాత్రమే పర్యవేక్షించబడతాయి.
+            </p>
+            <p className="text-[8.5px] text-gray-400 leading-normal">
+              As per survey policy, individual results are kept private and aggregate analytics are available exclusively to Election Analysts in the Admin Panel.
+            </p>
+          </div>
+
+          {/* Admin Panel Quick Access Button */}
+          <div className="p-2.5 rounded-xl bg-[#161622] border border-[#2B2B3D] flex items-center justify-between">
+            <div className="flex items-center gap-2 text-left">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 text-xs">
+                📊
+              </div>
+              <div>
+                <p className="text-[9.5px] font-bold text-white leading-tight">Election Admin Panel</p>
+                <p className="text-[8px] text-gray-400">View real-time standings & analytics</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate ? onNavigate('admin') : null}
+              className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-bold text-[8.5px] transition-all cursor-pointer flex items-center gap-1"
+            >
+              <span>View Admin</span>
+              <ChevronRight className="w-2.5 h-2.5" />
+            </button>
+          </div>
+
           {/* Action Button */}
-          <div className="pt-2">
+          <div className="pt-1">
             <button
               type="button"
               onClick={() => onNavigate ? onNavigate('home') : onBack()}
@@ -3549,7 +3555,7 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
             </div>
             <div>
               <h2 className="text-xs font-black text-white leading-tight flex items-center gap-1">
-                <span>Big Boss Telugu</span>
+                <span>Boss of House</span>
                 <span className="text-[7px] px-1 rounded bg-red-600 font-extrabold text-white animate-pulse">
                   LIVE
                 </span>
