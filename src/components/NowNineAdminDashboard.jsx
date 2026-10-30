@@ -38,8 +38,16 @@ import {
   CheckSquare,
   XCircle,
   UserCheck,
-  Share2
+  Share2,
+  Video,
+  VideoOff,
+  Mic,
+  MicOff,
+  Monitor,
+  Square,
+  Sparkles
 } from 'lucide-react';
+import LiveStreamModal from './LiveStreamModal';
 import { CONSTITUENCY_DATABASE, DEFAULT_DETECTED_LOCATION } from '../data/locationConstituencyData';
 import { SURVEY_QUESTIONS } from '../data/nowNineAppFlowData';
 
@@ -55,6 +63,38 @@ export default function NowNineAdminDashboard({
   const [isEmbargoActive, setIsEmbargoActive] = useState(true);
   const [toastMsg, setToastMsg] = useState(null);
   const [refreshCount, setRefreshCount] = useState(0);
+
+  // Live Broadcast & Stream Conduct State
+  const [isLiveStreamModalOpen, setIsLiveStreamModalOpen] = useState(false);
+  const [liveStreamModalMode, setLiveStreamModalMode] = useState('conduct');
+  const [isInlineBroadcasting, setIsInlineBroadcasting] = useState(false);
+  const [inlineBroadcastDuration, setInlineBroadcastDuration] = useState(0);
+  const [isInlineMicOn, setIsInlineMicOn] = useState(true);
+  const [isInlineCameraOn, setIsInlineCameraOn] = useState(true);
+  const [activeBroadcastTopic, setActiveBroadcastTopic] = useState('2026 ఎన్నికలు: ఎవరికి అవకాశాలు? (Live Civic Townhall)');
+  const [speakerQueue, setSpeakerQueue] = useState([
+    { id: 1, name: 'K. Ramesh (Mahabubnagar)', topic: 'Palamuru Lift Irrigation Water Issues', time: '1m ago', status: 'pending' },
+    { id: 2, name: 'M. Sunitha (LB Nagar)', topic: 'Badangpet Road Widening Guarantee', time: '3m ago', status: 'pending' },
+    { id: 3, name: 'Dr. V. Prasad (Jubilee Hills)', topic: 'Youth Employment in IT Hubs', time: '5m ago', status: 'pending' },
+  ]);
+
+  useEffect(() => {
+    let interval;
+    if (isInlineBroadcasting) {
+      interval = setInterval(() => {
+        setInlineBroadcastDuration(prev => prev + 1);
+      }, 1000);
+    } else {
+      setInlineBroadcastDuration(0);
+    }
+    return () => clearInterval(interval);
+  }, [isInlineBroadcasting]);
+
+  const formatDuration = (sec) => {
+    const mins = Math.floor(sec / 60);
+    const secs = sec % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Live Simulated Metrics
   const [totalVotesCount, setTotalVotesCount] = useState(148920);
@@ -996,45 +1036,269 @@ export default function NowNineAdminDashboard({
           {/* VIEW 4: LIVE ON & DEBATES MANAGEMENT */}
           {activeTab === 'live-debates' && (
             <div className="space-y-5 animate-fadeIn">
-              <div className="flex items-center justify-between pb-3 border-b border-[#20202E]">
+              
+              {/* Header with Title and Primary Conduct Live Action */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-3">
                 <div>
                   <h2 className="text-xl font-black text-white flex items-center gap-2">
-                    <Radio className="w-5 h-5 text-red-400" />
-                    <span>Live On • Stream Moderation & Speaker Queue</span>
+                    <Radio className="w-5 h-5 text-red-500 animate-pulse" />
+                    <span>Live On • Stream Moderation & Broadcast Studio</span>
                   </h2>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    Live video broadcasts, interactive voice panels, and audience speaker management
+                    Conduct live video broadcasts, interview candidates, take live citizen calls, and moderate streams
                   </p>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-black flex items-center gap-1.5 animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-white"></span>
-                  <span>14,280 Viewers Online</span>
-                </span>
+                
+                <div className="flex items-center gap-2.5">
+                  <span className="px-3 py-1.5 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 text-xs font-black flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <span>14,280 Viewers Online</span>
+                  </span>
+
+                  {/* MAIN PRIMARY BUTTON TO CONDUCT LIVE */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLiveStreamModalMode('conduct');
+                      setIsLiveStreamModalOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:brightness-110 text-white text-xs font-black flex items-center gap-2 shadow-xl shadow-red-600/40 active:scale-95 transition-all cursor-pointer border border-red-400/40"
+                    title="Launch Studio to Conduct Live Video Stream"
+                  >
+                    <Radio className="w-4 h-4 animate-pulse text-white" />
+                    <span>🔴 Conduct Live Stream</span>
+                  </button>
+                </div>
               </div>
 
+              {/* Broadcast Studio Station Banner */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#201014] via-[#141422] to-[#111118] border-2 border-red-500/40 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-red-600/20 border border-red-500/50 flex items-center justify-center shrink-0">
+                    <Radio className="w-6 h-6 text-red-400 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-extrabold text-white">Now9 Live Broadcast Studio & Host Station</h3>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                        isInlineBroadcasting 
+                          ? 'bg-red-500/30 border border-red-400 text-red-300 animate-pulse' 
+                          : 'bg-emerald-500/20 border border-emerald-400/30 text-emerald-300'
+                      }`}>
+                        {isInlineBroadcasting ? '● YOU ARE BROADCASTING LIVE' : 'STUDIO CONSOLE READY'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-300 mt-0.5">
+                      Target Audience: <strong className="text-amber-300">{activeConstituency.name}</strong> • 119 Assemblies Linked • Ultra Low Latency 1080p WebRTC
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap">
+                  {/* Fullscreen Video Studio Launcher */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLiveStreamModalMode('conduct');
+                      setIsLiveStreamModalOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-red-600/30 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Video className="w-4 h-4" />
+                    <span>Launch Fullscreen Studio</span>
+                  </button>
+
+                  {/* Inline Live Toggle */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = !isInlineBroadcasting;
+                      setIsInlineBroadcasting(next);
+                      if (next) {
+                        showToast('🔴 You are now BROADCASTING LIVE from this console to citizens!');
+                      } else {
+                        showToast('⏹️ Live broadcast ended');
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer border ${
+                      isInlineBroadcasting
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400 shadow-lg shadow-emerald-600/30'
+                        : 'bg-[#1C1C2B] hover:bg-[#252538] text-amber-300 border-amber-500/40'
+                    }`}
+                  >
+                    {isInlineBroadcasting ? (
+                      <>
+                        <Square className="w-3.5 h-3.5 fill-white" />
+                        <span>Stop Live Broadcast ({formatDuration(inlineBroadcastDuration)})</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <span>Conduct Live Right Here</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Grid: Player/Studio View + Citizen Speaker Queue */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Active Debate Player Card */}
+                
+                {/* Active Debate Player / Conduct Live Studio Card */}
                 <div className="lg:col-span-2 p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
                   <div className="aspect-video w-full rounded-xl bg-black relative overflow-hidden flex items-center justify-center border border-white/10">
-                    <img 
-                      src="https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=1200&auto=format&fit=crop&q=80" 
-                      alt="Debate stream" 
-                      className="w-full h-full object-cover opacity-60"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50"></div>
-                    <div className="absolute top-3 left-3 flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-black uppercase">LIVE NOW</span>
-                      <span className="text-xs font-bold text-white">2026 ఎన్నికలు: ఎవరికి అవకాశాలు?</span>
-                    </div>
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-gray-300">
-                      <span>Moderator: Senior Political Editor</span>
-                      <span className="font-mono text-amber-300">4 Active Speakers</span>
-                    </div>
+                    
+                    {isInlineBroadcasting ? (
+                      /* ACTIVE INLINE LIVE BROADCAST STUDIO */
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-[#180A0E] to-black flex flex-col justify-between p-5 text-center">
+                        {/* Top Live Bar */}
+                        <div className="flex items-center justify-between z-10">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-1 rounded-full bg-red-600 text-white text-[10px] font-black uppercase flex items-center gap-1.5 shadow-md">
+                              <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                              <span>ON AIR (HOST LIVE)</span>
+                            </span>
+                            <span className="bg-black/60 px-2 py-0.5 rounded text-[10px] text-emerald-400 font-mono border border-emerald-500/30">
+                              ⏱ {formatDuration(inlineBroadcastDuration)}
+                            </span>
+                          </div>
+                          <span className="bg-black/60 px-2.5 py-1 rounded text-xs text-amber-300 font-bold border border-white/10">
+                            👥 14,280 Citizens Tuned In
+                          </span>
+                        </div>
+
+                        {/* Center Visualizer & Audio Waves */}
+                        <div className="flex flex-col items-center justify-center my-auto space-y-3">
+                          <div className="relative">
+                            <div className="w-24 h-24 rounded-full bg-red-600/20 border-2 border-red-500/60 flex items-center justify-center animate-pulse">
+                              <Radio className="w-12 h-12 text-red-400" />
+                            </div>
+                            <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center text-[10px] font-bold">
+                              ✓
+                            </span>
+                          </div>
+                          <div>
+                            <h3 className="text-base sm:text-lg font-black text-white">
+                              {activeBroadcastTopic}
+                            </h3>
+                            <p className="text-xs text-emerald-400 font-medium mt-1">
+                              📡 Microphone Active • High-Definition Stream Broadcasting to {activeConstituency.name}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Bottom Studio Controls */}
+                        <div className="flex items-center justify-between pt-2 border-t border-white/10 z-10">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsInlineMicOn(!isInlineMicOn);
+                                showToast(isInlineMicOn ? '🔇 Host Microphone Muted' : '🎙️ Host Microphone Unmuted');
+                              }}
+                              className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                                isInlineMicOn 
+                                  ? 'bg-[#1C1C28] text-white border-gray-600' 
+                                  : 'bg-red-500/20 text-red-400 border-red-500/40'
+                              }`}
+                              title={isInlineMicOn ? 'Mute Mic' : 'Unmute Mic'}
+                            >
+                              {isInlineMicOn ? <Mic className="w-4 h-4 text-emerald-400" /> : <MicOff className="w-4 h-4 text-red-400" />}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsInlineCameraOn(!isInlineCameraOn);
+                                showToast(isInlineCameraOn ? '📷 Camera Off' : '📷 Camera On');
+                              }}
+                              className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                                isInlineCameraOn 
+                                  ? 'bg-[#1C1C28] text-white border-gray-600' 
+                                  : 'bg-red-500/20 text-red-400 border-red-500/40'
+                              }`}
+                              title={isInlineCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
+                            >
+                              {isInlineCameraOn ? <Video className="w-4 h-4 text-emerald-400" /> : <VideoOff className="w-4 h-4 text-red-400" />}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLiveStreamModalMode('conduct');
+                                setIsLiveStreamModalOpen(true);
+                              }}
+                              className="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold hover:bg-amber-500/30 cursor-pointer"
+                            >
+                              Expand Studio Fullscreen
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsInlineBroadcasting(false);
+                              showToast('⏹️ Broadcast ended');
+                            }}
+                            className="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs transition-all cursor-pointer shadow-md"
+                          >
+                            End Broadcast
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* REGULAR PREVIEW PLAYER */
+                      <>
+                        <img 
+                          src="https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=1200&auto=format&fit=crop&q=80" 
+                          alt="Debate stream" 
+                          className="w-full h-full object-cover opacity-60"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60"></div>
+                        <div className="absolute top-3 left-3 flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-black uppercase">LIVE NOW</span>
+                          <span className="text-xs font-bold text-white">2026 ఎన్నికలు: ఎవరికి అవకాశాలు?</span>
+                        </div>
+                        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-gray-300">
+                          <span>Moderator: Senior Political Editor</span>
+                          <span className="font-mono text-amber-300">4 Active Speakers</span>
+                        </div>
+
+                        {/* Center Play Overlay Trigger to Conduct */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLiveStreamModalMode('conduct');
+                              setIsLiveStreamModalOpen(true);
+                            }}
+                            className="px-4 py-2.5 rounded-2xl bg-black/75 hover:bg-red-600/90 border border-white/20 hover:border-red-400 text-white font-extrabold text-xs shadow-2xl backdrop-blur-md flex items-center gap-2 transition-all transform hover:scale-105 cursor-pointer"
+                          >
+                            <Radio className="w-4 h-4 text-red-400 animate-pulse" />
+                            <span>Conduct Live Stream as Host</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs font-bold text-gray-300">Channel: Now9 Telugu Prime Debates</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 gap-2">
+                    <span className="text-xs font-bold text-gray-300">
+                      Channel: <strong className="text-white">Now9 Telugu Prime Debates</strong> • Constituency: {activeConstituency.name}
+                    </span>
                     <div className="flex items-center gap-2">
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          setLiveStreamModalMode('conduct');
+                          setIsLiveStreamModalOpen(true);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                      >
+                        <Radio className="w-3.5 h-3.5" />
+                        <span>Conduct Live</span>
+                      </button>
+
                       <button 
                         type="button" 
                         onClick={() => showToast('🎙️ Moderator audio broadcast enabled')}
@@ -1046,43 +1310,84 @@ export default function NowNineAdminDashboard({
                   </div>
                 </div>
 
-                {/* Speaker Queue Approvals */}
-                <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
-                  <h3 className="font-extrabold text-sm text-white flex items-center justify-between">
-                    <span>Citizen Speaker Queue</span>
-                    <span className="text-[10px] text-amber-400 font-mono">3 Pending</span>
-                  </h3>
+                {/* Speaker Queue Approvals & Live On-Air Citizens */}
+                <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <h3 className="font-extrabold text-sm text-white flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-amber-400" />
+                        <span>Citizen Speaker Queue</span>
+                      </span>
+                      <span className="text-[10px] text-amber-400 font-mono">
+                        {speakerQueue.filter(s => s.status === 'pending').length} Pending
+                      </span>
+                    </h3>
 
-                  <div className="space-y-2">
-                    {[
-                      { name: 'K. Ramesh (Mahabubnagar)', topic: 'Palamuru Lift Irrigation Water Issues', time: '1m ago' },
-                      { name: 'M. Sunitha (LB Nagar)', topic: 'Badangpet Road Widening Guarantee', time: '3m ago' },
-                      { name: 'Dr. V. Prasad (Jubilee Hills)', topic: 'Youth Employment in IT Hubs', time: '5m ago' },
-                    ].map((spk, idx) => (
-                      <div key={idx} className="p-2.5 rounded-xl bg-[#12121A] border border-[#1E1E28] space-y-1.5 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-white">{spk.name}</span>
-                          <span className="text-[9px] text-gray-500">{spk.time}</span>
+                    <div className="space-y-2">
+                      {speakerQueue.map((spk) => (
+                        <div key={spk.id} className="p-2.5 rounded-xl bg-[#12121A] border border-[#1E1E28] space-y-1.5 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white">{spk.name}</span>
+                            <span className="text-[9px] text-gray-500">{spk.time}</span>
+                          </div>
+                          <p className="text-[10px] text-gray-400">{spk.topic}</p>
+                          
+                          {spk.status === 'on_air' ? (
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[9.5px] font-black flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                <span>ON AIR 🎙️</span>
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSpeakerQueue(prev => prev.map(s => s.id === spk.id ? { ...s, status: 'pending' } : s));
+                                  showToast(`Muted and removed ${spk.name} from live audio`);
+                                }}
+                                className="px-2 py-0.5 rounded bg-gray-700 text-gray-300 hover:text-white text-[9.5px] font-bold"
+                              >
+                                End Mic
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5 pt-1">
+                              <button 
+                                type="button" 
+                                onClick={() => {
+                                  setSpeakerQueue(prev => prev.map(s => s.id === spk.id ? { ...s, status: 'on_air' } : s));
+                                  showToast(`🎙️ Approved ${spk.name} to speak LIVE on air!`);
+                                }}
+                                className="flex-1 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                              >
+                                <span>Approve Mic</span>
+                              </button>
+                              <button 
+                                type="button" 
+                                onClick={() => {
+                                  setSpeakerQueue(prev => prev.filter(s => s.id !== spk.id));
+                                  showToast('✕ Declined speaker request');
+                                }}
+                                className="px-2 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-bold transition-all cursor-pointer"
+                              >
+                                Decline
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        <p className="text-[10px] text-gray-400">{spk.topic}</p>
-                        <div className="flex items-center gap-1.5 pt-1">
-                          <button 
-                            type="button" 
-                            onClick={() => showToast(`✓ Approved ${spk.name} to speak live!`)}
-                            className="flex-1 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-all cursor-pointer"
-                          >
-                            Approve Mic
-                          </button>
-                          <button 
-                            type="button" 
-                            onClick={() => showToast(`✕ Dismissed application`)}
-                            className="px-2 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-bold transition-all cursor-pointer"
-                          >
-                            Decline
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Broadcast Push Alert Trigger */}
+                  <div className="pt-2 border-t border-[#1E1E2C]">
+                    <button
+                      type="button"
+                      onClick={() => showToast(`📲 Push Notification broadcasted to all ${activeConstituency.name} voters: "Now9 Live Debate is ON AIR!"`)}
+                      className="w-full py-2 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-amber-300 hover:text-amber-200 text-[10.5px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <Bell className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Notify Citizens "Debate is Live"</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1354,6 +1659,16 @@ export default function NowNineAdminDashboard({
 
         </main>
       </div>
+      {/* Live Stream Studio Modal for Conducting Broadcasts */}
+      <LiveStreamModal 
+        isOpen={isLiveStreamModalOpen}
+        onClose={() => setIsLiveStreamModalOpen(false)}
+        presentDistrict={{
+          districtName: activeConstituency?.name || 'Mahabubnagar',
+          stateName: activeConstituency?.state || 'Telangana'
+        }}
+        initialMode={liveStreamModalMode}
+      />
     </div>
   );
 }
