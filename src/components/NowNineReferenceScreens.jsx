@@ -1089,8 +1089,8 @@ export function Screen2Home({
                     </p>
 
                     <div className="mt-2 flex items-center gap-1">
-                      <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-white/10 border border-amber-400/30 text-amber-300 font-mono">
-                        {party.voteShare}% Approval
+                      <span className="text-[8.5px] font-semibold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                        {partyStatus || 'Official Candidate'}
                       </span>
                     </div>
                   </button>
@@ -1602,10 +1602,9 @@ export function Screen3Survey({
                         {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'Party'} • Local`}
                       </p>
 
-                      {/* Approval / Vote share pill */}
                       <div className="mt-2 flex items-center gap-1">
-                        <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-white/10 border border-amber-400/30 text-amber-300 font-mono">
-                          {party.voteShare}% Approval
+                        <span className="text-[8.5px] font-semibold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                          {partyStatus || 'Contesting Candidate'}
                         </span>
                       </div>
                     </button>

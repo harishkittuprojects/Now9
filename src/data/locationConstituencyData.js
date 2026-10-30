@@ -88,6 +88,74 @@ export const DEFAULT_DETECTED_LOCATION = {
 
 // Comprehensive Database covering key Telangana & Andhra Pradesh Constituencies
 export const CONSTITUENCY_DATABASE = [
+  {
+    id: 'telangana-mahabubnagar',
+    locality: 'Yenugonda (యెనుగొండ)',
+    city: 'Mahabubnagar',
+    district: 'Mahabubnagar',
+    state: 'Telangana',
+    pincode: '509001',
+    ward: 'Ward No. 12 (Yenugonda / Mahabubnagar Urban)',
+    assembly: 'Mahabubnagar Assembly Constituency',
+    parliament: 'Mahabubnagar Lok Sabha',
+    formattedAddress: 'Yenugonda, Mahabubnagar, Telangana - 509001',
+    exactAddress: 'Yenugonda, Mahabubnagar, Telangana - 509001',
+    gpsCoordinates: '16.7645° N, 77.9860° E',
+    detectionMethod: 'Auto-detected via GPS & Network 🛰️',
+    parties: [
+      {
+        id: 'inc',
+        name: 'Congress (INC)',
+        teluguName: 'భారత జాతీయ కాంగ్రెస్',
+        code: 'INC',
+        symbol: '✋',
+        candidate: 'Yennam Srinivas Reddy',
+        role: 'Sitting MLA / Ruling Party',
+        status: 'Sitting MLA / Ruling Party',
+        color: '#0284C7',
+        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+        voteShare: 45.6,
+        focus: 'మహబూబ్‌నగర్ మెడికల్ కాలేజీ విస్తరణ, పాలమూరు తాగునీరు, రోడ్ల అభివృద్ధి',
+        keyFocus: 'మహబూబ్‌నగర్ మెడికల్ కాలేజీ విస్తరణ, పాలమూరు తాగునీరు, రోడ్ల అభివృద్ధి',
+        promises: ['Yenugonda Lake beautification & walking track', 'Super specialty hospital upgrade', 'Youth skill employment hub in Mahabubnagar'],
+        manifestoPromises: ['Yenugonda Lake beautification & walking track', 'Super specialty hospital upgrade', 'Youth skill employment hub in Mahabubnagar']
+      },
+      {
+        id: 'brs',
+        name: 'BRS',
+        teluguName: 'భారత్ రాష్ట్ర సమితి',
+        code: 'BRS',
+        symbol: '🚗',
+        candidate: 'V. Srinivas Goud',
+        role: 'Ex-Minister / Candidate',
+        status: 'Ex-Minister / Candidate',
+        color: '#E11D48',
+        badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+        voteShare: 40.2,
+        focus: 'కేసీఆర్ ఎకో అర్బన్ పార్క్, మహబూబ్‌నగర్ ఐటీ టవర్, పాలమూరు రంగారెడ్డి ఎత్తిపోతలు',
+        keyFocus: 'కేసీఆర్ ఎకో అర్బన్ పార్క్, మహబూబ్‌నగర్ ఐటీ టవర్, పాలమూరు రంగారెడ్డి ఎత్తిపోతలు',
+        promises: ['IT Corridor extension to Yenugonda', 'Underground drainage completion', 'Palamuru Ranga Reddy water connections'],
+        manifestoPromises: ['IT Corridor extension to Yenugonda', 'Underground drainage completion', 'Palamuru Ranga Reddy water connections']
+      },
+      {
+        id: 'bjp',
+        name: 'BJP',
+        teluguName: 'భారతీయ జనతా పార్టీ',
+        code: 'BJP',
+        symbol: '🪷',
+        candidate: 'A.P. Mithun Kumar Reddy',
+        role: 'Key Contender',
+        status: 'Key Contender',
+        color: '#FF6F00',
+        badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+        voteShare: 11.8,
+        focus: 'అవినీతి రహిత పాలన, కేంద్ర ప్రాజెక్టులు, అమృత్ భారత్ స్టేషన్',
+        keyFocus: 'అవినీతి రహిత పాలన, కేంద్ర ప్రాజెక్టులు, అమృత్ భారత్ స్టేషన్',
+        promises: ['Amrit Bharat Mahabubnagar railway station upgrade', 'PM Awas urban housing in Yenugonda', 'Central highway bypass connectivity'],
+        manifestoPromises: ['Amrit Bharat Mahabubnagar railway station upgrade', 'PM Awas urban housing in Yenugonda', 'Central highway bypass connectivity']
+      }
+    ]
+  },
   DEFAULT_DETECTED_LOCATION,
   {
     id: 'hyderabad-serilingampally',
@@ -612,10 +680,45 @@ export function resolveConstituencyAndParties(detectedInfo) {
     exactAddress = '',
     lat = 0,
     lon = 0,
+    county = '',
     method = 'Auto-detected via Live Device GPS 🛰️'
   } = detectedInfo;
 
-  const searchTarget = `${locality} ${city} ${district} ${exactAddress}`.toLowerCase();
+  const searchTarget = `${locality} ${city} ${district} ${county} ${exactAddress}`.toLowerCase();
+
+  // Geofence check for Mahabubnagar / Yenugonda:
+  // Coordinates range for Mahabubnagar urban: Lat ~ 16.60 to 16.90, Lon ~ 77.85 to 78.15
+  const isMahabubnagarCoordinates = lat && lon && (lat >= 16.60 && lat <= 16.90 && lon >= 77.85 && lon <= 78.15);
+
+  const isYenugondaOrMahabubnagar = isMahabubnagarCoordinates || 
+    searchTarget.includes('yenugonda') || 
+    searchTarget.includes('యెనుగొండ') || 
+    searchTarget.includes('enugonda') || 
+    searchTarget.includes('mahbubnagar') || 
+    searchTarget.includes('mahabubnagar') || 
+    searchTarget.includes('మహబూబ్‌నగర్') || 
+    searchTarget.includes('మహబూబ్ నగర్') || 
+    searchTarget.includes('palamuru') || 
+    searchTarget.includes('పాలమూరు') ||
+    pincode === '509001' || pincode === '509002';
+
+  if (isYenugondaOrMahabubnagar) {
+    const mbItem = CONSTITUENCY_DATABASE.find(item => item.id === 'telangana-mahabubnagar') || CONSTITUENCY_DATABASE[0];
+    const displayLocality = locality || 'యెనుగొండ';
+    return {
+      ...mbItem,
+      locality: displayLocality,
+      city: 'Mahabubnagar',
+      district: 'Mahabubnagar',
+      assembly: 'Mahabubnagar Assembly Constituency',
+      parliament: 'Mahabubnagar Lok Sabha',
+      pincode: pincode || '509001',
+      formattedAddress: exactAddress || `${displayLocality}, Mahabubnagar, Telangana - ${pincode || '509001'}`,
+      exactAddress: exactAddress || `${displayLocality}, Mahabubnagar, Telangana - ${pincode || '509001'}`,
+      gpsCoordinates: lat && lon ? `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E` : mbItem.gpsCoordinates,
+      detectionMethod: method
+    };
+  }
 
   // 1. Try to find an exact match in our pre-curated database
   const matched = CONSTITUENCY_DATABASE.find(item => {
@@ -628,6 +731,7 @@ export function resolveConstituencyAndParties(detectedInfo) {
   if (matched) {
     return {
       ...matched,
+      locality: locality || matched.locality,
       exactAddress: exactAddress || matched.exactAddress,
       formattedAddress: exactAddress || matched.formattedAddress,
       pincode: pincode || matched.pincode,
@@ -636,10 +740,75 @@ export function resolveConstituencyAndParties(detectedInfo) {
     };
   }
 
-  // 2. If located anywhere in Telangana (e.g. Mahabubnagar, Nizamabad, Karimnagar, Siddipet, Nalgonda, etc.)
+  // 2. Intelligent Assembly Constituency resolver for any other Telangana location
   const isTelangana = state.toLowerCase().includes('telangana') || searchTarget.includes('hyderabad') || searchTarget.includes('secunderabad');
   if (isTelangana) {
-    const areaName = locality || city || district || 'Telangana Locality';
+    let resolvedAssembly = '';
+    let parliamentName = 'State';
+
+    if (searchTarget.includes('almasguda') || searchTarget.includes('అల్మాస్‌గూడ') || searchTarget.includes('badangpet') || searchTarget.includes('meerpet') || searchTarget.includes('lb nagar') || searchTarget.includes('saroornagar')) {
+      resolvedAssembly = 'LB Nagar Assembly Constituency';
+      parliamentName = 'Malkajgiri / Chevella Lok Sabha';
+    } else if (searchTarget.includes('gachibowli') || searchTarget.includes('madhapur') || searchTarget.includes('kondapur') || searchTarget.includes('serilingampally')) {
+      resolvedAssembly = 'Serilingampally Assembly Constituency';
+      parliamentName = 'Chevella Lok Sabha';
+    } else if (searchTarget.includes('kphb') || searchTarget.includes('kukatpally') || searchTarget.includes('nizampet') || searchTarget.includes('bachupally')) {
+      resolvedAssembly = 'Kukatpally Assembly Constituency';
+      parliamentName = 'Malkajgiri Lok Sabha';
+    } else if (searchTarget.includes('jubilee') || searchTarget.includes('banjara') || searchTarget.includes('film nagar')) {
+      resolvedAssembly = 'Jubilee Hills Assembly Constituency';
+      parliamentName = 'Secunderabad Lok Sabha';
+    } else if (searchTarget.includes('khairatabad') || searchTarget.includes('ameerpet') || searchTarget.includes('panjagutta') || searchTarget.includes('somajiguda')) {
+      resolvedAssembly = 'Khairatabad Assembly Constituency';
+      parliamentName = 'Secunderabad Lok Sabha';
+    } else if (searchTarget.includes('secunderabad') || searchTarget.includes('begumpet') || searchTarget.includes('marredpally')) {
+      resolvedAssembly = 'Secunderabad Assembly Constituency';
+      parliamentName = 'Secunderabad Lok Sabha';
+    } else if (searchTarget.includes('uppal') || searchTarget.includes('habsiguda') || searchTarget.includes('ramanthapur') || searchTarget.includes('nacharam')) {
+      resolvedAssembly = 'Uppal Assembly Constituency';
+      parliamentName = 'Malkajgiri Lok Sabha';
+    } else if (searchTarget.includes('malkajgiri') || searchTarget.includes('neredmet') || searchTarget.includes('moula ali')) {
+      resolvedAssembly = 'Malkajgiri Assembly Constituency';
+      parliamentName = 'Malkajgiri Lok Sabha';
+    } else if (searchTarget.includes('quthbullapur') || searchTarget.includes('jeedimetla') || searchTarget.includes('chintal')) {
+      resolvedAssembly = 'Quthbullapur Assembly Constituency';
+      parliamentName = 'Malkajgiri Lok Sabha';
+    } else if (searchTarget.includes('rajendranagar') || searchTarget.includes('attapur') || searchTarget.includes('shamshabad')) {
+      resolvedAssembly = 'Rajendranagar Assembly Constituency';
+      parliamentName = 'Chevella Lok Sabha';
+    } else if (searchTarget.includes('munugode') || searchTarget.includes('choutuppal') || searchTarget.includes('chandur')) {
+      resolvedAssembly = 'Munugode Assembly Constituency';
+      parliamentName = 'Bhongir Lok Sabha';
+    } else if (searchTarget.includes('gajwel') || searchTarget.includes('toopran')) {
+      resolvedAssembly = 'Gajwel Assembly Constituency';
+      parliamentName = 'Medak Lok Sabha';
+    } else if (searchTarget.includes('warangal') || searchTarget.includes('hanamkonda') || searchTarget.includes('kazipet')) {
+      resolvedAssembly = 'Warangal West Assembly Constituency';
+      parliamentName = 'Warangal Lok Sabha';
+    } else if (searchTarget.includes('karimnagar')) {
+      resolvedAssembly = 'Karimnagar Assembly Constituency';
+      parliamentName = 'Karimnagar Lok Sabha';
+    } else if (searchTarget.includes('nizamabad')) {
+      resolvedAssembly = 'Nizamabad Urban Assembly Constituency';
+      parliamentName = 'Nizamabad Lok Sabha';
+    } else if (searchTarget.includes('khammam')) {
+      resolvedAssembly = 'Khammam Assembly Constituency';
+      parliamentName = 'Khammam Lok Sabha';
+    } else if (searchTarget.includes('nalgonda')) {
+      resolvedAssembly = 'Nalgonda Assembly Constituency';
+      parliamentName = 'Nalgonda Lok Sabha';
+    } else if (city && city !== 'Hyderabad' && city.length > 2) {
+      resolvedAssembly = `${city} Assembly Constituency`;
+      parliamentName = `${city} Lok Sabha`;
+    } else if (district && district !== 'Hyderabad' && district.length > 2) {
+      resolvedAssembly = `${district} Assembly Constituency`;
+      parliamentName = `${district} Lok Sabha`;
+    } else {
+      resolvedAssembly = 'Jubilee Hills / Khairatabad Assembly';
+      parliamentName = 'Secunderabad Lok Sabha';
+    }
+
+    const areaName = locality || city || 'Local Area';
     return {
       id: `ts-auto-${Date.now()}`,
       locality: locality || city || 'Local Area',
@@ -648,8 +817,8 @@ export function resolveConstituencyAndParties(detectedInfo) {
       state: 'Telangana',
       pincode: pincode || '500001',
       ward: `Ward (${areaName} Division)`,
-      assembly: `${areaName} Assembly Constituency`,
-      parliament: `${city || district || 'State'} Lok Sabha`,
+      assembly: resolvedAssembly,
+      parliament: parliamentName,
       formattedAddress: exactAddress || `${areaName}, ${city}, Telangana - ${pincode}`,
       exactAddress: exactAddress || `${areaName}, ${city}, Telangana - ${pincode}`,
       gpsCoordinates: lat && lon ? `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E` : '17.3850° N, 78.4867° E',
@@ -661,7 +830,7 @@ export function resolveConstituencyAndParties(detectedInfo) {
           teluguName: 'భారత జాతీయ కాంగ్రెస్',
           code: 'INC',
           symbol: '✋',
-          candidate: `Local MLA / Contestant (${areaName})`,
+          candidate: `Local MLA / Contestant (${resolvedAssembly.replace(' Assembly Constituency', '').replace(' Assembly', '')})`,
           role: 'Ruling Party in Telangana',
           status: 'Ruling Party in Telangana',
           color: '#0284C7',
@@ -678,7 +847,7 @@ export function resolveConstituencyAndParties(detectedInfo) {
           teluguName: 'భారత్ రాష్ట్ర సమితి',
           code: 'BRS',
           symbol: '🚗',
-          candidate: `BRS Nominee (${areaName})`,
+          candidate: `BRS Nominee (${resolvedAssembly.replace(' Assembly Constituency', '').replace(' Assembly', '')})`,
           role: 'Main Opposition Party',
           status: 'Main Opposition Party',
           color: '#E11D48',
@@ -695,7 +864,7 @@ export function resolveConstituencyAndParties(detectedInfo) {
           teluguName: 'భారతీయ జనతా పార్టీ',
           code: 'BJP',
           symbol: '🪷',
-          candidate: `BJP Candidate (${areaName})`,
+          candidate: `BJP Candidate (${resolvedAssembly.replace(' Assembly Constituency', '').replace(' Assembly', '')})`,
           role: 'Key Challenger',
           status: 'Key Challenger',
           color: '#FF6F00',
@@ -814,8 +983,8 @@ export async function fetchLiveUserAddress(lat, lon) {
       const data = await res.json();
       const addr = data.address || {};
       const road = addr.road || addr.pedestrian || addr.suburb || '';
-      const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.city_district || addr.town || '';
-      const city = addr.city || addr.town || addr.municipality || addr.county || addr.state_district || 'Hyderabad';
+      const locality = addr.suburb || addr.neighbourhood || addr.residential || addr.village || addr.city_district || addr.town || addr.hamlet || '';
+      const city = addr.city || addr.town || addr.municipality || addr.county || addr.state_district || 'Mahabubnagar';
       const district = addr.county || addr.state_district || city;
       const state = addr.state || 'Telangana';
       const pincode = addr.postcode || '';
@@ -827,6 +996,7 @@ export async function fetchLiveUserAddress(lat, lon) {
         district,
         state,
         pincode,
+        county: addr.county || '',
         exactAddress,
         lat,
         lon,
@@ -844,7 +1014,7 @@ export async function fetchLiveUserAddress(lat, lon) {
     if (bdcRes.ok) {
       const bdcData = await bdcRes.json();
       const locality = bdcData.locality || bdcData.city || '';
-      const city = bdcData.city || bdcData.locality || 'Hyderabad';
+      const city = bdcData.city || bdcData.locality || 'Mahabubnagar';
       const state = bdcData.principalSubdivision || 'Telangana';
       const pincode = bdcData.postcode || '';
       const exactAddress = `${locality}, ${city}, ${state}${pincode ? ' - ' + pincode : ''}`;
@@ -852,6 +1022,7 @@ export async function fetchLiveUserAddress(lat, lon) {
       return resolveConstituencyAndParties({
         locality,
         city,
+        district: city,
         state,
         pincode,
         exactAddress,
@@ -864,9 +1035,14 @@ export async function fetchLiveUserAddress(lat, lon) {
     console.warn('BigDataCloud reverse geocode failed:', err2);
   }
 
-  // Fallback to default Jubilee Hills
+  // Fallback with coordinates geofence check
+  const isMahabubnagar = lat && lon && (lat >= 16.60 && lat <= 16.90 && lon >= 77.85 && lon <= 78.15);
+  const fallbackLocation = isMahabubnagar 
+    ? (CONSTITUENCY_DATABASE.find(item => item.id === 'telangana-mahabubnagar') || DEFAULT_DETECTED_LOCATION)
+    : DEFAULT_DETECTED_LOCATION;
+
   return {
-    ...DEFAULT_DETECTED_LOCATION,
+    ...fallbackLocation,
     gpsCoordinates: `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E`,
     detectionMethod: 'Auto-detected via GPS Coordinates 🛰️'
   };

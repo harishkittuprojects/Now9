@@ -27,7 +27,13 @@ export default function ScreenAdminPanel({
   onNavigate = () => {}, 
   currentLocation = null 
 }) {
-  const [selectedConstituencyKey, setSelectedConstituencyKey] = useState('almasguda');
+  const [selectedConstituencyKey, setSelectedConstituencyKey] = useState(() => {
+    const locName = `${currentLocation?.locality || ''} ${currentLocation?.city || ''} ${currentLocation?.assembly || ''}`.toLowerCase();
+    if (locName.includes('yenugonda') || locName.includes('యెనుగొండ') || locName.includes('mahabubnagar') || locName.includes('mahbubnagar')) {
+      return 'mahabubnagar';
+    }
+    return 'mahabubnagar';
+  });
   const [activeTab, setActiveTab] = useState('standings'); // 'standings' | 'questions' | 'audit'
   const [isEmbargoActive, setIsEmbargoActive] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -42,6 +48,20 @@ export default function ScreenAdminPanel({
 
   // Pre-configured constituency data with detailed vote counts and breakdowns
   const CONSTITUENCY_STANDINGS = {
+    mahabubnagar: {
+      name: 'Yenugonda (Mahabubnagar)',
+      assembly: 'Mahabubnagar Assembly #74',
+      totalVotes: 14850,
+      verifiedRate: '99.5%',
+      leadingParty: 'Congress (INC)',
+      margin: '+5.4%',
+      parties: [
+        { id: 'inc', name: 'Congress (INC)', candidate: 'Yennam Srinivas Reddy (Sitting MLA)', symbol: '✋', voteShare: 45.6, votes: 6771, color: '#0284C7', trend: '+3.1%' },
+        { id: 'brs', name: 'BRS', candidate: 'V. Srinivas Goud (Ex-Minister)', symbol: '🚗', voteShare: 40.2, votes: 5970, color: '#EC4899', trend: '-1.4%' },
+        { id: 'bjp', name: 'BJP', candidate: 'A.P. Mithun Kumar Reddy', symbol: '🪷', voteShare: 11.8, votes: 1752, color: '#F97316', trend: '+1.2%' },
+        { id: 'oth', name: 'Others & Independents', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 2.4, votes: 357, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
     almasguda: {
       name: 'Almasguda (LB Nagar / Rangareddy)',
       assembly: 'LB Nagar Assembly #51',
@@ -274,6 +294,7 @@ export default function ScreenAdminPanel({
           }}
           className="flex-1 bg-[#14141E] text-white text-[9.5px] font-bold border border-[#2B2B3E] rounded-lg px-2 py-1 outline-none focus:border-amber-400 cursor-pointer"
         >
+          <option value="mahabubnagar">Yenugonda (Mahabubnagar Assembly #74)</option>
           <option value="almasguda">Almasguda (LB Nagar / Rangareddy)</option>
           <option value="jubileehills">Jubilee Hills (Hyderabad)</option>
           <option value="munugode">Munugode (Nalgonda)</option>
