@@ -680,7 +680,7 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
         {/* 4 Feature Icons Row */}
         <div className="w-full px-3 py-2 flex items-center justify-around text-center border-t border-b border-white/5 bg-[#101014]/80">
           {[
-            { label: 'Live Debates', icon: '🎙️', id: 'live-debates' },
+            { label: 'Live On', icon: '🎙️', id: 'live-debates' },
             { label: 'News', icon: '📰', id: 'news' },
             { label: 'Common People', icon: '👥', id: 'common-people' },
             { label: 'Boss of House', icon: '👁️', id: 'big-boss' },
@@ -946,7 +946,7 @@ export function Screen2Home({
                 {[
                   { label: 'Political Survey', icon: FileText, target: 'survey', color: 'text-amber-400' },
                   { label: 'NowNine News', icon: Newspaper, target: 'news', color: 'text-[#F5C754]' },
-                  { label: 'Live Debates', icon: Radio, target: 'live-debates', color: 'text-red-400' },
+                  { label: 'Live On', icon: Radio, target: 'live-debates', color: 'text-red-400' },
                   { label: 'Boss of House', icon: Eye, target: 'big-boss', color: 'text-amber-400' },
                   { label: 'Common People', icon: Users, target: 'common-people', color: 'text-emerald-400' },
                   { label: 'Admin Dashboard', icon: ShieldCheck, target: 'admin', color: 'text-[#F5C754]' },
@@ -1188,7 +1188,7 @@ export function Screen2Home({
 
             {/* 2x2 Feature Tiles Grid */}
             <div className="grid grid-cols-2 gap-2.5">
-              {/* Tile 1: Live Debates */}
+              {/* Tile 1: Live On */}
               <button 
                 type="button"
                 onClick={() => onNavigate('live-debates')}
@@ -1198,7 +1198,7 @@ export function Screen2Home({
                   <Play className="w-5 h-5 fill-[#F5C754] stroke-[#F5C754] ml-0.5" />
                 </div>
                 <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
-                  Live Debates
+                  Live On
                 </h3>
                 <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
                   Watch • Listen • Discuss
@@ -2007,7 +2007,7 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <h2 className="text-xs font-extrabold text-white">Live Debates</h2>
+          <h2 className="text-xs font-extrabold text-white">Live On</h2>
         </div>
         <div className="flex items-center gap-1.5">
           <button
