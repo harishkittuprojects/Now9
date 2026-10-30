@@ -22,6 +22,7 @@ import {
   PhoneFrame 
 } from './NowNineReferenceScreens';
 import ScreenAdminPanel from './ScreenAdminPanel';
+import NowNineAdminDashboard from './NowNineAdminDashboard';
 import { 
   DEFAULT_DETECTED_LOCATION, 
   CONSTITUENCY_DATABASE,
@@ -183,6 +184,17 @@ export default function NowNineUnifiedApp() {
         );
     }
   };
+
+  // Render Full-Screen Command Center Admin Dashboard
+  if (activeScreenId === 'admin') {
+    return (
+      <NowNineAdminDashboard 
+        onClose={() => setActiveScreenId('home')}
+        onSwitchToMobile={() => setActiveScreenId('home')}
+        currentLocation={currentLocation}
+      />
+    );
+  }
 
   return (
     <div className={`w-full min-h-[100dvh] h-[100dvh] bg-[#070709] text-white flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${

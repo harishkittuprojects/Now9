@@ -1,0 +1,1344 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  ShieldCheck, 
+  BarChart3, 
+  TrendingUp, 
+  Users, 
+  Vote, 
+  MapPin, 
+  ChevronLeft, 
+  ChevronRight, 
+  Lock, 
+  Unlock,
+  CheckCircle2, 
+  RefreshCw, 
+  Download, 
+  Filter, 
+  Eye, 
+  AlertCircle,
+  FileText,
+  Sliders,
+  Check,
+  Search,
+  Radio,
+  Newspaper,
+  Play,
+  Pause,
+  Plus,
+  Trash2,
+  ExternalLink,
+  Smartphone,
+  Layers,
+  Settings,
+  HelpCircle,
+  Clock,
+  Activity,
+  Globe,
+  Bell,
+  CheckSquare,
+  XCircle,
+  UserCheck,
+  Share2
+} from 'lucide-react';
+import { CONSTITUENCY_DATABASE, DEFAULT_DETECTED_LOCATION } from '../data/locationConstituencyData';
+import { SURVEY_QUESTIONS } from '../data/nowNineAppFlowData';
+
+export default function NowNineAdminDashboard({ 
+  onClose, 
+  onSwitchToMobile,
+  currentLocation = null 
+}) {
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'constituencies' | 'surveys' | 'live-debates' | 'news' | 'boss-house' | 'audit' | 'settings'
+  const [selectedConstituencyKey, setSelectedConstituencyKey] = useState('mahabubnagar');
+  const [regionFilter, setRegionFilter] = useState('All'); // 'All' | 'Telangana' | 'Andhra Pradesh'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isEmbargoActive, setIsEmbargoActive] = useState(true);
+  const [toastMsg, setToastMsg] = useState(null);
+  const [refreshCount, setRefreshCount] = useState(0);
+
+  // Live Simulated Metrics
+  const [totalVotesCount, setTotalVotesCount] = useState(148920);
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
+  };
+
+  // Live ticker increment to simulate real-time voting influx
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTotalVotesCount(prev => prev + Math.floor(Math.random() * 3) + 1);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Detailed Assembly Standings Data
+  const ALL_CONSTITUENCIES = {
+    mahabubnagar: {
+      id: 'mahabubnagar',
+      code: 'TS-74',
+      name: 'Mahabubnagar Assembly Constituency',
+      teluguName: 'మహబూబ్‌నగర్ శాసనసభ నియోజకవర్గం',
+      locality: 'Yenugonda (యెనుగొండ) & Mahabubnagar Urban',
+      district: 'Mahabubnagar',
+      state: 'Telangana',
+      totalVotes: 34850,
+      turnoutRate: '78.4%',
+      verifiedRate: '99.8%',
+      leadingParty: 'Congress (INC)',
+      leadingCandidate: 'Yennam Srinivas Reddy',
+      margin: '+5.4% (1,881 Votes)',
+      parliament: 'Mahabubnagar Lok Sabha',
+      parties: [
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Yennam Srinivas Reddy (Sitting MLA)', symbol: '✋', voteShare: 45.6, votes: 15891, color: '#0284C7', trend: '+3.1%' },
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'V. Srinivas Goud (Ex-Minister)', symbol: '🚗', voteShare: 40.2, votes: 14010, color: '#EC4899', trend: '-1.4%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'A.P. Mithun Kumar Reddy', symbol: '🪷', voteShare: 11.8, votes: 4112, color: '#F97316', trend: '+1.2%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 2.4, votes: 837, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    lbnagar: {
+      id: 'lbnagar',
+      code: 'TS-51',
+      name: 'LB Nagar Assembly Constituency',
+      teluguName: 'ఎల్బీ నగర్ శాసనసభ నియోజకవర్గం',
+      locality: 'Almasguda, Badangpet, Meerpet, Saroornagar',
+      district: 'Ranga Reddy',
+      state: 'Telangana',
+      totalVotes: 42180,
+      turnoutRate: '69.2%',
+      verifiedRate: '99.5%',
+      leadingParty: 'Congress (INC)',
+      leadingCandidate: 'Madhu Yaskhi Goud',
+      margin: '+3.7% (1,560 Votes)',
+      parliament: 'Chevella / Malkajgiri Lok Sabha',
+      parties: [
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Madhu Yaskhi Goud (Ruling Nominee)', symbol: '✋', voteShare: 41.2, votes: 17378, color: '#0284C7', trend: '+2.1%' },
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Devireddy Sudheer Reddy (Sitting MLA)', symbol: '🚗', voteShare: 37.5, votes: 15817, color: '#EC4899', trend: '-0.8%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Sama Ranga Reddy', symbol: '🪷', voteShare: 16.8, votes: 7086, color: '#F97316', trend: '+1.4%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 4.5, votes: 1899, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    jubileehills: {
+      id: 'jubileehills',
+      code: 'TS-61',
+      name: 'Jubilee Hills Assembly Constituency',
+      teluguName: 'జూబ్లీ హిల్స్ శాసనసభ నియోజకవర్గం',
+      locality: 'Jubilee Hills, Film Nagar, Banjara Hills',
+      district: 'Hyderabad',
+      state: 'Telangana',
+      totalVotes: 38920,
+      turnoutRate: '64.5%',
+      verifiedRate: '99.9%',
+      leadingParty: 'BRS',
+      leadingCandidate: 'Maganti Gopinath',
+      margin: '+5.7% (2,218 Votes)',
+      parliament: 'Secunderabad Lok Sabha',
+      parties: [
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Maganti Gopinath (Sitting MLA)', symbol: '🚗', voteShare: 41.5, votes: 16151, color: '#EC4899', trend: '+1.2%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Mohammed Azharuddin', symbol: '✋', voteShare: 35.8, votes: 13933, color: '#0284C7', trend: '+0.5%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Lankala Deepak Reddy', symbol: '🪷', voteShare: 18.2, votes: 7083, color: '#F97316', trend: '-1.0%' },
+        { id: 'aimim', name: 'AIMIM / Others', telugu: 'మజ్లిస్ / ఇతరులు', candidate: 'Local Corporator', symbol: '🪁', voteShare: 4.5, votes: 1753, color: '#16A34A', trend: '-0.7%' },
+      ]
+    },
+    serilingampally: {
+      id: 'serilingampally',
+      code: 'TS-52',
+      name: 'Serilingampally Assembly Constituency',
+      teluguName: 'శేరిలింగంపల్లి శాసనసభ నియోజకవర్గం',
+      locality: 'Gachibowli, HITEC City, Madhapur, Kondapur, Miyapur',
+      district: 'Ranga Reddy',
+      state: 'Telangana',
+      totalVotes: 58240,
+      turnoutRate: '61.8%',
+      verifiedRate: '99.7%',
+      leadingParty: 'BRS',
+      leadingCandidate: 'Arekapudi Gandhi',
+      margin: '+5.7% (3,319 Votes)',
+      parliament: 'Chevella Lok Sabha',
+      parties: [
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Arekapudi Gandhi', symbol: '🚗', voteShare: 43.8, votes: 25509, color: '#EC4899', trend: '+1.8%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Jagadeeshwar Goud', symbol: '✋', voteShare: 38.1, votes: 22189, color: '#0284C7', trend: '+1.1%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Ravi Kumar Yadav', symbol: '🪷', voteShare: 15.3, votes: 8910, color: '#F97316', trend: '-2.0%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 2.8, votes: 1632, color: '#64748B', trend: '-0.9%' },
+      ]
+    },
+    munugode: {
+      id: 'munugode',
+      code: 'TS-93',
+      name: 'Munugode Assembly Constituency',
+      teluguName: 'మునుగోడు శాసనసభ నియోజకవర్గం',
+      locality: 'Chandur, Choutuppal, Marriguda',
+      district: 'Nalgonda',
+      state: 'Telangana',
+      totalVotes: 32150,
+      turnoutRate: '86.4%',
+      verifiedRate: '99.4%',
+      leadingParty: 'Congress (INC)',
+      leadingCandidate: 'Komatireddy Raj Gopal Reddy',
+      margin: '+9.6% (3,086 Votes)',
+      parliament: 'Bhongir Lok Sabha',
+      parties: [
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Komatireddy Raj Gopal Reddy', symbol: '✋', voteShare: 43.8, votes: 14081, color: '#0284C7', trend: '+3.4%' },
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Kusukuntla Prabhakar Reddy', symbol: '🚗', voteShare: 34.2, votes: 10995, color: '#EC4899', trend: '-2.1%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Boora Narsaiah Goud', symbol: '🪷', voteShare: 18.0, votes: 5787, color: '#F97316', trend: '+0.8%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 4.0, votes: 1287, color: '#64748B', trend: '-2.1%' },
+      ]
+    },
+    gajwel: {
+      id: 'gajwel',
+      code: 'TS-40',
+      name: 'Gajwel Assembly Constituency',
+      teluguName: 'గజ్వేల్ శాసనసభ నియోజకవర్గం',
+      locality: 'Gajwel, Toopran, Wargal',
+      district: 'Siddipet',
+      state: 'Telangana',
+      totalVotes: 36400,
+      turnoutRate: '88.1%',
+      verifiedRate: '99.6%',
+      leadingParty: 'BRS',
+      leadingCandidate: 'K. Chandrashekar Rao',
+      margin: '+12.6% (4,586 Votes)',
+      parliament: 'Medak Lok Sabha',
+      parties: [
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'K. Chandrashekar Rao', symbol: '🚗', voteShare: 52.4, votes: 19073, color: '#EC4899', trend: '+1.5%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Thumkunta Narsa Reddy', symbol: '✋', voteShare: 39.8, votes: 14487, color: '#0284C7', trend: '-0.4%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Eatala Rajender', symbol: '🪷', voteShare: 7.8, votes: 2840, color: '#F97316', trend: '-1.1%' },
+      ]
+    },
+    chandragiri: {
+      id: 'chandragiri',
+      code: 'AP-166',
+      name: 'Chandragiri Assembly Constituency',
+      teluguName: 'చంద్రగిరి శాసనసభ నియోజకవర్గం',
+      locality: 'Chandragiri, Rangampeta, Tirupati Rural',
+      district: 'Tirupati',
+      state: 'Andhra Pradesh',
+      totalVotes: 31200,
+      turnoutRate: '84.2%',
+      verifiedRate: '99.5%',
+      leadingParty: 'TDP / NDA Alliance',
+      leadingCandidate: 'Pulivarthi Nani',
+      margin: '+8.4% (2,620 Votes)',
+      parliament: 'Chittoor Lok Sabha',
+      parties: [
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Pulivarthi Nani', symbol: '🚲', voteShare: 51.2, votes: 15974, color: '#EAB308', trend: '+2.8%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Chevireddy Mohith Reddy', symbol: '🚁', voteShare: 42.8, votes: 13353, color: '#16A34A', trend: '-2.2%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'K. Balaram', symbol: '✋', voteShare: 4.2, votes: 1310, color: '#0284C7', trend: '-0.3%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 1.8, votes: 563, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    vijayawada: {
+      id: 'vijayawada',
+      code: 'AP-80',
+      name: 'Vijayawada Central Assembly',
+      teluguName: 'విజయవాడ సెంట్రల్ అసెంబ్లీ',
+      locality: 'Benz Circle, Moghalrajpuram, Governorpet',
+      district: 'NTR / Krishna',
+      state: 'Andhra Pradesh',
+      totalVotes: 39500,
+      turnoutRate: '75.6%',
+      verifiedRate: '99.7%',
+      leadingParty: 'TDP / NDA Alliance',
+      leadingCandidate: 'Bonda Umamaheswara Rao',
+      margin: '+9.4% (3,713 Votes)',
+      parliament: 'Vijayawada Lok Sabha',
+      parties: [
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Bonda Umamaheswara Rao', symbol: '🚲', voteShare: 49.3, votes: 19473, color: '#EAB308', trend: '+3.2%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Velampalli Srinivasa Rao', symbol: '🪭', voteShare: 42.6, votes: 16827, color: '#0EA5E9', trend: '-2.5%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City President Nominee', symbol: '✋', voteShare: 5.8, votes: 2291, color: '#10B981', trend: '-0.4%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 2.3, votes: 909, color: '#64748B', trend: '-0.3%' },
+      ]
+    }
+  };
+
+  const activeConstituency = ALL_CONSTITUENCIES[selectedConstituencyKey] || ALL_CONSTITUENCIES.mahabubnagar;
+
+  // Real-Time 5 Question Analytics
+  const QUESTION_ANALYTICS = [
+    {
+      step: 1,
+      category: '🎯 ప్రాధాన్యత (Priority Governance Issue)',
+      title: 'What is the highest priority issue for your constituency in 2026-2031?',
+      totalSample: 124800,
+      options: [
+        { label: 'Local Road, Underground Drainage & Drinking Water', votes: 54288, percent: 43.5, color: '#0284C7' },
+        { label: 'Welfare Schemes, Direct Cash Transfers & Guarantees', votes: 35193, percent: 28.2, color: '#EAB308' },
+        { label: 'Youth Employment, IT Hubs & Industrial Jobs', votes: 23212, percent: 18.6, color: '#10B981' },
+        { label: 'Government Hospitals & School Quality Improvement', votes: 12107, percent: 9.7, color: '#8B5CF6' }
+      ]
+    },
+    {
+      step: 2,
+      category: '⭐ నచ్చిన అంశం (Key Deciding Factor)',
+      title: 'What primarily drives your voting choice for this MLA candidate?',
+      totalSample: 124800,
+      options: [
+        { label: 'Candidate Personal Accessibility & Constituency Groundwork', votes: 61276, percent: 49.1, color: '#EC4899' },
+        { label: 'State Chief Minister / Top Party Leadership Image', votes: 36691, percent: 29.4, color: '#0284C7' },
+        { label: 'Party Ideology & Manifesto Commitments', votes: 18470, percent: 14.8, color: '#F97316' },
+        { label: 'Community Support & Regional Recommendation', votes: 8363, percent: 6.7, color: '#64748B' }
+      ]
+    },
+    {
+      step: 3,
+      category: '📈 ఆశించిన మార్పు (Governance Satisfaction)',
+      title: 'How do you rate the pace of overall progress in your constituency?',
+      totalSample: 124800,
+      options: [
+        { label: 'Highly Satisfied • Work is Rapidly Progressing', votes: 52416, percent: 42.0, color: '#10B981' },
+        { label: 'Needs Improvement • Accelerated Pace Required', votes: 45427, percent: 36.4, color: '#EAB308' },
+        { label: 'Dissatisfied • Urgently Seeking Leadership Change', votes: 26957, percent: 21.6, color: '#EF4444' }
+      ]
+    },
+    {
+      step: 4,
+      category: '🤝 విశ్వాసం (Integrity & Trust Factor)',
+      title: 'Do you trust the sitting local leadership to deliver on future promises?',
+      totalSample: 124800,
+      options: [
+        { label: 'High Confidence • Promises Delivered Transparently', votes: 58406, percent: 46.8, color: '#10B981' },
+        { label: 'Moderate Trust • Partial Delivery with Genuine Effort', votes: 43305, percent: 34.7, color: '#0284C7' },
+        { label: 'Low Trust • Promises Remained Unfulfilled', votes: 23089, percent: 18.5, color: '#EF4444' }
+      ]
+    },
+    {
+      step: 5,
+      category: '🗳️ తుది నిర్ణయం (Final Decision Readiness)',
+      title: 'Have you locked in your final vote decision for the upcoming election?',
+      totalSample: 124800,
+      options: [
+        { label: '100% Firm Decision • Will not change party', votes: 88857, percent: 71.2, color: '#10B981' },
+        { label: 'Leaning towards Party • Still monitoring developments', votes: 25584, percent: 20.5, color: '#EAB308' },
+        { label: 'Completely Undecided Floating Voter', votes: 10359, percent: 8.3, color: '#64748B' }
+      ]
+    }
+  ];
+
+  // Boss of House (Entertainment Contestants) Voting
+  const [bossContestants, setBossContestants] = useState([
+    { id: 'c1', name: 'Prerana', role: 'Actress', votes: 94250, percent: 31.4, status: 'Safe', avatar: '👑' },
+    { id: 'c2', name: 'Nikhil', role: 'YouTuber', votes: 81400, percent: 27.1, status: 'Safe', avatar: '⚡' },
+    { id: 'c3', name: 'Vishnupriya', role: 'Anchor', votes: 58900, percent: 19.6, status: 'Safe', avatar: '🌟' },
+    { id: 'c4', name: 'Gautham', role: 'Doctor/Actor', votes: 41200, percent: 13.7, status: 'Danger Zone', avatar: '🔥' },
+    { id: 'c5', name: 'Teja', role: 'Content Creator', votes: 24250, percent: 8.2, status: 'Nominated', avatar: '🎭' },
+  ]);
+
+  // Live Audit Stream
+  const [auditStream, setAuditStream] = useState([
+    { id: 'TX-994821', locality: 'Yenugonda (Mahabubnagar)', party: 'Congress (INC)', candidate: 'Yennam Srinivas Reddy', time: '5s ago', ip: '157.48.***.***', status: 'GPS Verified ✓', hash: 'e8b4...19c2' },
+    { id: 'TX-994820', locality: 'Yenugonda (Mahabubnagar)', party: 'BRS', candidate: 'V. Srinivas Goud', time: '18s ago', ip: '49.207.***.***', status: 'GPS Verified ✓', hash: 'a14f...99d1' },
+    { id: 'TX-994819', locality: 'Almasguda (LB Nagar)', party: 'Congress (INC)', candidate: 'Madhu Yaskhi Goud', time: '42s ago', ip: '182.72.***.***', status: 'GPS Verified ✓', hash: 'c59d...43a8' },
+    { id: 'TX-994818', locality: 'Almasguda (LB Nagar)', party: 'BJP', candidate: 'Sama Ranga Reddy', time: '1m ago', ip: '103.211.***.***', status: 'GPS Verified ✓', hash: 'f871...12b9' },
+    { id: 'TX-994817', locality: 'Gachibowli (Serilingampally)', party: 'BRS', candidate: 'Arekapudi Gandhi', time: '1m ago', ip: '122.175.***.***', status: 'GPS Verified ✓', hash: 'b332...71e0' },
+    { id: 'TX-994816', locality: 'Chandragiri (Tirupati)', party: 'TDP Alliance', candidate: 'Pulivarthi Nani', time: '2m ago', ip: '14.139.***.***', status: 'GPS Verified ✓', hash: '90ea...5581' },
+    { id: 'TX-994815', locality: 'Munugode (Nalgonda)', party: 'Congress (INC)', candidate: 'Komatireddy Raj Gopal', time: '2m ago', ip: '223.185.***.***', status: 'GPS Verified ✓', hash: '24dc...38a4' },
+  ]);
+
+  // Live News Management
+  const [newsFeed, setNewsFeed] = useState([
+    { id: 1, title: 'మహబూబ్‌నగర్: పాలమూరు-రంగారెడ్డి ఎత్తిపోతల ప్రాజెక్టుపై ఎమ్మెల్యే సమీక్ష', time: '15m ago', category: 'Mahabubnagar', views: '28.4K', isLive: true },
+    { id: 2, title: 'తెలంగాణ కాంగ్రెస్ ప్రభుత్వం: 6 గ్యారెంటీల అమల్లో కీలక ముందడుగు', time: '40m ago', category: 'State Politics', views: '45.1K', isLive: true },
+    { id: 3, title: 'జీహెచ్‌ఎంసీ పరిధిలో రోడ్ల ఆధునీకరణకు రూ. 1,500 కోట్లు కేటాయింపు', time: '1h ago', category: 'Hyderabad', views: '19.8K', isLive: false },
+    { id: 4, title: 'ఏపీలో పింఛన్ల పంపిణీ: ఇంటింటికీ చేరిన ప్రభుత్వ సంక్షేమం', time: '2h ago', category: 'Andhra Pradesh', views: '32.6K', isLive: false },
+  ]);
+
+  const [newNewsTitle, setNewNewsTitle] = useState('');
+  const [newNewsCategory, setNewNewsCategory] = useState('Mahabubnagar');
+
+  const handleAddNews = (e) => {
+    e.preventDefault();
+    if (!newNewsTitle.trim()) return;
+    const item = {
+      id: Date.now(),
+      title: newNewsTitle.trim(),
+      time: 'Just now',
+      category: newNewsCategory,
+      views: '1',
+      isLive: true
+    };
+    setNewsFeed([item, ...newsFeed]);
+    setNewNewsTitle('');
+    showToast('📰 Breaking News Alert published live to mobile feed!');
+  };
+
+  const handleExportCSV = () => {
+    const csvContent = "data:text/csv;charset=utf-8," + 
+      "Constituency_ID,Constituency_Name,District,State,Total_Ballots,Party,Candidate,Vote_Share,Votes\n" +
+      Object.values(ALL_CONSTITUENCIES).flatMap(c => 
+        c.parties.map(p => `"${c.code}","${c.name}","${c.district}","${c.state}",${c.totalVotes},"${p.name}","${p.candidate}",${p.voteShare}%,${p.votes}`)
+      ).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Now9_Election_Standings_Report_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('📥 Official CSV Report downloaded successfully (8 Assemblies, 32 Candidates)');
+  };
+
+  // Filtered constituencies list based on region and search query
+  const filteredConstituenciesList = Object.values(ALL_CONSTITUENCIES).filter(c => {
+    if (regionFilter !== 'All' && c.state !== regionFilter) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return c.name.toLowerCase().includes(q) || 
+           c.locality.toLowerCase().includes(q) || 
+           c.district.toLowerCase().includes(q) ||
+           c.code.toLowerCase().includes(q);
+  });
+
+  return (
+    <div className="w-full min-h-screen bg-[#070709] text-white flex flex-col font-sans select-none antialiased">
+      {/* Toast Alert */}
+      {toastMsg && (
+        <div className="fixed top-4 right-6 z-50 bg-[#1A160E] border-2 border-amber-400 text-amber-300 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl animate-fadeIn flex items-center gap-2.5 backdrop-blur-md">
+          <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      {/* Top Global Command Bar */}
+      <header className="h-14 bg-[#0E0E14] border-b border-[#20202E] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 z-40 sticky top-0 shadow-lg">
+        {/* Brand & System Status */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <img 
+              src="/now9_icon.png" 
+              alt="now9 logo" 
+              className="w-8 h-8 object-contain rounded-xl shadow-md ring-1 ring-amber-400/40"
+            />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm tracking-tight text-white">
+                  now<span className="text-[#F5C754]">nine</span>
+                </span>
+                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[#F5C754] text-[8px] font-black uppercase tracking-wider">
+                  COMMAND CENTER
+                </span>
+              </div>
+              <p className="text-[8.5px] text-gray-400 leading-none">
+                Electoral Data Monitoring & Live Standings
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-[#20202E]">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-400 text-[10px] font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>24/7 Live Ingestion Online</span>
+            </span>
+            <span className="text-[10px] text-gray-400 font-mono">
+              Total Ballots: <strong className="text-white">{totalVotesCount.toLocaleString()}</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* Global Controls & Actions */}
+        <div className="flex items-center gap-2.5">
+          {/* Embargo Control Pill */}
+          <button
+            type="button"
+            onClick={() => {
+              const next = !isEmbargoActive;
+              setIsEmbargoActive(next);
+              showToast(next 
+                ? '🔒 Public Embargo ACTIVE: Survey results are hidden from ordinary voters' 
+                : '⚠️ Public Embargo OFF: Standings exposed publicly');
+            }}
+            className={`px-3 py-1.5 rounded-xl border text-[10px] font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
+              isEmbargoActive
+                ? 'bg-emerald-500/15 border-emerald-400/50 text-emerald-300 hover:bg-emerald-500/25'
+                : 'bg-red-500/15 border-red-400/50 text-red-300 hover:bg-red-500/25'
+            }`}
+            title="Toggle Public Results Visibility"
+          >
+            {isEmbargoActive ? <Lock className="w-3.5 h-3.5 text-emerald-400" /> : <Unlock className="w-3.5 h-3.5 text-red-400" />}
+            <span className="hidden sm:inline">
+              {isEmbargoActive ? 'Results Embargo: LOCKED (Confidential)' : 'Results Embargo: UNLOCKED'}
+            </span>
+          </button>
+
+          {/* Export CSV Report */}
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-amber-300 hover:text-white text-[10.5px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+            title="Download CSV Electoral Report"
+          >
+            <Download className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden md:inline">Export CSV</span>
+          </button>
+
+          {/* Refresh Data */}
+          <button
+            type="button"
+            onClick={() => {
+              setRefreshCount(prev => prev + 1);
+              showToast('🔄 Real-time polling database refreshed across all clusters');
+            }}
+            className="p-2 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-gray-300 hover:text-amber-300 transition-all cursor-pointer"
+            title="Refresh Live Data"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Switch to Citizen Mobile View */}
+          <button
+            type="button"
+            onClick={onSwitchToMobile || onClose}
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[10.5px] shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+            title="Return to Citizen Mobile App"
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span>Open Mobile App</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Layout: Sidebar Navigation + Dynamic Admin Views */}
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        
+        {/* Left Admin Navigation Sidebar */}
+        <aside className="w-56 sm:w-64 bg-[#0A0A0F] border-r border-[#1C1C28] p-3 flex flex-col justify-between shrink-0 overflow-y-auto">
+          <div className="space-y-1">
+            <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest px-2.5 py-1 block">
+              Core Modules
+            </span>
+
+            {[
+              { id: 'overview', label: 'Dashboard Overview', icon: BarChart3, badge: 'Live' },
+              { id: 'constituencies', label: 'Constituency Standings', icon: Vote, count: '8 Hot' },
+              { id: 'surveys', label: '5-Question Pulse', icon: FileText, count: '124K' },
+              { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
+              { id: 'news', label: 'News & Flash Ticker', icon: Newspaper, count: '4' },
+              { id: 'boss-house', label: 'Boss of House Voting', icon: Eye, count: '300K+' },
+              { id: 'audit', label: 'Ballot Security & Audit', icon: ShieldCheck, badge: 'GPS' },
+              { id: 'settings', label: 'Embargo & Settings', icon: Settings },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                    isActive
+                      ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-sm'
+                      : 'text-gray-400 hover:text-white hover:bg-[#14141E]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#F5C754]' : 'text-gray-400'}`} />
+                    <span>{tab.label}</span>
+                  </div>
+                  {tab.badge && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-red-600/80 text-white text-[7.5px] font-black uppercase animate-pulse">
+                      {tab.badge}
+                    </span>
+                  )}
+                  {tab.count && (
+                    <span className="px-1.5 py-0.2 rounded bg-white/10 text-gray-300 text-[8px] font-mono">
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Quick Info Card at Sidebar Bottom */}
+          <div className="pt-3 border-t border-[#1C1C28]">
+            <div className="p-2.5 rounded-xl bg-[#12121A] border border-[#20202E] text-[8.5px] space-y-1">
+              <div className="flex items-center justify-between text-gray-400">
+                <span>Electoral Version</span>
+                <span className="font-mono text-amber-300 font-bold">2026.4 v2</span>
+              </div>
+              <div className="flex items-center justify-between text-gray-400">
+                <span>Target Assemblies</span>
+                <span className="text-white font-bold">Telangana & AP</span>
+              </div>
+              <div className="flex items-center justify-between text-gray-400">
+                <span>Encrypted Hash</span>
+                <span className="font-mono text-emerald-400">SHA-256 ✓</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Right Main Content Panel */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-[#07070A]">
+
+          {/* VIEW 1: DASHBOARD OVERVIEW */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Header Banner */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1E1E2C]">
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                    <span>Central Electoral Command Center</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 font-bold">
+                      Live Stream Active
+                    </span>
+                  </h1>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Real-time citizen opinion aggregation, constituency mapping, and anti-tamper ballot monitoring
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <select
+                    value={selectedConstituencyKey}
+                    onChange={(e) => setSelectedConstituencyKey(e.target.value)}
+                    className="bg-[#12121C] border border-[#2B2B3E] text-white text-xs font-bold rounded-xl px-3 py-2 outline-none focus:border-amber-400 cursor-pointer"
+                  >
+                    {Object.values(ALL_CONSTITUENCIES).map(c => (
+                      <option key={c.id} value={c.id}>{c.name} ({c.code})</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Top 4 KPI Metrics */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
+                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
+                    <span>Total Ballots Received</span>
+                    <Vote className="w-4 h-4 text-[#F5C754]" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+                    {totalVotesCount.toLocaleString()}
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-bold mt-1 inline-flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" /> +14.2% since morning 08:00 AM
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
+                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
+                    <span>Target Constituencies</span>
+                    <MapPin className="w-4 h-4 text-sky-400" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+                    294
+                  </div>
+                  <span className="text-[10px] text-sky-300 font-bold mt-1 block">
+                    119 Telangana • 175 Andhra Pradesh
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
+                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
+                    <span>GPS Ingestion Integrity</span>
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
+                    99.8%
+                  </div>
+                  <span className="text-[10px] text-gray-400 font-bold mt-1 block">
+                    Zero duplicate votes per device ID
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
+                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
+                    <span>Public Results Embargo</span>
+                    <Lock className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-[#F5C754] font-mono">
+                    LOCKED
+                  </div>
+                  <span className="text-[10px] text-amber-300 font-bold mt-1 block">
+                    Confidential • Hidden from voter app
+                  </span>
+                </div>
+              </div>
+
+              {/* Spotlight: Active Constituency Detailed Breakdown */}
+              <div className="p-5 rounded-3xl bg-gradient-to-b from-[#181826] via-[#12121C] to-[#0D0D14] border border-amber-500/30 shadow-2xl space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#232334] gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-black text-white">
+                        {activeConstituency.name}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[9px] font-mono font-bold">
+                        {activeConstituency.code}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-300 font-telugu mt-0.5">
+                      {activeConstituency.teluguName} • {activeConstituency.locality}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-right">
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">Total Ballots Counted</span>
+                      <span className="text-base font-black text-white font-mono">
+                        {activeConstituency.totalVotes.toLocaleString()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">Frontrunner Lead</span>
+                      <span className="text-base font-black text-emerald-400 font-mono">
+                        {activeConstituency.margin}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Candidate Breakdown Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {activeConstituency.parties.map((party, rank) => (
+                    <div 
+                      key={party.id} 
+                      className="p-3.5 rounded-2xl bg-[#0F0F18] border border-[#222232] space-y-2 hover:border-amber-400/50 transition-all shadow-sm"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-[#1A1A28] border border-white/10 flex items-center justify-center text-xs font-mono font-bold">
+                            #{rank + 1}
+                          </span>
+                          <span className="text-2xl">{party.symbol}</span>
+                          <div>
+                            <h3 className="font-extrabold text-sm text-white leading-tight">
+                              {party.name}
+                            </h3>
+                            <span className="text-[9px] text-gray-400 font-telugu">{party.telugu}</span>
+                          </div>
+                        </div>
+                        <span className="text-sm font-black font-mono" style={{ color: party.color }}>
+                          {party.voteShare}%
+                        </span>
+                      </div>
+
+                      <p className="text-[10px] text-slate-300 line-clamp-1">
+                        {party.candidate}
+                      </p>
+
+                      <div className="space-y-1 pt-1">
+                        <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
+                          <div 
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{ width: `${party.voteShare}%`, backgroundColor: party.color }}
+                          ></div>
+                        </div>
+                        <div className="flex items-center justify-between text-[8.5px] text-gray-400 font-mono">
+                          <span>{party.votes.toLocaleString()} votes</span>
+                          <span className={party.trend.startsWith('+') ? 'text-emerald-400' : 'text-red-400'}>
+                            {party.trend}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Two Column Section: Live Battleground Table & Live Ingestion Log */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                
+                {/* Battleground Assemblies Summary */}
+                <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#20202E] space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#1E1E2C]">
+                    <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                      <Vote className="w-4 h-4 text-amber-400" />
+                      <span>Key Battleground Assemblies</span>
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('constituencies')}
+                      className="text-[10px] text-[#F5C754] font-bold hover:underline"
+                    >
+                      View All 8 Assemblies →
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {Object.values(ALL_CONSTITUENCIES).slice(0, 5).map(c => (
+                      <div 
+                        key={c.id}
+                        onClick={() => setSelectedConstituencyKey(c.id)}
+                        className={`p-2.5 rounded-xl border flex items-center justify-between text-xs cursor-pointer transition-all ${
+                          selectedConstituencyKey === c.id 
+                            ? 'bg-amber-500/10 border-amber-400/50' 
+                            : 'bg-[#12121A] border-[#1E1E28] hover:border-gray-600'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center gap-1.5 font-bold text-white">
+                            <span>{c.name}</span>
+                            <span className="text-[9px] text-gray-400 font-mono">({c.code})</span>
+                          </div>
+                          <span className="text-[10px] text-gray-400">{c.district} • {c.leadingParty} leading</span>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="font-mono font-black text-amber-300 block">{c.margin}</span>
+                          <span className="text-[9px] text-gray-500 font-mono">{c.totalVotes.toLocaleString()} votes</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Real-Time Geofence Stream */}
+                <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#20202E] space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#1E1E2C]">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <h3 className="text-sm font-extrabold text-white">Live Tamper-Proof Ballot Stream</h3>
+                    </div>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-mono">
+                      GPS Stream
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {auditStream.slice(0, 5).map((log) => (
+                      <div key={log.id} className="p-2 rounded-xl bg-[#12121A] border border-[#1E1E28] flex items-center justify-between text-[10.5px]">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-amber-400 text-[10px]">{log.id}</span>
+                          <span className="font-semibold text-white">{log.party}</span>
+                          <span className="text-gray-400 text-[9.5px]">({log.locality})</span>
+                        </div>
+                        <div className="flex items-center gap-2 font-mono text-[9px]">
+                          <span className="text-gray-500">{log.time}</span>
+                          <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                            {log.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 2: ALL CONSTITUENCIES STANDINGS */}
+          {activeTab === 'constituencies' && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-3">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <Vote className="w-5 h-5 text-amber-400" />
+                    <span>Live Constituency Standings & Vote Shares</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Select any constituency to inspect candidate-level vote counts, percentage shares, and trends
+                  </p>
+                </div>
+
+                {/* Region & Search Filters */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center bg-[#12121A] border border-[#2B2B3E] rounded-xl p-0.5 text-xs font-bold">
+                    {['All', 'Telangana', 'Andhra Pradesh'].map(region => (
+                      <button
+                        key={region}
+                        type="button"
+                        onClick={() => setRegionFilter(region)}
+                        className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                          regionFilter === region 
+                            ? 'bg-[#F5C754] text-black font-extrabold shadow-sm' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {region}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search constituency..."
+                      className="bg-[#12121A] border border-[#2B2B3E] rounded-xl pl-8 pr-3 py-1.5 text-xs text-white outline-none focus:border-amber-400 w-44"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid of All Target Assemblies */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredConstituenciesList.map(c => (
+                  <div 
+                    key={c.id}
+                    className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3 hover:border-amber-400/40 transition-all shadow-md"
+                  >
+                    <div className="flex items-center justify-between pb-2 border-b border-[#1E1E28]">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-extrabold text-sm text-white">{c.name}</h3>
+                          <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono text-[9px] font-bold border border-amber-400/30">
+                            {c.code}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-gray-400 font-telugu mt-0.5">
+                          {c.teluguName} • {c.locality}
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-xs font-mono font-bold text-amber-400 block">{c.margin}</span>
+                        <span className="text-[9px] text-gray-500 font-mono">{c.totalVotes.toLocaleString()} votes</span>
+                      </div>
+                    </div>
+
+                    {/* Parties Progress Bars */}
+                    <div className="space-y-2">
+                      {c.parties.map(p => (
+                        <div key={p.id} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-white flex items-center gap-1.5">
+                              <span>{p.symbol}</span>
+                              <span>{p.name}</span>
+                              <span className="text-[9.5px] text-gray-400 font-normal">({p.candidate.split('(')[0]})</span>
+                            </span>
+                            <span className="font-mono font-black" style={{ color: p.color }}>
+                              {p.voteShare}%
+                            </span>
+                          </div>
+                          <div className="h-2 bg-[#1A1A24] rounded-full overflow-hidden">
+                            <div 
+                              className="h-full rounded-full transition-all duration-700" 
+                              style={{ width: `${p.voteShare}%`, backgroundColor: p.color }}
+                            ></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 3: 5-QUESTION SURVEY GOVERNANCE PULSE */}
+          {activeTab === 'surveys' && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-2">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-amber-400" />
+                    <span>5-Question Citizen Governance Pulse (124,800 Respondents)</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Official breakdown of public priorities, leader trust factors, and voting decision firmness
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleExportCSV}
+                  className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-[#1E1E2E]"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Survey Dataset</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {QUESTION_ANALYTICS.map((q) => (
+                  <div key={q.step} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-[#1E1E28]">
+                      <span className="text-xs font-black text-[#F5C754]">{q.category}</span>
+                      <span className="text-[10px] text-gray-400 font-mono">Step {q.step} of 5</span>
+                    </div>
+
+                    <h3 className="font-bold text-xs text-white leading-snug">
+                      {q.title}
+                    </h3>
+
+                    <div className="space-y-2 pt-1">
+                      {q.options.map((opt, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-300 truncate max-w-[75%]">{opt.label}</span>
+                            <span className="font-mono font-bold text-white">
+                              {opt.percent}% <span className="text-gray-500 font-normal">({opt.votes.toLocaleString()})</span>
+                            </span>
+                          </div>
+                          <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
+                            <div 
+                              className="h-full rounded-full transition-all duration-700" 
+                              style={{ width: `${opt.percent}%`, backgroundColor: opt.color }}
+                            ></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 4: LIVE ON & DEBATES MANAGEMENT */}
+          {activeTab === 'live-debates' && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center justify-between pb-3 border-b border-[#20202E]">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <Radio className="w-5 h-5 text-red-400" />
+                    <span>Live On • Stream Moderation & Speaker Queue</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Live video broadcasts, interactive voice panels, and audience speaker management
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-black flex items-center gap-1.5 animate-pulse">
+                  <span className="w-2 h-2 rounded-full bg-white"></span>
+                  <span>14,280 Viewers Online</span>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Active Debate Player Card */}
+                <div className="lg:col-span-2 p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                  <div className="aspect-video w-full rounded-xl bg-black relative overflow-hidden flex items-center justify-center border border-white/10">
+                    <img 
+                      src="https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=1200&auto=format&fit=crop&q=80" 
+                      alt="Debate stream" 
+                      className="w-full h-full object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50"></div>
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-black uppercase">LIVE NOW</span>
+                      <span className="text-xs font-bold text-white">2026 ఎన్నికలు: ఎవరికి అవకాశాలు?</span>
+                    </div>
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-gray-300">
+                      <span>Moderator: Senior Political Editor</span>
+                      <span className="font-mono text-amber-300">4 Active Speakers</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-xs font-bold text-gray-300">Channel: Now9 Telugu Prime Debates</span>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        type="button" 
+                        onClick={() => showToast('🎙️ Moderator audio broadcast enabled')}
+                        className="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-bold hover:bg-amber-500/30 cursor-pointer"
+                      >
+                        Join as Moderator
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Speaker Queue Approvals */}
+                <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                  <h3 className="font-extrabold text-sm text-white flex items-center justify-between">
+                    <span>Citizen Speaker Queue</span>
+                    <span className="text-[10px] text-amber-400 font-mono">3 Pending</span>
+                  </h3>
+
+                  <div className="space-y-2">
+                    {[
+                      { name: 'K. Ramesh (Mahabubnagar)', topic: 'Palamuru Lift Irrigation Water Issues', time: '1m ago' },
+                      { name: 'M. Sunitha (LB Nagar)', topic: 'Badangpet Road Widening Guarantee', time: '3m ago' },
+                      { name: 'Dr. V. Prasad (Jubilee Hills)', topic: 'Youth Employment in IT Hubs', time: '5m ago' },
+                    ].map((spk, idx) => (
+                      <div key={idx} className="p-2.5 rounded-xl bg-[#12121A] border border-[#1E1E28] space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-white">{spk.name}</span>
+                          <span className="text-[9px] text-gray-500">{spk.time}</span>
+                        </div>
+                        <p className="text-[10px] text-gray-400">{spk.topic}</p>
+                        <div className="flex items-center gap-1.5 pt-1">
+                          <button 
+                            type="button" 
+                            onClick={() => showToast(`✓ Approved ${spk.name} to speak live!`)}
+                            className="flex-1 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-all cursor-pointer"
+                          >
+                            Approve Mic
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => showToast(`✕ Dismissed application`)}
+                            className="px-2 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-bold transition-all cursor-pointer"
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 5: NEWS & FLASH TICKER PUBLISHER */}
+          {activeTab === 'news' && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center justify-between pb-3 border-b border-[#20202E]">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <Newspaper className="w-5 h-5 text-amber-400" />
+                    <span>NowNine News & Flash Ticker Publisher</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Publish breaking stories, constituency alerts, and live ticker bulletins directly to users
+                  </p>
+                </div>
+              </div>
+
+              {/* Publish News Form */}
+              <form onSubmit={handleAddNews} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                <h3 className="font-extrabold text-sm text-white">Publish Immediate Breaking Bulletin</h3>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    value={newNewsTitle}
+                    onChange={(e) => setNewNewsTitle(e.target.value)}
+                    placeholder="Enter breaking news headline (Telugu or English)..."
+                    className="flex-1 bg-[#12121A] border border-[#2B2B3E] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                  />
+                  <select
+                    value={newNewsCategory}
+                    onChange={(e) => setNewNewsCategory(e.target.value)}
+                    className="bg-[#12121A] border border-[#2B2B3E] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400 cursor-pointer"
+                  >
+                    <option value="Mahabubnagar">Mahabubnagar</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Telangana">Telangana State</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Elections 2026">Elections 2026</option>
+                  </select>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-xs shadow-md shadow-amber-500/20 hover:brightness-110 cursor-pointer"
+                  >
+                    Publish News Live
+                  </button>
+                </div>
+              </form>
+
+              {/* Active Published Stories Table */}
+              <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                <h3 className="font-extrabold text-sm text-white">Live News Feed Stream</h3>
+                <div className="space-y-2">
+                  {newsFeed.map(item => (
+                    <div key={item.id} className="p-3 rounded-xl bg-[#12121A] border border-[#1E1E28] flex items-center justify-between text-xs">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold border border-amber-400/30">
+                            {item.category}
+                          </span>
+                          <span className="font-telugu font-bold text-white text-xs">{item.title}</span>
+                        </div>
+                        <span className="text-[10px] text-gray-500 mt-0.5 block">{item.time} • {item.views} readers</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewsFeed(newsFeed.filter(n => n.id !== item.id));
+                            showToast('🗑️ News story removed from live feed');
+                          }}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-white/5 cursor-pointer"
+                          title="Delete News Item"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 6: BOSS OF HOUSE VOTING */}
+          {activeTab === 'boss-house' && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center justify-between pb-3 border-b border-[#20202E]">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <Eye className="w-5 h-5 text-amber-400" />
+                    <span>Boss of House (Telugu) • Live Elimination Tally</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Live votes tally, contestant rankings, and safe/danger zone analytics
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => showToast('🔄 Elimination votes reset for new voting week')}
+                  className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-amber-300 text-xs font-bold hover:bg-[#1E1E2E] cursor-pointer"
+                >
+                  Reset Week Tally
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {bossContestants.map((c, rank) => (
+                  <div key={c.id} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-3xl">{c.avatar}</span>
+                        <div>
+                          <h3 className="font-extrabold text-sm text-white">{c.name}</h3>
+                          <span className="text-[10px] text-gray-400">{c.role}</span>
+                        </div>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${
+                        c.status === 'Safe' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40' : 'bg-red-500/20 text-red-300 border border-red-400/40'
+                      }`}>
+                        {c.status}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <span className="text-gray-400">{c.votes.toLocaleString()} votes</span>
+                        <span className="text-amber-400 font-bold">{c.percent}%</span>
+                      </div>
+                      <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full" 
+                          style={{ width: `${c.percent}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 7: BALLOT AUDIT & SECURITY */}
+          {activeTab === 'audit' && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="flex items-center justify-between pb-3 border-b border-[#20202E]">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                    <span>Ballot Audit Trail & GPS Geofence Verification</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Real-time ingestion of anonymous encrypted ballots with anti-fraud geo-verification
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleExportCSV}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold hover:bg-emerald-500/30 cursor-pointer"
+                >
+                  Export Audit Log
+                </button>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-[#1E1E28] text-gray-400 text-[10px] uppercase font-mono">
+                        <th className="pb-2">Transaction ID</th>
+                        <th className="pb-2">Locality / Constituency</th>
+                        <th className="pb-2">Voted Candidate</th>
+                        <th className="pb-2">Timestamp</th>
+                        <th className="pb-2">GPS Verification</th>
+                        <th className="pb-2">Integrity Hash</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#1A1A24]">
+                      {auditStream.map((log) => (
+                        <tr key={log.id} className="text-gray-300 hover:bg-[#12121C]">
+                          <td className="py-2.5 font-mono text-amber-400 font-bold">{log.id}</td>
+                          <td className="py-2.5 font-semibold text-white">{log.locality}</td>
+                          <td className="py-2.5">{log.candidate} ({log.party})</td>
+                          <td className="py-2.5 font-mono text-gray-500">{log.time}</td>
+                          <td className="py-2.5">
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 text-[9px] font-bold">
+                              {log.status}
+                            </span>
+                          </td>
+                          <td className="py-2.5 font-mono text-gray-500 text-[10px]">{log.hash}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW 8: SETTINGS & RESULTS EMBARGO CONTROLS */}
+          {activeTab === 'settings' && (
+            <div className="space-y-5 animate-fadeIn max-w-3xl">
+              <div className="pb-3 border-b border-[#20202E]">
+                <h2 className="text-xl font-black text-white flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-amber-400" />
+                  <span>Election Controls & Platform Settings</span>
+                </h2>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Configure results embargo, security policies, and client presentation settings
+                </p>
+              </div>
+
+              {/* Embargo Control Box */}
+              <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-white flex items-center gap-1.5">
+                      <Lock className="w-4 h-4 text-amber-400" />
+                      <span>Public Results Embargo (Voter Confidentiality)</span>
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      When enabled, voting standings and percentages are concealed from ordinary voters and only visible in this Admin Panel.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = !isEmbargoActive;
+                      setIsEmbargoActive(next);
+                      showToast(next ? '🔒 Public Results Embargo Enabled' : '⚠️ Results Embargo Disabled');
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                      isEmbargoActive
+                        ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20'
+                        : 'bg-red-600 text-white shadow-md'
+                    }`}
+                  >
+                    {isEmbargoActive ? 'EMBARGO ACTIVE ✓' : 'EMBARGO DISABLED'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Client Demo Presentation Mode */}
+              <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-white flex items-center gap-1.5">
+                      <span>📱 Citizen Mobile App Preview</span>
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Switch instantly to the mobile user app to show clients how citizens cast their votes.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onSwitchToMobile || onClose}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-xs shadow-md shadow-amber-500/20 cursor-pointer"
+                  >
+                    Open Mobile App View
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </main>
+      </div>
+    </div>
+  );
+}
