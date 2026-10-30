@@ -741,6 +741,16 @@ export function Screen2Home({
   const [voteToast, setVoteToast] = useState(null);
   const [showSurveyParties, setShowSurveyParties] = useState(false);
 
+  const constituencyLabel = (() => {
+    const raw = currentLocation?.assembly || 'Constituency';
+    const clean = raw
+      .replace(/\s*Assembly\s*Constituency\s*/gi, '')
+      .replace(/\s*Assembly\s*/gi, '')
+      .replace(/\s*Constituency\s*/gi, '')
+      .trim();
+    return clean ? `${clean} Constituency` : 'Local Constituency';
+  })();
+
   useEffect(() => {
     if (selectedParty?.id) {
       setSelectedPartyId(selectedParty.id);
@@ -1085,12 +1095,13 @@ export function Screen2Home({
                     </h3>
 
                     <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1">
-                      {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'MLA'} • Local`}
+                      {party.candidate || `${party.name} Candidate`}
                     </p>
 
-                    <div className="mt-2 flex items-center gap-1">
-                      <span className="text-[8.5px] font-semibold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
-                        {partyStatus || 'Official Candidate'}
+                    <div className="mt-2 flex items-center justify-center gap-1 max-w-full">
+                      <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 flex items-center gap-1 max-w-full truncate">
+                        <MapPin className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                        <span className="truncate">{constituencyLabel}</span>
                       </span>
                     </div>
                   </button>
@@ -1349,6 +1360,16 @@ export function Screen3Survey({
   const loc = currentLocation || DEFAULT_DETECTED_LOCATION;
   const partiesList = loc?.parties || [];
 
+  const constituencyLabel = (() => {
+    const raw = loc?.assembly || 'Constituency';
+    const clean = raw
+      .replace(/\s*Assembly\s*Constituency\s*/gi, '')
+      .replace(/\s*Assembly\s*/gi, '')
+      .replace(/\s*Constituency\s*/gi, '')
+      .trim();
+    return clean ? `${clean} Constituency` : 'Local Constituency';
+  })();
+
   // Active view tab: 'parties' | 'questions' | 'results'
   const [activeTab, setActiveTab] = useState(() => (selectedParty ? 'questions' : 'parties'));
   // Strictly single chosen party
@@ -1597,14 +1618,15 @@ export function Screen3Survey({
                         {party.name}
                       </h3>
 
-                      {/* Subtitle matching reference format: Candidate • Role */}
+                      {/* Candidate Name */}
                       <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1">
-                        {party.candidate ? `${party.candidate} • ${partyStatus}` : `${party.code || 'Party'} • Local`}
+                        {party.candidate || `${party.name} Candidate`}
                       </p>
 
-                      <div className="mt-2 flex items-center gap-1">
-                        <span className="text-[8.5px] font-semibold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
-                          {partyStatus || 'Contesting Candidate'}
+                      <div className="mt-2 flex items-center justify-center gap-1 max-w-full">
+                        <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 flex items-center gap-1 max-w-full truncate">
+                          <MapPin className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                          <span className="truncate">{constituencyLabel}</span>
                         </span>
                       </div>
                     </button>
