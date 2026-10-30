@@ -58,6 +58,7 @@ import {
   CONSTITUENCY_DATABASE, 
   resolveConstituencyAndParties 
 } from '../data/locationConstituencyData';
+import { recordLiveBallot } from '../data/voteStore';
 
 // Phone Status Bar (Cellular, Wifi, Battery icons removed as requested)
 export function PhoneStatusBar() {
@@ -1426,6 +1427,12 @@ export function Screen3Survey({
     } else {
       setIsSubmitted(true);
       setActiveTab('submitted');
+      // Record real live ballot into Admin system
+      recordLiveBallot({
+        party: chosenParty,
+        location: loc,
+        answers: answers
+      });
       showToast('🎉 మీ ఓటు విజయవంతంగా నమోదైంది! (Vote Recorded)');
     }
   };

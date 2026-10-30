@@ -45,9 +45,11 @@ import {
   MicOff,
   Monitor,
   Square,
-  Sparkles
+  Sparkles,
+  RotateCcw
 } from 'lucide-react';
 import LiveStreamModal from './LiveStreamModal';
+import { getStoredBallotData, recordLiveBallot, resetAllBallotsToZero, VOTE_CAST_EVENT } from '../data/voteStore';
 import { CONSTITUENCY_DATABASE, DEFAULT_DETECTED_LOCATION } from '../data/locationConstituencyData';
 import { SURVEY_QUESTIONS } from '../data/nowNineAppFlowData';
 
@@ -96,20 +98,50 @@ export default function NowNineAdminDashboard({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Live Simulated Metrics
-  const [totalVotesCount, setTotalVotesCount] = useState(148920);
+  // Live Real-Time Voting Metrics (starts strictly at 0)
+  const initialBallotData = getStoredBallotData();
+  const [totalVotesCount, setTotalVotesCount] = useState(initialBallotData.count);
+  const [auditStream, setAuditStream] = useState(initialBallotData.logs);
+  const [liveConstituencyVotes, setLiveConstituencyVotes] = useState(initialBallotData.constituencyVotes);
+  const [liveQuestionVotes, setLiveQuestionVotes] = useState(initialBallotData.questionVotes);
 
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
   };
 
-  // Live ticker increment to simulate real-time voting influx
+  // Real-time listener for incoming citizen votes
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTotalVotesCount(prev => prev + Math.floor(Math.random() * 3) + 1);
-    }, 4000);
-    return () => clearInterval(timer);
+    const handleLiveVote = (e) => {
+      const detail = e.detail || getStoredBallotData();
+      setTotalVotesCount(detail.count ?? 0);
+      if (detail.log) {
+        setAuditStream(prev => [detail.log, ...prev.filter(item => item.id !== detail.log.id)].slice(0, 50));
+      } else if (detail.count === 0) {
+        setAuditStream([]);
+      }
+      if (detail.constituencyVotes) {
+        setLiveConstituencyVotes(detail.constituencyVotes);
+      }
+      if (detail.questionVotes) {
+        setLiveQuestionVotes(detail.questionVotes);
+      }
+    };
+
+    const handleStorageChange = () => {
+      const data = getStoredBallotData();
+      setTotalVotesCount(data.count);
+      setAuditStream(data.logs);
+      setLiveConstituencyVotes(data.constituencyVotes);
+      setLiveQuestionVotes(data.questionVotes);
+    };
+
+    window.addEventListener(VOTE_CAST_EVENT, handleLiveVote);
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener(VOTE_CAST_EVENT, handleLiveVote);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Detailed Assembly Standings Data
@@ -363,16 +395,7 @@ export default function NowNineAdminDashboard({
     { id: 'c5', name: 'Teja', role: 'Content Creator', votes: 24250, percent: 8.2, status: 'Nominated', avatar: '🎭' },
   ]);
 
-  // Live Audit Stream
-  const [auditStream, setAuditStream] = useState([
-    { id: 'TX-994821', locality: 'Yenugonda (Mahabubnagar)', party: 'Congress (INC)', candidate: 'Yennam Srinivas Reddy', time: '5s ago', ip: '157.48.***.***', status: 'GPS Verified ✓', hash: 'e8b4...19c2' },
-    { id: 'TX-994820', locality: 'Yenugonda (Mahabubnagar)', party: 'BRS', candidate: 'V. Srinivas Goud', time: '18s ago', ip: '49.207.***.***', status: 'GPS Verified ✓', hash: 'a14f...99d1' },
-    { id: 'TX-994819', locality: 'Almasguda (LB Nagar)', party: 'Congress (INC)', candidate: 'Madhu Yaskhi Goud', time: '42s ago', ip: '182.72.***.***', status: 'GPS Verified ✓', hash: 'c59d...43a8' },
-    { id: 'TX-994818', locality: 'Almasguda (LB Nagar)', party: 'BJP', candidate: 'Sama Ranga Reddy', time: '1m ago', ip: '103.211.***.***', status: 'GPS Verified ✓', hash: 'f871...12b9' },
-    { id: 'TX-994817', locality: 'Gachibowli (Serilingampally)', party: 'BRS', candidate: 'Arekapudi Gandhi', time: '1m ago', ip: '122.175.***.***', status: 'GPS Verified ✓', hash: 'b332...71e0' },
-    { id: 'TX-994816', locality: 'Chandragiri (Tirupati)', party: 'TDP Alliance', candidate: 'Pulivarthi Nani', time: '2m ago', ip: '14.139.***.***', status: 'GPS Verified ✓', hash: '90ea...5581' },
-    { id: 'TX-994815', locality: 'Munugode (Nalgonda)', party: 'Congress (INC)', candidate: 'Komatireddy Raj Gopal', time: '2m ago', ip: '223.185.***.***', status: 'GPS Verified ✓', hash: '24dc...38a4' },
-  ]);
+// Real-time auditStream managed via voteStore
 
   // Live News Management
   const [newsFeed, setNewsFeed] = useState([
@@ -653,6 +676,37 @@ export default function NowNineAdminDashboard({
                       <option key={c.id} value={c.id}>{c.name} ({c.code})</option>
                     ))}
                   </select>
+
+                  {/* Real-time Demo Controls: Reset to 0 and +1 Test Vote */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      resetAllBallotsToZero();
+                      showToast('🗑️ All ballots reset to 0! Ledger cleared.');
+                    }}
+                    className="px-2.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                    title="Reset ballot count to 0"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-red-400" />
+                    <span>Reset to 0</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      recordLiveBallot({
+                        party: { name: 'Congress (INC)', candidate: 'Yennam Srinivas Reddy', id: 'inc' },
+                        location: { assembly: 'Mahabubnagar Assembly Constituency', locality: 'Yenugonda', state: 'Telangana' },
+                        answers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
+                      });
+                      showToast('🗳️ 1 Live ballot recorded from Yenugonda (Mahabubnagar)!');
+                    }}
+                    className="px-2.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                    title="Cast 1 test vote to demonstrate real-time count increment"
+                  >
+                    <Vote className="w-3.5 h-3.5 text-amber-400" />
+                    <span>+1 Test Vote</span>
+                  </button>
                 </div>
               </div>
 
@@ -660,15 +714,23 @@ export default function NowNineAdminDashboard({
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
                   <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span>Total Ballots Received</span>
+                    <span className="font-extrabold text-white">Total Ballots Received</span>
                     <Vote className="w-4 h-4 text-[#F5C754]" />
                   </div>
                   <div className="text-2xl sm:text-3xl font-black text-white font-mono">
                     {totalVotesCount.toLocaleString()}
                   </div>
-                  <span className="text-[10px] text-emerald-400 font-bold mt-1 inline-flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" /> +14.2% since morning 08:00 AM
-                  </span>
+                  {totalVotesCount === 0 ? (
+                    <span className="text-[10px] text-gray-400 font-bold mt-1 inline-flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                      0 recorded votes • Waiting for first voter
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-emerald-400 font-bold mt-1 inline-flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" />
+                      +{totalVotesCount} verified real vote${totalVotesCount === 1 ? '' : 's'} recorded live
+                    </span>
+                  )}
                 </div>
 
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
@@ -852,8 +914,14 @@ export default function NowNineAdminDashboard({
                   </div>
 
                   <div className="space-y-1.5">
-                    {auditStream.slice(0, 5).map((log) => (
-                      <div key={log.id} className="p-2 rounded-xl bg-[#12121A] border border-[#1E1E28] flex items-center justify-between text-[10.5px]">
+                    {auditStream.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-gray-500 bg-[#12121A] rounded-xl border border-dashed border-[#222232]">
+                        <p className="font-bold text-gray-400">0 Ballots Received Yet</p>
+                        <p className="text-[10px] text-gray-500 mt-1">Vote on mobile or click "+1 Vote" to see live cryptographic audit logs appear here.</p>
+                      </div>
+                    ) : (
+                      auditStream.slice(0, 5).map((log) => (
+                        <div key={log.id} className="p-2 rounded-xl bg-[#12121A] border border-[#1E1E28] flex items-center justify-between text-[10.5px]">
                         <div className="flex items-center gap-2">
                           <span className="font-mono font-bold text-amber-400 text-[10px]">{log.id}</span>
                           <span className="font-semibold text-white">{log.party}</span>
@@ -866,7 +934,8 @@ export default function NowNineAdminDashboard({
                           </span>
                         </div>
                       </div>
-                    ))}
+                    ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -1570,7 +1639,14 @@ export default function NowNineAdminDashboard({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#1A1A24]">
-                      {auditStream.map((log) => (
+                      {auditStream.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-8 text-center text-gray-500 font-mono text-xs">
+                            No ballots recorded in ledger yet. Start by voting on the citizen mobile app or clicking "+1 Vote".
+                          </td>
+                        </tr>
+                      ) : (
+                        auditStream.map((log) => (
                         <tr key={log.id} className="text-gray-300 hover:bg-[#12121C]">
                           <td className="py-2.5 font-mono text-amber-400 font-bold">{log.id}</td>
                           <td className="py-2.5 font-semibold text-white">{log.locality}</td>
@@ -1583,7 +1659,8 @@ export default function NowNineAdminDashboard({
                           </td>
                           <td className="py-2.5 font-mono text-gray-500 text-[10px]">{log.hash}</td>
                         </tr>
-                      ))}
+                      ))
+                      )}
                     </tbody>
                   </table>
                 </div>
