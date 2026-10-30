@@ -31,8 +31,68 @@ import {
 } from '../data/locationConstituencyData';
 
 export default function NowNineUnifiedApp() {
-  // Directly start on the Login screen on entry as requested
-  const [activeScreenId, setActiveScreenId] = useState('login');
+  // Check if URL specifies direct admin access (e.g. /#admin, /?admin=true, or /admin)
+  const getInitialScreen = () => {
+    if (typeof window !== 'undefined') {
+      const search = window.location.search || '';
+      const hash = (window.location.hash || '').toLowerCase();
+      const pathname = (window.location.pathname || '').toLowerCase();
+      const params = new URLSearchParams(search);
+      if (
+        params.get('admin') === 'true' || 
+        params.get('screen') === 'admin' ||
+        hash === '#admin' || 
+        hash === '#/admin' || 
+        pathname === '/admin' || 
+        pathname.startsWith('/admin')
+      ) {
+        return 'admin';
+      }
+    }
+    return 'login';
+  };
+
+  const [activeScreenId, setActiveScreenId] = useState(getInitialScreen);
+
+  // Sync direct admin link on hash or history changes
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const search = window.location.search || '';
+      const hash = (window.location.hash || '').toLowerCase();
+      const pathname = (window.location.pathname || '').toLowerCase();
+      const params = new URLSearchParams(search);
+      if (
+        params.get('admin') === 'true' || 
+        params.get('screen') === 'admin' ||
+        hash === '#admin' || 
+        hash === '#/admin' || 
+        pathname === '/admin'
+      ) {
+        setActiveScreenId('admin');
+      }
+    };
+
+    window.addEventListener('hashchange', handleUrlChange);
+    window.addEventListener('popstate', handleUrlChange);
+    return () => {
+      window.removeEventListener('hashchange', handleUrlChange);
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, []);
+
+  const handleOpenAdmin = () => {
+    if (typeof window !== 'undefined') {
+      window.location.hash = 'admin';
+    }
+    setActiveScreenId('admin');
+  };
+
+  const handleExitAdmin = (targetId = 'home') => {
+    if (typeof window !== 'undefined' && window.location.hash.toLowerCase().includes('admin')) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+    setActiveScreenId(targetId);
+  };
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(DEFAULT_DETECTED_LOCATION);
   const [selectedSurveyParty, setSelectedSurveyParty] = useState(null);
@@ -189,8 +249,8 @@ export default function NowNineUnifiedApp() {
   if (activeScreenId === 'admin') {
     return (
       <NowNineAdminDashboard 
-        onClose={() => setActiveScreenId('home')}
-        onSwitchToMobile={() => setActiveScreenId('home')}
+        onClose={() => handleExitAdmin('home')}
+        onSwitchToMobile={() => handleExitAdmin('home')}
         currentLocation={currentLocation}
       />
     );
@@ -254,7 +314,7 @@ export default function NowNineUnifiedApp() {
           <div className="flex items-center gap-2">
             {/* Admin Panel Toggle Button */}
             <button
-              onClick={() => setActiveScreenId(activeScreenId === 'admin' ? 'home' : 'admin')}
+              onClick={() => activeScreenId === 'admin' ? handleExitAdmin('home') : handleOpenAdmin()}
               className={`p-1.5 px-2.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeScreenId === 'admin'
                   ? 'bg-amber-500/25 border-amber-400 text-amber-300 shadow-md shadow-amber-500/20'

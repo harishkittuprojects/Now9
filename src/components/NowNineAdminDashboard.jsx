@@ -484,6 +484,21 @@ export default function NowNineAdminDashboard({
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
 
+          {/* Copy Direct Admin Link */}
+          <button
+            type="button"
+            onClick={() => {
+              const adminUrl = window.location.origin + window.location.pathname + '#admin';
+              navigator.clipboard?.writeText(adminUrl);
+              showToast(`📋 Admin URL copied: ${adminUrl}`);
+            }}
+            className="px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-amber-500/40 text-amber-300 hover:text-white text-[10.5px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+            title="Copy Direct Admin Link"
+          >
+            <Share2 className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden lg:inline">Copy Admin Link</span>
+          </button>
+
           {/* Switch to Citizen Mobile View */}
           <button
             type="button"
@@ -1342,3 +1357,4 @@ export default function NowNineAdminDashboard({
     </div>
   );
 }
+
