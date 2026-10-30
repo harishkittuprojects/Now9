@@ -740,6 +740,7 @@ export function Screen2Home({
   const [selectedPartyId, setSelectedPartyId] = useState(() => selectedParty?.id || null);
   const [voteToast, setVoteToast] = useState(null);
   const [showSurveyParties, setShowSurveyParties] = useState(false);
+  const [logoTapCount, setLogoTapCount] = useState(0);
 
   const constituencyLabel = (() => {
     const raw = currentLocation?.assembly || 'Constituency';
@@ -799,8 +800,17 @@ export function Screen2Home({
           </button>
 
           <div 
-            onClick={() => onNavigate('home')}
+            onClick={() => {
+              setLogoTapCount(prev => {
+                if (prev + 1 >= 3) {
+                  onNavigate('admin');
+                  return 0;
+                }
+                return prev + 1;
+              });
+            }}
             className="flex items-center gap-1.5 cursor-pointer shrink-0"
+            title="NowNine"
           >
             <img 
               src="/now9_icon.png" 
@@ -949,7 +959,6 @@ export function Screen2Home({
                   { label: 'Live On', icon: Radio, target: 'live-debates', color: 'text-red-400' },
                   { label: 'Boss of House', icon: Eye, target: 'big-boss', color: 'text-amber-400' },
                   { label: 'Common People', icon: Users, target: 'common-people', color: 'text-emerald-400' },
-                  { label: 'Admin Dashboard', icon: ShieldCheck, target: 'admin', color: 'text-[#F5C754]' },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
@@ -1836,27 +1845,6 @@ export function Screen3Survey({
             <p className="text-[8.5px] text-gray-400 leading-normal">
               As per survey policy, individual results are kept private and aggregate analytics are available exclusively to Election Analysts in the Admin Panel.
             </p>
-          </div>
-
-          {/* Admin Panel Quick Access Button */}
-          <div className="p-2.5 rounded-xl bg-[#161622] border border-[#2B2B3D] flex items-center justify-between">
-            <div className="flex items-center gap-2 text-left">
-              <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 text-xs">
-                📊
-              </div>
-              <div>
-                <p className="text-[9.5px] font-bold text-white leading-tight">Election Admin Panel</p>
-                <p className="text-[8px] text-gray-400">View real-time standings & analytics</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => onNavigate ? onNavigate('admin') : null}
-              className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/50 text-amber-300 font-bold text-[8.5px] transition-all cursor-pointer flex items-center gap-1"
-            >
-              <span>View Admin</span>
-              <ChevronRight className="w-2.5 h-2.5" />
-            </button>
           </div>
 
           {/* Action Button */}
