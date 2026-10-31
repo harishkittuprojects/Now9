@@ -1380,12 +1380,44 @@ export function Screen3Survey({
     return clean ? `${clean} Constituency` : 'Local Constituency';
   })();
 
+  // Dynamic questions list supporting extra questions added from admin
+  const [questionsList, setQuestionsList] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('now9_custom_questions_v1');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return SURVEY_QUESTIONS;
+  });
+
+  useEffect(() => {
+    const handleQuestionsUpdate = () => {
+      try {
+        const stored = localStorage.getItem('now9_custom_questions_v1');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) setQuestionsList(parsed);
+        }
+      } catch (e) {}
+    };
+    window.addEventListener('now9_questions_updated', handleQuestionsUpdate);
+    window.addEventListener('storage', handleQuestionsUpdate);
+    return () => {
+      window.removeEventListener('now9_questions_updated', handleQuestionsUpdate);
+      window.removeEventListener('storage', handleQuestionsUpdate);
+    };
+  }, []);
+
   // Active view tab: 'parties' | 'questions' | 'results'
   const [activeTab, setActiveTab] = useState(() => (selectedParty ? 'questions' : 'parties'));
   // Strictly single chosen party
   const [chosenParty, setChosenParty] = useState(selectedParty);
-  const [currentStep, setCurrentStep] = useState(0); // 0 to 4
-  const [answers, setAnswers] = useState({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 });
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [isConstituencyModalOpen, setIsConstituencyModalOpen] = useState(false);
@@ -1413,8 +1445,8 @@ export function Screen3Survey({
     }, 450);
   };
 
-  const activeQuestion = SURVEY_QUESTIONS[currentStep] || SURVEY_QUESTIONS[0];
-  const progressPercent = ((currentStep + 1) / SURVEY_QUESTIONS.length) * 100;
+  const activeQuestion = questionsList[currentStep] || questionsList[0];
+  const progressPercent = ((currentStep + 1) / questionsList.length) * 100;
   const selectedOptionIdx = answers[currentStep] ?? 0;
 
   const handleSelectOption = (idx) => {
@@ -1422,7 +1454,7 @@ export function Screen3Survey({
   };
 
   const handleNext = () => {
-    if (currentStep < SURVEY_QUESTIONS.length - 1) {
+    if (currentStep < questionsList.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
       setIsSubmitted(true);
@@ -1792,7 +1824,7 @@ export function Screen3Survey({
               onClick={handleNext}
               className="flex-1 py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F8CD55] via-[#E3A336] to-[#C58319] text-black font-extrabold text-xs shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer"
             >
-              <span>{currentStep === 4 ? 'Submit Answers 🗳️' : 'Next Question'}</span>
+              <span>{currentStep === questionsList.length - 1 ? 'Submit Answers 🗳️' : 'Next Question'}</span>
               <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
             </button>
           </div>

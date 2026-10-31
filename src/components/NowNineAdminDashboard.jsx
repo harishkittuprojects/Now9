@@ -369,8 +369,89 @@ export default function NowNineAdminDashboard({
     showToast(`⚡ Voted ${partyName} in ${constName}! Check Sections 1, 2, 3, 4 below.`);
   };
 
-  // Real-Time 5 Question Analytics
-  const QUESTION_ANALYTICS = SURVEY_QUESTIONS ? SURVEY_QUESTIONS.map((q, qIdx) => {
+  // Dynamic Survey Questions List (persisted in localStorage)
+  const [surveyQuestionsList, setSurveyQuestionsList] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('now9_custom_questions_v1');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return SURVEY_QUESTIONS || [];
+  });
+
+  const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
+  const [newQuestionCategory, setNewQuestionCategory] = useState('');
+  const [newQuestionText, setNewQuestionText] = useState('');
+  const [newQuestionOptions, setNewQuestionOptions] = useState([
+    'చాలా బాగుంది (Very Good)',
+    'మెరుగుపడాలి (Needs Improvement)',
+    'అసంతృప్తికరం (Poor)',
+    'స్పందించలేదు (No Opinion)'
+  ]);
+
+  const handleAddNewQuestion = (e) => {
+    e.preventDefault();
+    if (!newQuestionText.trim()) {
+      showToast('⚠️ Please enter the question text.');
+      return;
+    }
+    const validOptions = newQuestionOptions.filter(opt => opt.trim().length > 0);
+    if (validOptions.length < 2) {
+      showToast('⚠️ Please provide at least 2 voting options for the question.');
+      return;
+    }
+
+    const nextStep = surveyQuestionsList.length + 1;
+    const newQ = {
+      step: nextStep,
+      id: `q${nextStep}_${Date.now()}`,
+      headerLabel: `${nextStep} of ${nextStep}`,
+      category: newQuestionCategory.trim() || `Priority #${nextStep}: స్థానిక సమస్యలు (Civic Issue)`,
+      question: newQuestionText.trim(),
+      options: validOptions,
+      defaultSelected: 0,
+      isCustom: true
+    };
+
+    const nextList = [...surveyQuestionsList, newQ];
+    setSurveyQuestionsList(nextList);
+    try {
+      localStorage.setItem('now9_custom_questions_v1', JSON.stringify(nextList));
+      window.dispatchEvent(new CustomEvent('now9_questions_updated', { detail: nextList }));
+    } catch (err) {}
+
+    setIsAddQuestionModalOpen(false);
+    setNewQuestionText('');
+    setNewQuestionCategory('');
+    setNewQuestionOptions([
+      'చాలా బాగుంది (Very Good)',
+      'మెరుగుపడాలి (Needs Improvement)',
+      'అసంతృప్తికరం (Poor)',
+      'స్పందించలేదు (No Opinion)'
+    ]);
+    showToast(`✅ Question #${nextStep} published live to Citizen Survey!`);
+  };
+
+  const handleDeleteQuestion = (qId) => {
+    const nextList = surveyQuestionsList.filter(q => q.id !== qId).map((q, idx) => ({
+      ...q,
+      step: idx + 1,
+      headerLabel: `${idx + 1} of ${surveyQuestionsList.length - 1}`
+    }));
+    setSurveyQuestionsList(nextList);
+    try {
+      localStorage.setItem('now9_custom_questions_v1', JSON.stringify(nextList));
+      window.dispatchEvent(new CustomEvent('now9_questions_updated', { detail: nextList }));
+    } catch (err) {}
+    showToast('🗑️ Custom question removed from survey.');
+  };
+
+  // Real-Time Question Analytics computed from dynamic list
+  const QUESTION_ANALYTICS = surveyQuestionsList.map((q, qIdx) => {
     const qVotes = liveQuestionVotes[qIdx] || {};
     const totalQVotes = Object.values(qVotes).reduce((sum, v) => sum + v, 0);
     const optionsWithVotes = q.options.map((opt, optIdx) => {
@@ -384,71 +465,15 @@ export default function NowNineAdminDashboard({
       };
     });
     return {
+      id: q.id || `q${qIdx + 1}`,
       step: qIdx + 1,
-      category: `Priority #${qIdx + 1}`,
+      category: q.category || `Priority #${qIdx + 1}`,
       title: q.question,
       totalSample: totalQVotes,
-      options: optionsWithVotes
+      options: optionsWithVotes,
+      isCustom: !!q.isCustom
     };
-  }) : [
-    {
-      step: 1,
-      category: '🎯 ప్రాధాన్యత (Priority Governance Issue)',
-      title: 'What is the highest priority issue for your constituency in 2026-2031?',
-      totalSample: 124800,
-      options: [
-        { label: 'Local Road, Underground Drainage & Drinking Water', votes: 54288, percent: 43.5, color: '#0284C7' },
-        { label: 'Welfare Schemes, Direct Cash Transfers & Guarantees', votes: 35193, percent: 28.2, color: '#EAB308' },
-        { label: 'Youth Employment, IT Hubs & Industrial Jobs', votes: 23212, percent: 18.6, color: '#10B981' },
-        { label: 'Government Hospitals & School Quality Improvement', votes: 12107, percent: 9.7, color: '#8B5CF6' }
-      ]
-    },
-    {
-      step: 2,
-      category: '⭐ నచ్చిన అంశం (Key Deciding Factor)',
-      title: 'What primarily drives your voting choice for this MLA candidate?',
-      totalSample: 124800,
-      options: [
-        { label: 'Candidate Personal Accessibility & Constituency Groundwork', votes: 61276, percent: 49.1, color: '#EC4899' },
-        { label: 'State Chief Minister / Top Party Leadership Image', votes: 36691, percent: 29.4, color: '#0284C7' },
-        { label: 'Party Ideology & Manifesto Commitments', votes: 18470, percent: 14.8, color: '#F97316' },
-        { label: 'Community Support & Regional Recommendation', votes: 8363, percent: 6.7, color: '#64748B' }
-      ]
-    },
-    {
-      step: 3,
-      category: '📈 ఆశించిన మార్పు (Governance Satisfaction)',
-      title: 'How do you rate the pace of overall progress in your constituency?',
-      totalSample: 124800,
-      options: [
-        { label: 'Highly Satisfied • Work is Rapidly Progressing', votes: 52416, percent: 42.0, color: '#10B981' },
-        { label: 'Needs Improvement • Accelerated Pace Required', votes: 45427, percent: 36.4, color: '#EAB308' },
-        { label: 'Dissatisfied • Urgently Seeking Leadership Change', votes: 26957, percent: 21.6, color: '#EF4444' }
-      ]
-    },
-    {
-      step: 4,
-      category: '🤝 విశ్వాసం (Integrity & Trust Factor)',
-      title: 'Do you trust the sitting local leadership to deliver on future promises?',
-      totalSample: 124800,
-      options: [
-        { label: 'High Confidence • Promises Delivered Transparently', votes: 58406, percent: 46.8, color: '#10B981' },
-        { label: 'Moderate Trust • Partial Delivery with Genuine Effort', votes: 43305, percent: 34.7, color: '#0284C7' },
-        { label: 'Low Trust • Promises Remained Unfulfilled', votes: 23089, percent: 18.5, color: '#EF4444' }
-      ]
-    },
-    {
-      step: 5,
-      category: '🗳️ తుది నిర్ణయం (Final Decision Readiness)',
-      title: 'Have you locked in your final vote decision for the upcoming election?',
-      totalSample: 124800,
-      options: [
-        { label: '100% Firm Decision • Will not change party', votes: 88857, percent: 71.2, color: '#10B981' },
-        { label: 'Leaning towards Party • Still monitoring developments', votes: 25584, percent: 20.5, color: '#EAB308' },
-        { label: 'Completely Undecided Floating Voter', votes: 10359, percent: 8.3, color: '#64748B' }
-      ]
-    }
-  ];
+  });
 
   // Boss of House (Entertainment Contestants) Voting
   const [bossContestants, setBossContestants] = useState([
@@ -1287,35 +1312,71 @@ export default function NowNineAdminDashboard({
             </div>
           )}
 
-          {/* VIEW 3: 5-QUESTION SURVEY GOVERNANCE PULSE */}
+          {/* VIEW 3: CITIZEN GOVERNANCE SURVEY PULSE */}
           {activeTab === 'surveys' && (
             <div className="space-y-5 animate-fadeIn">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-2">
+              
+              {/* Header with Title and "Add Extra Question" Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-3">
                 <div>
                   <h2 className="text-xl font-black text-white flex items-center gap-2">
                     <FileText className="w-5 h-5 text-amber-400" />
-                    <span>5-Question Citizen Governance Pulse (124,800 Respondents)</span>
+                    <span>{surveyQuestionsList.length}-Question Citizen Governance Pulse ({totalVotesCount} Respondents)</span>
                   </h2>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    Official breakdown of public priorities, leader trust factors, and voting decision firmness
+                    Official breakdown of public priorities, leader trust factors, and custom civic survey questions
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleExportCSV}
-                  className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-[#1E1E2E]"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Survey Dataset</span>
-                </button>
+
+                <div className="flex items-center gap-2.5">
+                  {/* ADD EXTRA QUESTION BUTTON */}
+                  <button
+                    type="button"
+                    onClick={() => setIsAddQuestionModalOpen(true)}
+                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:brightness-110 text-black text-xs font-black flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 stroke-[3]" />
+                    <span>Add Extra Question</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleExportCSV}
+                    className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-amber-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-[#1E1E2E]"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Export Dataset</span>
+                  </button>
+                </div>
               </div>
 
+              {/* Questions Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {QUESTION_ANALYTICS.map((q) => (
-                  <div key={q.step} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
+                  <div key={q.step} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3 relative group hover:border-amber-500/40 transition-all shadow-md">
                     <div className="flex items-center justify-between pb-1.5 border-b border-[#1E1E28]">
-                      <span className="text-xs font-black text-[#F5C754]">{q.category}</span>
-                      <span className="text-[10px] text-gray-400 font-mono">Step {q.step} of 5</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-[#F5C754]">{q.category}</span>
+                        {q.isCustom && (
+                          <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[8.5px] font-bold">
+                            Custom Added
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-400 font-mono">Step {q.step} of {surveyQuestionsList.length}</span>
+                        {q.isCustom && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteQuestion(q.id)}
+                            className="p-1 text-gray-500 hover:text-red-400 transition-colors"
+                            title="Delete this question"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <h3 className="font-bold text-xs text-white leading-snug">
@@ -1342,7 +1403,140 @@ export default function NowNineAdminDashboard({
                     </div>
                   </div>
                 ))}
+
+                {/* Inline "Add New Question" Card at the end of the grid */}
+                <div 
+                  onClick={() => setIsAddQuestionModalOpen(true)}
+                  className="p-6 rounded-2xl bg-[#0B0B10] border-2 border-dashed border-[#26263A] hover:border-amber-400/60 flex flex-col items-center justify-center text-center cursor-pointer transition-all group min-h-[220px]"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-center text-amber-400 mb-2 group-hover:scale-110 transition-transform">
+                    <Plus className="w-6 h-6 stroke-[2.5]" />
+                  </div>
+                  <h4 className="font-bold text-sm text-white group-hover:text-amber-300 transition-colors">
+                    Add Extra Survey Question
+                  </h4>
+                  <p className="text-[11px] text-gray-400 max-w-xs mt-1">
+                    Add Step #{surveyQuestionsList.length + 1} to the citizen voting survey with custom Telugu or English questions and voting options.
+                  </p>
+                </div>
               </div>
+
+              {/* MODAL: ADD EXTRA SURVEY QUESTION */}
+              {isAddQuestionModalOpen && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+                  <div className="bg-[#12121A] border-2 border-amber-500/40 rounded-3xl max-w-lg w-full text-white shadow-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between pb-3 border-b border-[#232332]">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                          ➕
+                        </div>
+                        <div>
+                          <h3 className="font-black text-base text-white">Add Extra Survey Question</h3>
+                          <p className="text-[11px] text-gray-400">Step #{surveyQuestionsList.length + 1} in the Citizen Survey Flow</p>
+                        </div>
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => setIsAddQuestionModalOpen(false)}
+                        className="text-gray-400 hover:text-white text-lg font-bold p-1 cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleAddNewQuestion} className="space-y-4">
+                      {/* Question Category / Label */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-gray-300">Question Category / Header (Optional)</label>
+                        <input
+                          type="text"
+                          value={newQuestionCategory}
+                          onChange={(e) => setNewQuestionCategory(e.target.value)}
+                          placeholder={`e.g. Priority #${surveyQuestionsList.length + 1}: స్థానిక సమస్యలు (Civic Needs)`}
+                          className="w-full bg-[#181824] border border-[#2B2B3E] focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                        />
+                      </div>
+
+                      {/* Question Text */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-gray-300">
+                          Question Text (in Telugu or English) <span className="text-red-400">*</span>
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={newQuestionText}
+                          onChange={(e) => setNewQuestionText(e.target.value)}
+                          placeholder="e.g. మీ నియోజకవర్గంలో మహిళా రక్షణ, శాంతిభద్రతల పరిస్థితి ఎలా ఉంది? (How do you rate women's safety & law order?)"
+                          className="w-full bg-[#181824] border border-[#2B2B3E] focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none resize-none"
+                          required
+                        />
+                      </div>
+
+                      {/* Options List */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-bold text-gray-300">Voting Options (Minimum 2)</label>
+                          <button
+                            type="button"
+                            onClick={() => setNewQuestionOptions([...newQuestionOptions, `Option ${newQuestionOptions.length + 1}`])}
+                            className="text-[11px] text-amber-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Option</span>
+                          </button>
+                        </div>
+
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                          {newQuestionOptions.map((opt, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <span className="text-xs font-mono text-gray-500 w-5 text-right">{idx + 1}.</span>
+                              <input
+                                type="text"
+                                value={opt}
+                                onChange={(e) => {
+                                  const updated = [...newQuestionOptions];
+                                  updated[idx] = e.target.value;
+                                  setNewQuestionOptions(updated);
+                                }}
+                                className="flex-1 bg-[#181824] border border-[#2B2B3E] focus:border-amber-400 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
+                                required
+                              />
+                              {newQuestionOptions.length > 2 && (
+                                <button
+                                  type="button"
+                                  onClick={() => setNewQuestionOptions(newQuestionOptions.filter((_, i) => i !== idx))}
+                                  className="text-gray-500 hover:text-red-400 text-xs p-1"
+                                  title="Remove option"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Modal Action Buttons */}
+                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#232332]">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddQuestionModalOpen(false)}
+                          className="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold transition-all cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-black text-xs font-black shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                          <span>Publish Question Live 🗳️</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 
@@ -1408,48 +1602,17 @@ export default function NowNineAdminDashboard({
                 </div>
 
                 <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap">
-                  {/* Fullscreen Video Studio Launcher */}
+                  {/* Primary Video Broadcast Studio Launcher (Streamlined single action) */}
                   <button
                     type="button"
                     onClick={() => {
                       setLiveStreamModalMode('conduct');
                       setIsLiveStreamModalOpen(true);
                     }}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-red-600/30 active:scale-95 transition-all cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:brightness-110 text-white text-xs font-black flex items-center gap-2 shadow-xl shadow-red-600/40 active:scale-95 transition-all cursor-pointer border border-red-400/40"
                   >
-                    <Video className="w-4 h-4" />
-                    <span>Launch Fullscreen Studio</span>
-                  </button>
-
-                  {/* Inline Live Toggle */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = !isInlineBroadcasting;
-                      setIsInlineBroadcasting(next);
-                      if (next) {
-                        showToast('🔴 You are now BROADCASTING LIVE from this console to citizens!');
-                      } else {
-                        showToast('⏹️ Live broadcast ended');
-                      }
-                    }}
-                    className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer border ${
-                      isInlineBroadcasting
-                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400 shadow-lg shadow-emerald-600/30'
-                        : 'bg-[#1C1C2B] hover:bg-[#252538] text-amber-300 border-amber-500/40'
-                    }`}
-                  >
-                    {isInlineBroadcasting ? (
-                      <>
-                        <Square className="w-3.5 h-3.5 fill-white" />
-                        <span>Stop Live Broadcast ({formatDuration(inlineBroadcastDuration)})</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span>Conduct Live Right Here</span>
-                      </>
-                    )}
+                    <Radio className="w-4 h-4 animate-pulse text-white" />
+                    <span>🔴 Launch Live Broadcast Studio</span>
                   </button>
                 </div>
               </div>
