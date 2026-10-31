@@ -59,6 +59,14 @@ import {
   resolveConstituencyAndParties 
 } from '../data/locationConstituencyData';
 import { recordLiveBallot } from '../data/voteStore';
+import { 
+  getActiveBroadcast, 
+  getRecordedSessions, 
+  subscribeBroadcast, 
+  setSelectedDebate, 
+  getSelectedDebate 
+} from '../data/liveBroadcastStore';
+import { getPublishedNews, subscribeNews } from '../data/newsStore';
 
 // Phone Status Bar (Cellular, Wifi, Battery icons removed as requested)
 export function PhoneStatusBar() {
@@ -742,6 +750,16 @@ export function Screen2Home({
   const [voteToast, setVoteToast] = useState(null);
   const [showSurveyParties, setShowSurveyParties] = useState(false);
   const [logoTapCount, setLogoTapCount] = useState(0);
+  const [activeBroadcast, setActiveBroadcast] = useState(() => getActiveBroadcast());
+  const [recordedSessions, setRecordedSessions] = useState(() => getRecordedSessions());
+
+  useEffect(() => {
+    const unsub = subscribeBroadcast(({ activeBroadcast: ab, recordedSessions: rs }) => {
+      if (ab) setActiveBroadcast(ab);
+      if (rs) setRecordedSessions(rs);
+    });
+    return unsub;
+  }, []);
 
   const constituencyLabel = (() => {
     const raw = currentLocation?.assembly || 'Constituency';
@@ -1305,23 +1323,41 @@ export function Screen2Home({
               </div>
             </div>
 
-            {/* Live Debate Spotlight Section */}
+            {/* Live Debate Spotlight Section (Synced with Live Broadcast Store) */}
             <div 
-              onClick={() => onNavigate('live-debates')}
-              className="p-3 rounded-2xl bg-gradient-to-r from-[#1A1212] via-[#241414] to-[#161214] border border-red-500/30 hover:border-red-500/60 cursor-pointer transition-all group"
+              onClick={() => {
+                if (activeBroadcast?.isLive) {
+                  setSelectedDebate({ ...activeBroadcast, isLive: true });
+                  onNavigate('debate-detail');
+                } else if (recordedSessions[0]) {
+                  setSelectedDebate({ ...recordedSessions[0], isRecorded: true });
+                  onNavigate('debate-detail');
+                } else {
+                  onNavigate('live-debates');
+                }
+              }}
+              className={`p-3 rounded-2xl bg-gradient-to-r from-[#1A1212] via-[#241414] to-[#161214] border transition-all cursor-pointer group ${
+                activeBroadcast?.isLive ? 'border-red-500/70 shadow-lg shadow-red-500/20' : 'border-red-500/30 hover:border-red-500/60'
+              }`}
             >
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] font-bold text-white flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  <span>Today's Big Debate (7:30 PM)</span>
+                  <span className={`w-2 h-2 rounded-full ${activeBroadcast?.isLive ? 'bg-red-500 animate-ping' : 'bg-amber-400'}`}></span>
+                  <span>{activeBroadcast?.isLive ? '🔴 LIVE DEBATE NOW ON AIR' : '🎬 Watch Recorded Debate'}</span>
                 </span>
-                <span className="text-[8px] text-red-400 font-semibold group-hover:underline">Join &gt;</span>
+                <span className="text-[8px] text-red-400 font-semibold group-hover:underline">
+                  {activeBroadcast?.isLive ? 'Join Live >' : 'Watch >'}
+                </span>
               </div>
               <p className="font-telugu text-[10px] font-bold text-white leading-snug">
-                2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
+                {activeBroadcast?.isLive 
+                  ? activeBroadcast.title 
+                  : (recordedSessions[0]?.title || '2026 ఎన్నికలు : ఎవరికి అవకాశాలు?')}
               </p>
               <p className="text-[8px] text-gray-400 mt-0.5">
-                4 Panelists • Live Chat Stream Active
+                {activeBroadcast?.isLive
+                  ? `Live with ${activeBroadcast.host} • 14,280 Citizens Tuned In`
+                  : `${recordedSessions[0]?.host || 'Now9 Prime Desk'} • ${recordedSessions[0]?.duration || '28:40'} • ${recordedSessions[0]?.views || '14.8K views'}`}
               </p>
             </div>
           </>
@@ -1922,9 +1958,17 @@ export function Screen3Survey({
 export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
   const [filter, setFilter] = useState('Live Now');
   const [reminders, setReminders] = useState({});
-  const [isSpeakerModalOpen, setIsSpeakerModalOpen] = useState(false);
-  const [speakerTopic, setSpeakerTopic] = useState('');
   const [toastMessage, setToastMessage] = useState(null);
+  const [activeBroadcast, setActiveBroadcast] = useState(() => getActiveBroadcast());
+  const [recordedSessions, setRecordedSessions] = useState(() => getRecordedSessions());
+
+  useEffect(() => {
+    const unsub = subscribeBroadcast(({ activeBroadcast: ab, recordedSessions: rs }) => {
+      if (ab) setActiveBroadcast(ab);
+      if (rs) setRecordedSessions(rs);
+    });
+    return unsub;
+  }, []);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -1938,19 +1982,66 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
     showToast(next ? `🔔 Reminder set for: ${title}` : `Reminder cancelled`);
   };
 
-  const handleSpeakerApply = (e) => {
-    e.preventDefault();
-    if (!speakerTopic.trim()) return;
-    setIsSpeakerModalOpen(false);
-    setSpeakerTopic('');
-    showToast('🎙️ Speaker application sent to Moderator! You will be queued.');
+  const handleWatchItem = (item) => {
+    setSelectedDebate(item);
+    if (onSelectDebate) onSelectDebate();
   };
 
-  // Filter logic
-  const filteredDebates = LIVE_DEBATES.filter(item => {
-    if (filter === 'Live Now') return item.isLive;
-    if (filter === 'Upcoming') return !item.isLive;
-    return true; // 'Past'
+  // Build filtered debates dynamically
+  let displayList = [];
+  if (filter === 'Live Now') {
+    if (activeBroadcast?.isLive) {
+      displayList.push({
+        id: activeBroadcast.id || 'admin-live',
+        title: activeBroadcast.title,
+        host: activeBroadcast.host,
+        time: 'Broadcasting Live',
+        views: `${(activeBroadcast.viewers / 1000).toFixed(1)}K watching`,
+        isLive: true,
+        img: activeBroadcast.thumbnail || '/assets/news_debate_studio.jpg',
+        isAdminLive: true
+      });
+    }
+    const standardLive = LIVE_DEBATES.filter(item => item.isLive);
+    displayList = [...displayList, ...standardLive];
+  } else if (filter === 'Past') {
+    // Recorded sessions from store
+    displayList = recordedSessions.map(rec => ({
+      id: rec.id,
+      title: rec.title,
+      host: rec.host,
+      time: rec.date || 'Recorded Session',
+      duration: rec.duration,
+      views: rec.views,
+      isLive: false,
+      isRecorded: true,
+      img: rec.thumbnail || '/assets/news_debate_studio.jpg',
+      videoUrl: rec.videoUrl
+    }));
+  } else {
+    // Upcoming
+    displayList = LIVE_DEBATES.filter(item => !item.isLive);
+  }
+
+  const heroItem = activeBroadcast?.isLive ? {
+    title: activeBroadcast.title,
+    subtitle: `Live Broadcast • ${activeBroadcast.host} • ${activeBroadcast.constituency}`,
+    views: `${(activeBroadcast.viewers / 1000).toFixed(1)}K Watching`,
+    isLive: true,
+    img: activeBroadcast.thumbnail || '/assets/news_debate_studio.jpg'
+  } : (recordedSessions[0] ? {
+    title: recordedSessions[0].title,
+    subtitle: `Recorded Debate • ${recordedSessions[0].host} • ${recordedSessions[0].duration}`,
+    views: recordedSessions[0].views,
+    isLive: false,
+    img: recordedSessions[0].thumbnail || '/assets/news_debate_studio.jpg',
+    isRecorded: true
+  } : {
+    title: '2026 ఎన్నికలు : ఎవరికి అవకాశాలు?',
+    subtitle: 'Political Debate • 4 Experts • Public Q&A',
+    views: '12.4K Watching',
+    isLive: false,
+    img: '/assets/news_debate_studio.jpg'
   });
 
   return (
@@ -1964,66 +2055,6 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
         </div>
       )}
 
-      {/* Speaker Application Modal */}
-      {isSpeakerModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
-          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
-              <div className="flex items-center gap-1.5">
-                <Mic className="w-4 h-4 text-amber-400" />
-                <h3 className="text-xs font-bold text-white">Apply to Speak in Live Debate</h3>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setIsSpeakerModalOpen(false)}
-                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <p className="text-[10px] text-gray-300">
-              Citizens can speak directly with analysts and leaders on live broadcast.
-            </p>
-
-            <form onSubmit={handleSpeakerApply} className="space-y-2.5">
-              <div>
-                <label className="text-[9px] font-bold text-gray-400 block mb-1">
-                  Your Name / నియోజకవర్గం
-                </label>
-                <input 
-                  type="text" 
-                  defaultValue="NowNine Citizen (Hyderabad)" 
-                  className="w-full bg-[#181820] border border-[#2B2B35] rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400" 
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-[9px] font-bold text-gray-400 block mb-1">
-                  Question or Stance (ప్రశ్న / అంశం)
-                </label>
-                <textarea 
-                  rows={2} 
-                  value={speakerTopic} 
-                  onChange={(e) => setSpeakerTopic(e.target.value)} 
-                  placeholder="మీరు అడగాలనుకుంటున్న ప్రశ్న రాయండి..." 
-                  className="w-full bg-[#181820] border border-[#2B2B35] rounded-xl p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-400" 
-                  required 
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs shadow-md cursor-pointer hover:brightness-110"
-              >
-                Submit Application 🎙️
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
         <div className="flex items-center gap-1.5">
@@ -2034,47 +2065,54 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <h2 className="text-xs font-extrabold text-white">Live On</h2>
+          <h2 className="text-xs font-extrabold text-white">Live On & Debates</h2>
         </div>
         <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setIsSpeakerModalOpen(true)}
-            className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-[#FDE047] text-[8px] font-bold hover:bg-amber-500/25 transition-all cursor-pointer flex items-center gap-1"
-          >
-            <Mic className="w-2.5 h-2.5" />
-            <span>Apply to Speak</span>
-          </button>
-          <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase">
-            LIVE
-          </span>
+          {activeBroadcast?.isLive ? (
+            <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[8px] font-extrabold uppercase flex items-center gap-1 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+              <span>LIVE NOW</span>
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded-full bg-[#181824] text-gray-400 text-[8px] font-bold">
+              24/7 Citizen Debates
+            </span>
+          )}
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 min-h-0 px-3 py-2 overflow-y-auto phone-scroll touch-pan-y space-y-2.5 pb-6">
-        {/* Main Live Debate Video Card */}
+        {/* Main Hero Debate Video Card */}
         <div 
-          onClick={onSelectDebate}
-          className="rounded-2xl overflow-hidden bg-[#141419] border border-red-500/40 shadow-lg cursor-pointer group hover:border-red-500/80 transition-all active:scale-[0.99]"
+          onClick={() => handleWatchItem(heroItem)}
+          className={`rounded-2xl overflow-hidden bg-[#141419] border transition-all cursor-pointer group active:scale-[0.99] ${
+            heroItem.isLive ? 'border-red-500/60 shadow-lg shadow-red-500/10' : 'border-[#242432]'
+          }`}
         >
           <div className="relative h-28 w-full overflow-hidden">
             <img 
-              src="/assets/news_debate_studio.jpg" 
+              src={heroItem.img} 
               alt="Live Debate Studio" 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-black/30"></div>
             
             {/* Top Badges */}
             <div className="absolute top-1.5 left-1.5 right-1.5 flex items-center justify-between">
-              <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[8px] font-extrabold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                LIVE NOW
-              </span>
-              <span className="px-1.5 py-0.2 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
+              {heroItem.isLive ? (
+                <span className="px-1.5 py-0.5 rounded bg-red-600 text-white text-[8px] font-extrabold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                  LIVE NOW
+                </span>
+              ) : (
+                <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[8px] font-bold uppercase">
+                  RECORDED SESSION
+                </span>
+              )}
+              <span className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
                 <Eye className="w-2.5 h-2.5 text-red-400" />
-                12.4K Watching
+                {heroItem.views}
               </span>
             </div>
 
@@ -2086,31 +2124,31 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
             </div>
           </div>
 
-          <div className="p-2 flex items-center justify-between">
-            <div>
-              <h3 className="font-telugu text-[11px] font-bold text-white line-clamp-1">
-                2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
+          <div className="p-2.5 flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-telugu text-[11px] font-bold text-white line-clamp-1 group-hover:text-amber-300">
+                {heroItem.title}
               </h3>
-              <p className="text-[8px] text-gray-400 mt-0.5">
-                Political Debate • 4 Experts • Public Q&A
+              <p className="text-[8px] text-gray-400 mt-0.5 truncate">
+                {heroItem.subtitle}
               </p>
             </div>
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onSelectDebate();
+                handleWatchItem(heroItem);
               }}
               className="px-2.5 py-1 rounded-full bg-red-600 text-white text-[9px] font-extrabold shadow-sm hover:brightness-110 shrink-0 cursor-pointer"
             >
-              Watch Live →
+              {heroItem.isLive ? 'Watch Live →' : 'Watch ▶'}
             </button>
           </div>
         </div>
 
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5">
-          {['Live Now', 'Upcoming', 'Past'].map((tabName) => {
+          {['Live Now', 'Past', 'Upcoming'].map((tabName) => {
             const isActive = filter === tabName;
             return (
               <button
@@ -2123,7 +2161,7 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
                     : 'bg-[#181820] text-gray-400 hover:text-white hover:bg-[#202028]'
                 }`}
               >
-                {tabName}
+                {tabName === 'Past' ? 'Past / Recorded' : tabName}
               </button>
             );
           })}
@@ -2131,26 +2169,37 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
 
         {/* Debates List */}
         <div className="space-y-1.5">
-          {filteredDebates.length === 0 ? (
+          {displayList.length === 0 ? (
             <div className="p-4 text-center rounded-xl bg-[#141419] border border-[#222228] text-gray-400 text-[10px]">
-              No debates currently under "{filter}". Check "Live Now" or "Upcoming".
+              {filter === 'Live Now' 
+                ? 'No live broadcast on air currently. Click "Past / Recorded" to watch recorded sessions.' 
+                : `No debates under "${filter}".`}
             </div>
           ) : (
-            filteredDebates.map((item) => (
+            displayList.map((item) => (
               <div
                 key={item.id}
-                onClick={onSelectDebate}
+                onClick={() => handleWatchItem(item)}
                 className="p-1.5 rounded-xl bg-[#141419] border border-[#222228] flex items-center gap-2 cursor-pointer hover:border-amber-500/50 transition-all group"
               >
-                <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 relative">
+                <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 relative bg-black">
                   <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   {item.isLive ? (
                     <span className="absolute top-0.5 left-0.5 px-1 rounded bg-red-600 text-white text-[7px] font-black">
                       LIVE
                     </span>
+                  ) : item.isRecorded ? (
+                    <span className="absolute top-0.5 left-0.5 px-1 rounded bg-amber-500 text-black text-[7px] font-black">
+                      REC
+                    </span>
                   ) : (
                     <span className="absolute top-0.5 left-0.5 px-1 rounded bg-black/70 text-amber-400 text-[7px] font-bold">
                       UPCOMING
+                    </span>
+                  )}
+                  {item.duration && (
+                    <span className="absolute bottom-0.5 right-0.5 px-1 rounded bg-black/80 text-white text-[7px] font-mono">
+                      {item.duration}
                     </span>
                   )}
                 </div>
@@ -2168,7 +2217,7 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
                 </div>
 
                 {/* Reminder or Watch CTA */}
-                {!item.isLive ? (
+                {filter === 'Upcoming' ? (
                   <button
                     type="button"
                     onClick={(e) => toggleReminder(e, item.id, item.title)}
@@ -2185,7 +2234,7 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSelectDebate();
+                      handleWatchItem(item);
                     }}
                     className="p-1.5 rounded-full bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white transition-colors shrink-0 cursor-pointer"
                     title="Watch Stream"
@@ -3075,6 +3124,22 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
   const [isQueueJoined, setIsQueueJoined] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
+  const selectedDebate = getSelectedDebate();
+  const activeBroadcast = getActiveBroadcast();
+  const debate = selectedDebate || (activeBroadcast?.isLive ? activeBroadcast : {
+    title: '2026 ఎన్నికలు : ఎవరికి అవకాశాలు?',
+    host: 'Senior Political Editor',
+    time: 'Today, 07:30 PM',
+    isLive: false,
+    isRecorded: true,
+    duration: '28:40',
+    views: '14.8K views',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+  });
+
+  const isLive = debate.isLive;
+  const isRecorded = debate.isRecorded || !isLive;
+
   const emojis = ['👍', '❤️', '👏', '🔥', '🇮🇳', '🗳️', '📢'];
 
   const showToast = (msg) => {
@@ -3171,23 +3236,21 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <h2 className="text-xs font-extrabold text-white">Live Debate Studio</h2>
+          <h2 className="text-xs font-extrabold text-white">
+            {isLive ? 'Live Debate Studio' : 'Recorded Debate Playback'}
+          </h2>
         </div>
         <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={toggleQueue}
-            className={`px-2 py-0.5 rounded-full text-[8px] font-bold transition-all cursor-pointer ${
-              isQueueJoined 
-                ? 'bg-emerald-600 text-white' 
-                : 'bg-amber-500/15 border border-amber-400/30 text-[#FDE047] hover:bg-amber-500/25'
-            }`}
-          >
-            {isQueueJoined ? 'In Queue #2 ✓' : 'Speak 🙋‍♂️'}
-          </button>
-          <span className="px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase">
-            LIVE
-          </span>
+          {isLive ? (
+            <span className="px-1.5 py-0.5 rounded-full bg-[#DC2626] text-white text-[8px] font-extrabold uppercase flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+              LIVE
+            </span>
+          ) : (
+            <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[8px] font-bold uppercase">
+              RECORDED
+            </span>
+          )}
         </div>
       </div>
 
@@ -3195,61 +3258,72 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
       <div className="flex-1 min-h-0 overflow-y-auto phone-scroll touch-pan-y pb-2">
         {/* Video Player */}
         <div className="relative w-full h-36 bg-black overflow-hidden shrink-0 group">
-          <img 
-            src="/assets/news_debate_studio.jpg" 
-            alt="Live Debate Broadcast" 
-            className="w-full h-full object-cover"
-          />
-          {/* Top Badges */}
-          <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
-            <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[8px] font-extrabold flex items-center gap-1 shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-              LIVE
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-1 rounded bg-black/60 text-white hover:text-amber-400 cursor-pointer"
-                title="Mute/Unmute"
-              >
-                {isMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3" />}
-              </button>
-              <span className="px-1.5 py-0.2 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
-                <Eye className="w-2.5 h-2.5 text-red-400" />
-                12.4K
-              </span>
-            </div>
-          </div>
-
-          {/* Play/Pause Control Overlay */}
-          <div 
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/40 transition-colors"
-          >
-            {!isPlaying && (
-              <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg">
-                <Play className="w-5 h-5 fill-current ml-0.5" />
+          {isRecorded && debate.videoUrl ? (
+            <video
+              src={debate.videoUrl}
+              controls
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <>
+              <img 
+                src={debate.thumbnail || debate.img || "/assets/news_debate_studio.jpg"} 
+                alt="Live Debate Broadcast" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
+                <span className="px-1.5 py-0.5 rounded bg-red-600 text-white text-[8px] font-extrabold flex items-center gap-1 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                  LIVE NOW
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsMuted(!isMuted)}
+                    className="p-1 rounded bg-black/60 text-white hover:text-amber-400 cursor-pointer"
+                    title="Mute/Unmute"
+                  >
+                    {isMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3" />}
+                  </button>
+                  <span className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
+                    <Eye className="w-2.5 h-2.5 text-red-400" />
+                    {debate.views || '14.2K'}
+                  </span>
+                </div>
               </div>
-            )}
-          </div>
+
+              {/* Play/Pause Control Overlay */}
+              <div 
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/40 transition-colors"
+              >
+                {!isPlaying && (
+                  <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg">
+                    <Play className="w-5 h-5 fill-current ml-0.5" />
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Debate Title & Meta */}
         <div className="p-3 border-b border-[#1A1A22]">
           <h3 className="font-telugu text-xs font-bold text-white leading-snug">
-            2026 ఎన్నికలు : ఎవరికి అవకాశాలు?
+            {debate.title}
           </h3>
           <p className="text-[9px] text-gray-400 mt-0.5">
-            Political Debate | Experts | Public Opinion
+            {debate.subtitle || `Host: ${debate.host || 'Now9 Prime Desk'} • Constituency: ${debate.constituency || 'Mahabubnagar'}`}
           </p>
           <div className="flex items-center gap-2 text-[8px] text-gray-400 mt-1">
             <span className="flex items-center gap-0.5">
               <Clock className="w-2.5 h-2.5 text-amber-400" />
-              Today, 07:30 PM
+              {debate.time || debate.date || 'Today, 07:30 PM'}
             </span>
             <span>•</span>
-            <span>Live from Hyderabad Studio</span>
+            <span>{isLive ? 'Broadcasting Live from Studio' : `Duration: ${debate.duration || '28:40'}`}</span>
           </div>
         </div>
 
@@ -3361,78 +3435,30 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
 export function ScreenNews({ onBack, onNavigate }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [toastMessage, setToastMessage] = useState(null);
+  const [newsList, setNewsList] = useState(() => getPublishedNews());
+
+  useEffect(() => {
+    const unsub = subscribeNews((updated) => {
+      setNewsList(updated);
+    });
+    return unsub;
+  }, []);
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
   };
 
-  const categories = ['All', 'Politics', 'Telangana', 'Andhra Pradesh', 'Development', 'Welfare'];
+  const categories = ['All', 'Politics', 'Telangana', 'Andhra Pradesh', 'Mahabubnagar', 'Hyderabad'];
 
-  const newsItems = [
-    {
-      id: 1,
-      tag: 'Breaking',
-      tagColor: 'bg-red-500/20 text-red-400 border-red-500/30',
-      title: '2026 తెలంగాణ ఎన్నికల కార్యాచరణ: పార్టీల ముమ్మర సన్నాహాలు',
-      summary: 'రాష్ట్రవ్యాప్తంగా రాజకీయ సమీకరణాలు వేడెక్కాయి. అన్ని ప్రధాన పార్టీలు క్షేత్రస్థాయిలో ప్రచారానికి రంగం సిద్ధం చేస్తున్నాయి.',
-      time: '12m ago',
-      reads: '48.2K readers',
-      source: 'NowNine Political Desk',
-      img: '/assets/news_debate_studio.jpg'
-    },
-    {
-      id: 2,
-      tag: 'Development',
-      tagColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-      title: 'హైదరాబాద్ మెట్రో ఫేజ్-2 కి కేబినెట్ ఆమోదం - 5 కొత్త కారిడార్లు',
-      summary: 'రూ. 24,000 కోట్ల అంచనా వ్యయంతో విమానాశ్రయ ఎక్స్‌ప్రెస్ మార్గంతో సహా శంషాబాద్, ఓల్డ్ సిటీ మార్గాల్లో విస్తరణ పనులకు ఆమోదం.',
-      time: '45m ago',
-      reads: '36.5K readers',
-      source: 'Civic Infrastructure',
-      img: '/assets/hyderabad_it.jpg'
-    },
-    {
-      id: 3,
-      tag: 'Welfare',
-      tagColor: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
-      title: 'రైతు రుణమాఫీ నిధుల 3వ విడత విడుదల - రైతుల హర్షం',
-      summary: 'రూ. 2 లక్షల వరకు రైతు రుణాల మాఫీ ప్రక్రియ దాదాపు పూర్తి. రైతుల బ్యాంక్ ఖాతాల్లోకి నేరుగా నగదు జమ.',
-      time: '2h ago',
-      reads: '54.1K readers',
-      source: 'Agriculture & Economy',
-      img: '/assets/farmer_portrait.jpg'
-    },
-    {
-      id: 4,
-      tag: 'Andhra Pradesh',
-      tagColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-      title: 'అమరావతి రాజధాని నిర్మాణ పనులకు రీ-టెండరింగ్ ఖరారు',
-      summary: 'ప్రపంచ స్థాయి రాజధాని నిర్మాణానికి నూతన బ్లూప్రింట్. మౌలిక సదుపాయాల పనులను వేగవంతం చేయాలని సీఎం సమీక్ష.',
-      time: '3h ago',
-      reads: '29.8K readers',
-      source: 'State Secretariat',
-      img: '/assets/youth_speaker_mic.jpg'
-    },
-    {
-      id: 5,
-      tag: 'Governance',
-      tagColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-      title: 'ప్రజా పాలన దరఖాస్తుల పరిష్కారం వేగవంతం - ప్రత్యేక పోర్టల్',
-      summary: 'స్థానిక సమస్యలు, సంక్షేమ దరఖాస్తులను ట్రాక్ చేసేందుకు అత్యాధునిక డిజిటల్ వ్యవస్థ ప్రారంభం.',
-      time: '5h ago',
-      reads: '21.4K readers',
-      source: 'Citizen Services',
-      img: '/assets/news_debate_studio.jpg'
-    }
-  ];
-
-  const filteredNews = newsItems.filter(item => {
+  const filteredNews = newsList.filter(item => {
     if (activeCategory === 'All') return true;
-    if (activeCategory === 'Politics') return item.tag === 'Breaking' || item.tag === 'Governance';
-    if (activeCategory === 'Telangana') return item.title.includes('తెలంగాణ') || item.title.includes('హైదరాబాద్');
-    if (activeCategory === 'Andhra Pradesh') return item.tag === 'Andhra Pradesh' || item.title.includes('అమరావతి');
-    return item.tag.toLowerCase() === activeCategory.toLowerCase();
+    if (activeCategory === 'Politics') return (item.tag === 'Breaking' || item.category === 'Elections 2026' || item.category === 'State Politics');
+    if (activeCategory === 'Telangana') return (item.category === 'Telangana' || item.title.includes('తెలంగాణ'));
+    if (activeCategory === 'Andhra Pradesh') return (item.category === 'Andhra Pradesh' || item.title.includes('ఏపీ') || item.title.includes('ఆంధ్ర'));
+    if (activeCategory === 'Mahabubnagar') return (item.category === 'Mahabubnagar' || item.title.includes('మహబూబ్‌నగర్'));
+    if (activeCategory === 'Hyderabad') return (item.category === 'Hyderabad' || item.title.includes('హైదరాబాద్'));
+    return item.category?.toLowerCase() === activeCategory.toLowerCase();
   });
 
   return (
@@ -3477,8 +3503,8 @@ export function ScreenNews({ onBack, onNavigate }) {
         <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[7.5px] uppercase tracking-wider shrink-0">
           BREAKING
         </span>
-        <p className="text-[8.5px] text-gray-200 font-medium truncate">
-          2026 ఎన్నికల సర్వే: తాజా ప్రజాతీర్పు గణాంకాలు వెల్లడి...
+        <p className="text-[8.5px] text-gray-200 font-medium truncate font-telugu">
+          {newsList[0]?.title || '2026 ఎన్నికల సర్వే: తాజా ప్రజాతీర్పు గణాంకాలు వెల్లడి...'}
         </p>
       </div>
 

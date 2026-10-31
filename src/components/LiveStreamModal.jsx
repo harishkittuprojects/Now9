@@ -26,13 +26,14 @@ import {
   TrendingUp,
   Sliders
 } from 'lucide-react';
+import { startLiveBroadcast, endLiveBroadcast, getActiveBroadcast } from '../data/liveBroadcastStore';
 
 export default function LiveStreamModal({ isOpen, onClose, presentDistrict, initialMode = 'conduct' }) {
   if (!isOpen) return null;
 
   // Modes: 'conduct' (host / studio) or 'watch' (viewer)
   const [streamMode, setStreamMode] = useState(initialMode);
-  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [isBroadcasting, setIsBroadcasting] = useState(() => getActiveBroadcast().isLive);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -58,18 +59,6 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
 
   // Floating Reactions
   const [floatingReactions, setFloatingReactions] = useState([]);
-
-  // Live Poll inside stream
-  const [pollVoted, setPollVoted] = useState(null);
-  const [pollStats, setPollStats] = useState({ yes: 78, no: 22 });
-  const [isPollOpen, setIsPollOpen] = useState(true);
-  const [isPollMinimized, setIsPollMinimized] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState('chat'); // 'chat' | 'poll'
-
-  // Dynamic poll percentages (always strictly sums to 100%)
-  const totalPollVotes = pollStats.yes + pollStats.no;
-  const yesPercent = totalPollVotes > 0 ? Math.round((pollStats.yes / totalPollVotes) * 100) : 78;
-  const noPercent = 100 - yesPercent;
 
   const videoRef = useRef(null);
   const mediaStreamRef = useRef(null);
@@ -193,16 +182,6 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
     setTimeout(() => {
       setFloatingReactions(prev => prev.filter(r => r.id !== id));
     }, 2000);
-  };
-
-  const handleVotePoll = (choice) => {
-    if (pollVoted) return;
-    setPollVoted(choice);
-    if (choice === 'yes') {
-      setPollStats(prev => ({ ...prev, yes: prev.yes + 1 }));
-    } else {
-      setPollStats(prev => ({ ...prev, no: prev.no + 1 }));
-    }
   };
 
   return (
@@ -354,123 +333,8 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
               ))}
             </div>
 
-            {/* Bottom Overlay: Live Poll & Stream Controls */}
+            {/* Bottom Overlay: Stream Controls */}
             <div className="relative z-20 space-y-4">
-              
-              {/* Interactive Live Stream Poll Widget */}
-              {isPollOpen && (
-                isPollMinimized ? (
-                  /* Minimized Poll Pill (Zero obstruction) */
-                  <div className="flex items-center gap-2 bg-slate-900/95 backdrop-blur-md border border-amber-500/40 rounded-full px-3 py-1.5 shadow-xl w-fit animate-fadeIn">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span className="text-xs font-bold text-amber-300">
-                      📊 Poll: {yesPercent}% Yes ({totalPollVotes} votes)
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsPollMinimized(false)}
-                      className="text-[10.5px] bg-slate-800 hover:bg-slate-700 text-white px-2 py-0.5 rounded-full font-bold ml-1 cursor-pointer transition-all"
-                    >
-                      Expand
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsPollOpen(false)}
-                      className="text-slate-400 hover:text-white text-xs px-1 cursor-pointer"
-                      title="Hide Poll"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  /* Sleek, Compact Live Pulse Poll Card */
-                  <div className="bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-3.5 max-w-md shadow-2xl animate-fadeIn transition-all">
-                    {/* Header with Title, Count, Minimize & Close Controls */}
-                    <div className="flex items-center justify-between pb-1.5 border-b border-slate-800 mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="text-[10.5px] font-black text-amber-300 uppercase tracking-wider">
-                          LIVE PULSE POLL
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 font-mono">
-                          {totalPollVotes} votes cast
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setIsPollMinimized(true)}
-                          className="w-5 h-5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
-                          title="Minimize Poll"
-                        >
-                          —
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setIsPollOpen(false)}
-                          className="w-5 h-5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
-                          title="Close Poll"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Poll Question */}
-                    <p className="text-xs font-bold text-white mb-2.5 leading-snug">
-                      "Should district civic representatives conduct monthly live Q&A sessions on Now 9?"
-                    </p>
-
-                    {/* Progress Bar & Voting Buttons */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleVotePoll('yes')}
-                        className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border text-left relative overflow-hidden group cursor-pointer ${
-                          pollVoted === 'yes'
-                            ? 'bg-emerald-600/30 text-white border-emerald-400'
-                            : 'bg-slate-800/90 hover:bg-slate-800 text-slate-200 border-slate-700'
-                        }`}
-                      >
-                        <div 
-                          className="absolute inset-0 bg-emerald-500/25 rounded-xl transition-all duration-500 pointer-events-none"
-                          style={{ width: `${yesPercent}%` }}
-                        />
-                        <div className="relative z-10 flex items-center justify-between">
-                          <span>Yes, Absolutely</span>
-                          <span className="font-mono text-emerald-400 font-black">{yesPercent}%</span>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleVotePoll('no')}
-                        className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border text-left relative overflow-hidden group cursor-pointer ${
-                          pollVoted === 'no'
-                            ? 'bg-red-600/30 text-white border-red-400'
-                            : 'bg-slate-800/90 hover:bg-slate-800 text-slate-200 border-slate-700'
-                        }`}
-                      >
-                        <div 
-                          className="absolute inset-0 bg-red-500/25 rounded-xl transition-all duration-500 pointer-events-none"
-                          style={{ width: `${noPercent}%` }}
-                        />
-                        <div className="relative z-10 flex items-center justify-between">
-                          <span>Not Necessary</span>
-                          <span className="font-mono text-red-400 font-black">{noPercent}%</span>
-                        </div>
-                      </button>
-                    </div>
-
-                    {pollVoted && (
-                      <p className="text-[10px] text-emerald-400 font-medium text-center mt-2 flex items-center justify-center gap-1">
-                        ✓ Your live vote has been tallied into the broadcast!
-                      </p>
-                    )}
-                  </div>
-                )
-              )}
-
               {/* Host Broadcast Action Buttons */}
               {streamMode === 'conduct' && (
                 <div className="bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3">
@@ -510,42 +374,35 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
                     >
                       <Monitor className="w-4 h-4" />
                     </button>
-
-                    {/* Toggle Poll Visibility */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsPollOpen(true);
-                        setIsPollMinimized(false);
-                      }}
-                      className={`p-2.5 rounded-xl border transition-all ${
-                        isPollOpen && !isPollMinimized
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-400/40'
-                          : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
-                      }`}
-                      title={isPollOpen ? "Poll Active" : "Open Live Poll"}
-                    >
-                      <Sparkles className="w-4 h-4" />
-                    </button>
                   </div>
 
                   {/* Broadcast Trigger */}
                   <div>
                     {!isBroadcasting ? (
                       <button
-                        onClick={() => setIsBroadcasting(true)}
-                        className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-lg hover:shadow-red-glow transition-all"
+                        onClick={() => {
+                          startLiveBroadcast({
+                            title: streamTitle,
+                            host: 'Now9 Prime Host',
+                            constituency: districtName
+                          });
+                          setIsBroadcasting(true);
+                        }}
+                        className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-lg hover:shadow-red-glow transition-all cursor-pointer"
                       >
                         <Play className="w-4 h-4 fill-white" />
                         <span>Start Live Stream</span>
                       </button>
                     ) : (
                       <button
-                        onClick={() => setIsBroadcasting(false)}
-                        className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-red-400 border border-red-500/40 font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all"
+                        onClick={() => {
+                          endLiveBroadcast();
+                          setIsBroadcasting(false);
+                        }}
+                        className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-red-400 border border-red-500/40 font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all cursor-pointer"
                       >
                         <Square className="w-4 h-4 fill-red-400" />
-                        <span>End Broadcast</span>
+                        <span>End Broadcast & Save</span>
                       </button>
                     )}
                   </div>
@@ -558,33 +415,11 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
           {/* Right Column: Live Chat & Reactions */}
           <div className="lg:col-span-4 bg-slate-950 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-slate-800 h-[380px] lg:h-auto">
             
-            {/* Chat & Poll Tabs */}
+            {/* Citizen Chat Header */}
             <div className="p-2.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl text-xs font-bold border border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setSidebarTab('chat')}
-                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                    sidebarTab === 'chat'
-                      ? 'bg-brand-500 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  <span>Citizen Chat</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSidebarTab('poll')}
-                  className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                    sidebarTab === 'poll'
-                      ? 'bg-amber-500 text-black shadow-xs font-black'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Poll ({totalPollVotes})</span>
-                </button>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-white">
+                <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
+                <span>Citizen Live Chat</span>
               </div>
 
               <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
@@ -592,66 +427,6 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
                 Live
               </span>
             </div>
-
-            {/* Sidebar View: Chat OR Poll Dashboard */}
-            {sidebarTab === 'poll' ? (
-              <div className="flex-1 p-4 overflow-y-auto space-y-4 min-h-0 text-xs animate-fadeIn">
-                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
-                  <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider block mb-1">
-                    Live Broadcast Audience Poll
-                  </span>
-                  <p className="text-xs font-bold text-white leading-relaxed">
-                    "Should district civic representatives conduct monthly live Q&A sessions on Now 9?"
-                  </p>
-                </div>
-
-                <div className="space-y-3 p-3 bg-slate-900 rounded-2xl border border-slate-800">
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-emerald-400">Yes, Absolutely</span>
-                      <span className="font-mono text-white">{yesPercent}% ({pollStats.yes} votes)</span>
-                    </div>
-                    <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${yesPercent}%` }}></div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-red-400">Not Necessary</span>
-                      <span className="font-mono text-white">{noPercent}% ({pollStats.no} votes)</span>
-                    </div>
-                    <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-red-500 rounded-full transition-all duration-500" style={{ width: `${noPercent}%` }}></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 space-y-2">
-                  <span className="text-[10.5px] font-bold text-slate-400 block">Host Actions</span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsPollOpen(true);
-                        setIsPollMinimized(false);
-                      }}
-                      className="flex-1 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-extrabold rounded-xl transition-all text-xs"
-                    >
-                      Show On Stream
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsPollOpen(false)}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs"
-                    >
-                      Hide
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-            <>
             {/* Chat Messages Log */}
             <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-0 text-xs">
               <div className="p-2.5 bg-brand-500/10 border border-brand-500/20 rounded-xl text-slate-300">
@@ -747,8 +522,6 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
               </form>
 
             </div>
-            </>
-            )}
 
           </div>
 
