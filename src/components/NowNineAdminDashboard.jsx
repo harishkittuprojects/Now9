@@ -681,7 +681,6 @@ export default function NowNineAdminDashboard({
               { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
               { id: 'news', label: 'News & Flash Ticker', icon: Newspaper, count: '4' },
               { id: 'boss-house', label: 'Boss of House Voting', icon: Eye, count: '300K+' },
-              { id: 'audit', label: 'Ballot Security & Audit', icon: ShieldCheck, badge: 'GPS' },
               { id: 'settings', label: 'Embargo & Settings', icon: Settings },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -2006,71 +2005,6 @@ export default function NowNineAdminDashboard({
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {/* VIEW 7: BALLOT AUDIT & SECURITY */}
-          {activeTab === 'audit' && (
-            <div className="space-y-5 animate-fadeIn">
-              <div className="flex items-center justify-between pb-3 border-b border-[#20202E]">
-                <div>
-                  <h2 className="text-xl font-black text-white flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                    <span>Ballot Audit Trail & GPS Geofence Verification</span>
-                  </h2>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Real-time ingestion of anonymous encrypted ballots with anti-fraud geo-verification
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleExportCSV}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold hover:bg-emerald-500/30 cursor-pointer"
-                >
-                  Export Audit Log
-                </button>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-[#1E1E28] text-gray-400 text-[10px] uppercase font-mono">
-                        <th className="pb-2">Transaction ID</th>
-                        <th className="pb-2">Locality / Constituency</th>
-                        <th className="pb-2">Voted Candidate</th>
-                        <th className="pb-2">Timestamp</th>
-                        <th className="pb-2">GPS Verification</th>
-                        <th className="pb-2">Integrity Hash</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#1A1A24]">
-                      {auditStream.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="py-8 text-center text-gray-500 font-mono text-xs">
-                            No ballots recorded in ledger yet. Start by voting on the citizen mobile app or clicking "+1 Vote".
-                          </td>
-                        </tr>
-                      ) : (
-                        auditStream.map((log) => (
-                        <tr key={log.id} className="text-gray-300 hover:bg-[#12121C]">
-                          <td className="py-2.5 font-mono text-amber-400 font-bold">{log.id}</td>
-                          <td className="py-2.5 font-semibold text-white">{log.locality}</td>
-                          <td className="py-2.5">{log.candidate} ({log.party})</td>
-                          <td className="py-2.5 font-mono text-gray-500">{log.time}</td>
-                          <td className="py-2.5">
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 text-[9px] font-bold">
-                              {log.status}
-                            </span>
-                          </td>
-                          <td className="py-2.5 font-mono text-gray-500 text-[10px]">{log.hash}</td>
-                        </tr>
-                      ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
               </div>
             </div>
           )}
