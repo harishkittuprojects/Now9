@@ -1,8 +1,8 @@
 // Central Real-Time Voting & Ballot Ledger for NowNine
-export const BALLOT_COUNT_KEY = 'now9_total_ballots_live_v3';
-export const BALLOT_LOGS_KEY = 'now9_ballot_logs_live_v3';
-export const CONSTITUENCY_VOTES_KEY = 'now9_constituency_votes_live_v3';
-export const QUESTION_VOTES_KEY = 'now9_question_votes_live_v3';
+export const BALLOT_COUNT_KEY = 'now9_total_ballots_live_v4';
+export const BALLOT_LOGS_KEY = 'now9_ballot_logs_live_v4';
+export const CONSTITUENCY_VOTES_KEY = 'now9_constituency_votes_live_v4';
+export const QUESTION_VOTES_KEY = 'now9_question_votes_live_v4';
 export const VOTE_CAST_EVENT = 'now9_vote_cast_event';
 
 export function getStoredBallotData() {
@@ -11,7 +11,7 @@ export function getStoredBallotData() {
   }
   try {
     const rawCount = localStorage.getItem(BALLOT_COUNT_KEY);
-    // Explicitly start at 0 if not set or set to 0
+    // Explicitly start at 0 if not set
     const count = rawCount !== null ? parseInt(rawCount, 10) : 0;
     const logs = JSON.parse(localStorage.getItem(BALLOT_LOGS_KEY) || '[]');
     const constituencyVotes = JSON.parse(localStorage.getItem(CONSTITUENCY_VOTES_KEY) || '{}');
@@ -29,18 +29,51 @@ export function recordLiveBallot({ party, location, answers = {} }) {
   const nextCount = current.count + 1;
   
   const constituencyName = location?.assembly || location?.locality || 'Mahabubnagar Constituency';
-  const localityName = location?.locality || location?.city || 'Local Area';
+  const localityName = location?.locality || location?.city || 'Yenugonda';
   const partyName = party?.name || 'Congress (INC)';
   const candidateName = party?.candidate || 'Local Candidate';
-  const partyCode = (party?.id || party?.name?.split(' ')[0] || 'inc').toLowerCase();
   
+  // Normalize party code to match party.id in ALL_CONSTITUENCIES ('inc', 'brs', 'bjp', 'oth', 'tdp', 'ysrcp', 'aimim')
+  const pNameLower = (partyName + ' ' + (party?.id || '')).toLowerCase();
+  let partyCode = 'oth';
+  if (pNameLower.includes('congress') || pNameLower.includes('inc')) partyCode = 'inc';
+  else if (pNameLower.includes('brs')) partyCode = 'brs';
+  else if (pNameLower.includes('bjp')) partyCode = 'bjp';
+  else if (pNameLower.includes('tdp')) partyCode = 'tdp';
+  else if (pNameLower.includes('ysr')) partyCode = 'ysrcp';
+  else if (pNameLower.includes('aimim') || pNameLower.includes('mim')) partyCode = 'aimim';
+
   const ballotId = `#BLT-${String(nextCount).padStart(4, '0')}`;
   
+  // Normalize constituency key
+  const constituencyLower = (constituencyName + ' ' + localityName).toLowerCase();
+  let constituencyKey = 'mahabubnagar';
+  if (constituencyLower.includes('mahabubnagar') || constituencyLower.includes('yenugonda') || constituencyLower.includes('palamuru')) {
+    constituencyKey = 'mahabubnagar';
+  } else if (constituencyLower.includes('lb nagar') || constituencyLower.includes('almasguda') || constituencyLower.includes('badangpet') || constituencyLower.includes('saroornagar')) {
+    constituencyKey = 'lbnagar';
+  } else if (constituencyLower.includes('jubilee')) {
+    constituencyKey = 'jubileehills';
+  } else if (constituencyLower.includes('khairatabad')) {
+    constituencyKey = 'khairatabad';
+  } else if (constituencyLower.includes('serilingampally') || constituencyLower.includes('gachibowli')) {
+    constituencyKey = 'serilingampally';
+  } else if (constituencyLower.includes('munugode')) {
+    constituencyKey = 'munugode';
+  } else if (constituencyLower.includes('gajwel')) {
+    constituencyKey = 'gajwel';
+  } else if (constituencyLower.includes('chandragiri') || constituencyLower.includes('tirupati')) {
+    constituencyKey = 'chandragiri';
+  } else if (constituencyLower.includes('vijayawada')) {
+    constituencyKey = 'vijayawada';
+  }
+
   const newLog = {
     id: ballotId,
     party: partyName,
     candidate: candidateName,
     partyId: partyCode,
+    constituencyKey: constituencyKey,
     locality: `${localityName} (${constituencyName.replace(/\s*Constituency\s*/gi, '')})`,
     constituency: constituencyName,
     state: location?.state || 'Telangana',
@@ -51,15 +84,6 @@ export function recordLiveBallot({ party, location, answers = {} }) {
     ip: '182.72.' + Math.floor(Math.random() * 200 + 10) + '.' + Math.floor(Math.random() * 200 + 10),
     hash: 'SHA256:' + Math.random().toString(36).substring(2, 8) + '...' + Math.random().toString(36).substring(2, 6)
   };
-  
-  // Normalize constituency key
-  const constituencyLower = constituencyName.toLowerCase();
-  const constituencyKey = constituencyLower.includes('mahabubnagar') ? 'mahabubnagar' :
-    constituencyLower.includes('lb nagar') ? 'lbnagar' :
-    constituencyLower.includes('jubilee') ? 'jubileehills' :
-    constituencyLower.includes('khairatabad') ? 'khairatabad' :
-    constituencyLower.includes('serilingampally') ? 'serilingampally' :
-    'mahabubnagar';
     
   const constituencyVotes = { ...current.constituencyVotes };
   if (!constituencyVotes[constituencyKey]) {
@@ -111,4 +135,3 @@ export function resetAllBallotsToZero() {
     }));
   } catch (e) {}
 }
-

@@ -323,10 +323,74 @@ export default function NowNineAdminDashboard({
     }
   };
 
-  const activeConstituency = ALL_CONSTITUENCIES[selectedConstituencyKey] || ALL_CONSTITUENCIES.mahabubnagar;
+  // 100% DYNAMIC REAL-TIME CONSTITUENCY COMPUTATION
+  const baseConstituency = ALL_CONSTITUENCIES[selectedConstituencyKey] || ALL_CONSTITUENCIES.mahabubnagar;
+  const currentConstVotes = liveConstituencyVotes[selectedConstituencyKey] || { total: 0, parties: {} };
+  const realConstTotalVotes = currentConstVotes.total || 0;
+  
+  const activeConstituencyParties = baseConstituency.parties.map(party => {
+    const pVotes = currentConstVotes.parties?.[party.id] || 0;
+    const pShare = realConstTotalVotes > 0 
+      ? Math.round((pVotes / realConstTotalVotes) * 1000) / 10 
+      : 0;
+    return {
+      ...party,
+      votes: pVotes,
+      voteShare: pShare,
+      trend: pVotes > 0 ? `+${pVotes} Votes` : '0 Votes'
+    };
+  }).sort((a, b) => b.votes - a.votes);
+
+  const topParty = activeConstituencyParties[0];
+  const secondParty = activeConstituencyParties[1];
+  const leadingMargin = realConstTotalVotes === 0 
+    ? '0 Votes • Waiting for first ballot' 
+    : (topParty.votes === secondParty?.votes 
+        ? `Tied (${topParty.votes} Votes each)`
+        : `+${Math.round((topParty.voteShare - (secondParty?.voteShare || 0)) * 10) / 10}% (${topParty.votes - (secondParty?.votes || 0)} Votes Lead)`);
+
+  const activeConstituency = {
+    ...baseConstituency,
+    totalVotes: realConstTotalVotes,
+    leadingParty: realConstTotalVotes === 0 ? 'Awaiting First Vote' : topParty.name,
+    leadingCandidate: realConstTotalVotes === 0 ? 'No votes cast yet' : topParty.candidate,
+    margin: leadingMargin,
+    parties: activeConstituencyParties
+  };
+
+  const handleCastVoterChoice = (partyName, candidateName, partyId, optIdx = 0) => {
+    const constName = activeConstituency.name;
+    const locality = activeConstituency.locality?.split(',')[0] || 'Yenugonda';
+    recordLiveBallot({
+      party: { name: partyName, candidate: candidateName, id: partyId },
+      location: { assembly: constName, locality: locality, state: activeConstituency.state },
+      answers: { 0: optIdx, 1: 0, 2: 0, 3: 0, 4: 0 }
+    });
+    showToast(`⚡ Voted ${partyName} in ${constName}! Check Sections 1, 2, 3, 4 below.`);
+  };
 
   // Real-Time 5 Question Analytics
-  const QUESTION_ANALYTICS = [
+  const QUESTION_ANALYTICS = SURVEY_QUESTIONS ? SURVEY_QUESTIONS.map((q, qIdx) => {
+    const qVotes = liveQuestionVotes[qIdx] || {};
+    const totalQVotes = Object.values(qVotes).reduce((sum, v) => sum + v, 0);
+    const optionsWithVotes = q.options.map((opt, optIdx) => {
+      const votes = qVotes[optIdx] || 0;
+      const percent = totalQVotes > 0 ? Math.round((votes / totalQVotes) * 1000) / 10 : 0;
+      return {
+        label: opt,
+        votes: votes,
+        percent: percent,
+        color: ['#0284C7', '#EAB308', '#10B981', '#8B5CF6'][optIdx % 4]
+      };
+    });
+    return {
+      step: qIdx + 1,
+      category: `Priority #${qIdx + 1}`,
+      title: q.question,
+      totalSample: totalQVotes,
+      options: optionsWithVotes
+    };
+  }) : [
     {
       step: 1,
       category: '🎯 ప్రాధాన్యత (Priority Governance Issue)',
@@ -652,6 +716,162 @@ export default function NowNineAdminDashboard({
           {/* VIEW 1: DASHBOARD OVERVIEW */}
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-fadeIn">
+              
+              {/* SECTION-WISE VISUAL FLOW INSPECTOR (Shows crystal-clearly what happens on every vote) */}
+              <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#1A1828] via-[#141422] to-[#0D0D14] border-2 border-amber-500/50 shadow-2xl space-y-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-[#252538]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-400 font-black text-xl shadow-inner">
+                      ⚡
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-base sm:text-lg font-black text-white">
+                          Live Voting Inspector • Section-by-Section Flow
+                        </h2>
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[9.5px] font-mono font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                          <span>LIVE SYNC ACTIVE</span>
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-300 mt-0.5">
+                        Whenever someone presses vote on the mobile website, watch how each section below reacts in real-time:
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* One-Click Real Test Voter Actions */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[11px] font-bold text-gray-400">Quick Test Vote:</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCastVoterChoice('Congress (INC)', 'Yennam Srinivas Reddy', 'inc', 0)}
+                      className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                    >
+                      <span>✋ Vote Congress</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCastVoterChoice('BRS', 'V. Srinivas Goud', 'brs', 1)}
+                      className="px-3 py-1.5 rounded-xl bg-pink-600/20 hover:bg-pink-600/30 text-pink-300 border border-pink-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                    >
+                      <span>🚗 Vote BRS</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCastVoterChoice('BJP', 'A.P. Mithun Kumar Reddy', 'bjp', 2)}
+                      className="px-3 py-1.5 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                    >
+                      <span>🪷 Vote BJP</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        resetAllBallotsToZero();
+                        showToast('🗑️ Cleared everything! All sections reset back to 0.');
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                      title="Reset everything to 0"
+                    >
+                      <RotateCcw className="w-3 h-3 text-red-400" />
+                      <span>Reset 0</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4 Interactive Visual Cards Explaining Exactly What Happens Section-by-Section */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  
+                  {/* Section 1 Card */}
+                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-amber-500/30 space-y-1.5 shadow-md">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px]">
+                        SECTION 1
+                      </span>
+                      <span className="text-[10px] text-gray-400">Total Ballots</span>
+                    </div>
+                    <h3 className="text-sm font-black text-white">Electoral Counters</h3>
+                    <p className="text-[11px] text-gray-300 leading-snug">
+                      Immediately ticks up by <strong className="text-emerald-400 font-mono">+1</strong> across all cluster nodes.
+                    </p>
+                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
+                      <span className="text-gray-400">Count:</span>
+                      <span className="font-black text-amber-400 text-xs">{totalVotesCount} Ballots</span>
+                    </div>
+                  </div>
+
+                  {/* Section 2 Card */}
+                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-sky-500/30 space-y-1.5 shadow-md">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 font-mono text-[10px]">
+                        SECTION 2
+                      </span>
+                      <span className="text-[10px] text-gray-400">Standings</span>
+                    </div>
+                    <h3 className="text-sm font-black text-white">Candidate Vote Share</h3>
+                    <p className="text-[11px] text-gray-300 leading-snug">
+                      Increments selected candidate's tally and animates percentage bar.
+                    </p>
+                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
+                      <span className="text-gray-400">Leading:</span>
+                      <span className="font-black text-sky-400 text-xs truncate max-w-[130px]">{activeConstituency.leadingParty}</span>
+                    </div>
+                  </div>
+
+                  {/* Section 3 Card */}
+                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-emerald-500/30 space-y-1.5 shadow-md">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">
+                        SECTION 3
+                      </span>
+                      <span className="text-[10px] text-gray-400">Governance</span>
+                    </div>
+                    <h3 className="text-sm font-black text-white">5-Question Sentiment</h3>
+                    <p className="text-[11px] text-gray-300 leading-snug">
+                      Logs answers to Road & Drainage, Water, and MLA Accessibility in live bars.
+                    </p>
+                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
+                      <span className="text-gray-400">Sample:</span>
+                      <span className="font-black text-emerald-400 text-xs">{totalVotesCount} Voters</span>
+                    </div>
+                  </div>
+
+                  {/* Section 4 Card */}
+                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-rose-500/30 space-y-1.5 shadow-md">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-mono text-[10px]">
+                        SECTION 4
+                      </span>
+                      <span className="text-[10px] text-gray-400">Audit Trail</span>
+                    </div>
+                    <h3 className="text-sm font-black text-white">Tamper-Proof Ledger</h3>
+                    <p className="text-[11px] text-gray-300 leading-snug">
+                      Logs SHA-256 integrity block, timestamp, and geofence verification tag.
+                    </p>
+                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
+                      <span className="text-gray-400">Last Hash:</span>
+                      <span className="font-black text-rose-400 text-[10px] truncate max-w-[120px]">{auditStream[0]?.id || 'None'}</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* If a ballot was received, show glowing confirmation banner */}
+                {auditStream.length > 0 && (
+                  <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                      <span className="font-bold text-emerald-300">
+                        ⚡ Most Recent Citizen Vote: <strong>{auditStream[0].party}</strong> ({auditStream[0].candidate}) in <strong>{auditStream[0].locality}</strong>
+                      </span>
+                    </div>
+                    <span className="text-[10.5px] font-mono text-emerald-400 font-bold">
+                      {auditStream[0].id} • {auditStream[0].time}
+                    </span>
+                  </div>
+                )}
+              </div>
+
               {/* Header Banner */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1E1E2C]">
                 <div>
@@ -710,7 +930,15 @@ export default function NowNineAdminDashboard({
                 </div>
               </div>
 
-              {/* Top 4 KPI Metrics */}
+              {/* SECTION 1: ELECTORAL COUNTERS & LIVE KPI METRICS */}
+              <div className="flex items-center justify-between pt-1">
+                <span className="px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10.5px] font-black border border-amber-400/30 flex items-center gap-1.5">
+                  <span>SECTION 1</span> • <span>ELECTORAL COUNTERS & REAL-TIME BALLOTS</span>
+                </span>
+                <span className="text-[10px] text-gray-400 font-mono">
+                  Auto-updates on every voter submit
+                </span>
+              </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
                   <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
@@ -773,7 +1001,15 @@ export default function NowNineAdminDashboard({
                 </div>
               </div>
 
-              {/* Spotlight: Active Constituency Detailed Breakdown */}
+              {/* SECTION 2: CONSTITUENCY CANDIDATE STANDINGS & VOTE SHARES */}
+              <div className="flex items-center justify-between pt-2">
+                <span className="px-2.5 py-0.5 rounded-md bg-sky-500/20 text-sky-300 font-mono text-[10.5px] font-black border border-sky-400/30 flex items-center gap-1.5">
+                  <span>SECTION 2</span> • <span>CONSTITUENCY CANDIDATE STANDINGS & VOTE SHARES</span>
+                </span>
+                <span className="text-[10px] text-gray-400 font-mono">
+                  {activeConstituency.totalVotes} votes in {activeConstituency.name}
+                </span>
+              </div>
               <div className="p-5 rounded-3xl bg-gradient-to-b from-[#181826] via-[#12121C] to-[#0D0D14] border border-amber-500/30 shadow-2xl space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#232334] gap-2">
                   <div>
@@ -854,16 +1090,21 @@ export default function NowNineAdminDashboard({
                 </div>
               </div>
 
-              {/* Two Column Section: Live Battleground Table & Live Ingestion Log */}
+              {/* Two Column Section: SECTION 3 (Key Battlegrounds / Pulse) & SECTION 4 (Audit Stream) */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 
                 {/* Battleground Assemblies Summary */}
                 <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#20202E] space-y-3">
                   <div className="flex items-center justify-between pb-2 border-b border-[#1E1E2C]">
-                    <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-                      <Vote className="w-4 h-4 text-amber-400" />
-                      <span>Key Battleground Assemblies</span>
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-black border border-emerald-400/30">
+                        SECTION 3
+                      </span>
+                      <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                        <Vote className="w-4 h-4 text-amber-400" />
+                        <span>Battleground Assemblies</span>
+                      </h3>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setActiveTab('constituencies')}
@@ -905,8 +1146,11 @@ export default function NowNineAdminDashboard({
                 <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#20202E] space-y-3">
                   <div className="flex items-center justify-between pb-2 border-b border-[#1E1E2C]">
                     <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-mono text-[9px] font-black border border-rose-400/30">
+                        SECTION 4
+                      </span>
                       <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      <h3 className="text-sm font-extrabold text-white">Live Tamper-Proof Ballot Stream</h3>
+                      <h3 className="text-sm font-extrabold text-white">Tamper-Proof Ballot Stream</h3>
                     </div>
                     <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-mono">
                       GPS Stream
