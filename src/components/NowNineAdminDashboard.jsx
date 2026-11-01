@@ -82,6 +82,12 @@ import {
   clearCustomerActivities, 
   subscribeCustomerActivities 
 } from '../data/customerActivityStore';
+import { 
+  getActiveCitizenSession, 
+  subscribeCitizenSession, 
+  recordCitizenLogin, 
+  getConstituencyKeyFromLocation 
+} from '../data/citizenSessionStore';
 
 export default function NowNineAdminDashboard({ 
   onClose, 
@@ -89,7 +95,13 @@ export default function NowNineAdminDashboard({
   currentLocation = null 
 }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'constituencies' | 'surveys' | 'live-debates' | 'news' | 'boss-house' | 'audit' | 'settings'
-  const [selectedConstituencyKey, setSelectedConstituencyKey] = useState('mahabubnagar');
+  const [activeCitizenSession, setActiveCitizenSession] = useState(() => getActiveCitizenSession());
+  const [selectedConstituencyKey, setSelectedConstituencyKey] = useState(() => {
+    const saved = getActiveCitizenSession();
+    if (saved?.constituencyKey) return saved.constituencyKey;
+    if (currentLocation) return getConstituencyKeyFromLocation(currentLocation);
+    return 'kurnool';
+  });
   const [regionFilter, setRegionFilter] = useState('All'); // 'All' | 'Telangana' | 'Andhra Pradesh'
   const [searchQuery, setSearchQuery] = useState('');
   const [isEmbargoActive, setIsEmbargoActive] = useState(true);
@@ -209,6 +221,32 @@ export default function NowNineAdminDashboard({
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  // Real-time synchronization: when a citizen logs in from Kurnool or any constituency in the live preview,
+  // automatically update the admin dashboard view to match their constituency instantly!
+  useEffect(() => {
+    const unsubSession = subscribeCitizenSession((session) => {
+      if (session) {
+        setActiveCitizenSession(session);
+        if (session.constituencyKey) {
+          setSelectedConstituencyKey(session.constituencyKey);
+          setToastMsg(`⚡ Auto-Synced: Live citizen active in ${session.assembly || session.locality} (${session.method || 'Mobile App'})`);
+          setTimeout(() => setToastMsg(null), 4000);
+        }
+      }
+    });
+    return unsubSession;
+  }, []);
+
+  // Sync if parent passes updated currentLocation
+  useEffect(() => {
+    if (currentLocation) {
+      const key = getConstituencyKeyFromLocation(currentLocation);
+      if (key) {
+        setSelectedConstituencyKey(key);
+      }
+    }
+  }, [currentLocation]);
 
   // Live Citizen Activity Stream State (Captures everything customers do on website)
   const [customerActivities, setCustomerActivities] = useState(() => getCustomerActivities());
@@ -465,6 +503,28 @@ export default function NowNineAdminDashboard({
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Velampalli Srinivasa Rao', symbol: '🪭', voteShare: 42.6, votes: 16827, color: '#0EA5E9', trend: '-2.5%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City President Nominee', symbol: '✋', voteShare: 5.8, votes: 2291, color: '#10B981', trend: '-0.4%' },
         { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 2.3, votes: 909, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    kurnool: {
+      id: 'kurnool',
+      code: 'AP-138',
+      name: 'Kurnool Assembly Constituency',
+      teluguName: 'కర్నూలు శాసనసభ నియోజకవర్గం',
+      locality: 'C-Camp (సి-క్యాంప్), Old City, Birla Gate',
+      district: 'Kurnool',
+      state: 'Andhra Pradesh',
+      totalVotes: 37400,
+      turnoutRate: '76.8%',
+      verifiedRate: '99.8%',
+      leadingParty: 'TDP / NDA Alliance',
+      leadingCandidate: 'T.G. Bharath',
+      margin: '+9.3% (3,478 Votes)',
+      parliament: 'Kurnool Lok Sabha',
+      parties: [
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'T.G. Bharath (Sitting MLA / Minister)', symbol: '🚲', voteShare: 52.4, votes: 19597, color: '#EAB308', trend: '+4.1%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'A. Md. Imtiaz (Ex-Collector)', symbol: '🪭', voteShare: 43.1, votes: 16119, color: '#0EA5E9', trend: '-2.8%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Shaik Jailani Basha', symbol: '✋', voteShare: 3.2, votes: 1196, color: '#0284C7', trend: '-0.8%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 1.3, votes: 488, color: '#64748B', trend: '-0.5%' },
       ]
     }
   };
@@ -786,6 +846,10 @@ export default function NowNineAdminDashboard({
             </span>
             <span className="text-[10px] text-gray-400 font-mono">
               Total Ballots: <strong className="text-white">{totalVotesCount.toLocaleString()}</strong>
+            </span>
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 text-[9.5px] font-bold ml-1">
+              <MapPin className="w-3 h-3 text-amber-400" />
+              <span>Active: <strong>{baseConstituency.name.replace(' Assembly Constituency', '')}</strong></span>
             </span>
           </div>
         </div>
@@ -1221,6 +1285,115 @@ export default function NowNineAdminDashboard({
                     </span>
                   </div>
                 )}
+              </div>
+
+              {/* LIVE CITIZEN CONSTITUENCY INGESTION BANNER */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#101F1B] to-[#0E1522] border-2 border-emerald-500/50 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black shadow-inner shrink-0">
+                    <MapPin className="w-5 h-5 text-emerald-400 animate-bounce" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-black text-white">Live Citizen Ingestion:</span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-black border border-emerald-400/40 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span>{baseConstituency.name} ({baseConstituency.code})</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-400/30">
+                        ⚡ AUTO-SYNCED WITH MOBILE
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-300 mt-1">
+                      Citizen Locality: <strong className="text-white">{activeCitizenSession?.locality || baseConstituency.locality}</strong> • State: <strong className="text-amber-300">{baseConstituency.state}</strong> • Sign-In: <span className="font-mono text-emerald-300">{activeCitizenSession?.method || 'Active Ingestion'}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Quick 1-Click Citizen Constituency Simulators */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10.5px] font-bold text-gray-400">Simulate Citizen Login:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      recordCitizenLogin({
+                        location: {
+                          id: 'ap-kurnool',
+                          locality: 'C-Camp (సి-క్యాంప్)',
+                          city: 'Kurnool',
+                          assembly: 'Kurnool Assembly Constituency',
+                          district: 'Kurnool',
+                          state: 'Andhra Pradesh'
+                        },
+                        userPhone: '+91 94401 23456',
+                        method: 'Mobile OTP (Kurnool)'
+                      });
+                      setSelectedConstituencyKey('kurnool');
+                      showToast('⚡ Citizen login detected from Kurnool! Admin dashboard auto-switched to Kurnool.');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center gap-1 ${
+                      selectedConstituencyKey === 'kurnool'
+                        ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400 shadow-sm'
+                        : 'bg-[#141420] text-gray-300 border-[#26263A] hover:border-gray-500 hover:text-white'
+                    }`}
+                  >
+                    <span>📍 Kurnool (కర్నూలు)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      recordCitizenLogin({
+                        location: {
+                          id: 'ts-mahabubnagar',
+                          locality: 'Yenugonda (ఏనుగొండ)',
+                          city: 'Mahabubnagar',
+                          assembly: 'Mahabubnagar Assembly Constituency',
+                          district: 'Mahabubnagar',
+                          state: 'Telangana'
+                        },
+                        userPhone: '+91 98480 12345',
+                        method: 'Mobile OTP (Mahabubnagar)'
+                      });
+                      setSelectedConstituencyKey('mahabubnagar');
+                      showToast('⚡ Citizen login detected from Mahabubnagar! Admin dashboard auto-switched to Mahabubnagar.');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center gap-1 ${
+                      selectedConstituencyKey === 'mahabubnagar'
+                        ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400 shadow-sm'
+                        : 'bg-[#141420] text-gray-300 border-[#26263A] hover:border-gray-500 hover:text-white'
+                    }`}
+                  >
+                    <span>📍 Mahabubnagar</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      recordCitizenLogin({
+                        location: {
+                          id: 'ts-lbnagar',
+                          locality: 'Badangpet (బడంగ్‌పేట్)',
+                          city: 'Hyderabad',
+                          assembly: 'LB Nagar Assembly Constituency',
+                          district: 'Rangareddy',
+                          state: 'Telangana'
+                        },
+                        userPhone: '+91 99887 65432',
+                        method: 'Mobile OTP (LB Nagar)'
+                      });
+                      setSelectedConstituencyKey('lbnagar');
+                      showToast('⚡ Citizen login detected from LB Nagar! Admin dashboard auto-switched to LB Nagar.');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center gap-1 ${
+                      selectedConstituencyKey === 'lbnagar'
+                        ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400 shadow-sm'
+                        : 'bg-[#141420] text-gray-300 border-[#26263A] hover:border-gray-500 hover:text-white'
+                    }`}
+                  >
+                    <span>📍 LB Nagar</span>
+                  </button>
+                </div>
               </div>
 
               {/* Header Banner */}

@@ -73,6 +73,7 @@ import {
   subscribeHousemates 
 } from '../data/bossStore';
 import { recordCustomerActivity } from '../data/customerActivityStore';
+import { recordCitizenLogin } from '../data/citizenSessionStore';
 
 // Phone Status Bar (Cellular, Wifi, Battery icons removed as requested)
 export function PhoneStatusBar() {
@@ -176,6 +177,7 @@ export function ConstituencyPickerModal({
       method: 'Manually Entered Address 📍'
     });
     onLocationChange(resolved);
+    recordCitizenLogin({ location: resolved, method: 'Manually Entered Address' });
     onClose();
   };
 
@@ -266,6 +268,7 @@ export function ConstituencyPickerModal({
                   key={item.id}
                   onClick={() => {
                     onLocationChange(item);
+                    recordCitizenLogin({ location: item, method: 'Constituency Picker' });
                     onClose();
                   }}
                   className={`p-2 rounded-xl border transition-all cursor-pointer ${
@@ -377,12 +380,14 @@ export function ScreenLogin({
 
   const handleVerify = (e) => {
     e.preventDefault();
-    showToast('Verified! Welcome to NowNine.');
+    recordCitizenLogin({ location: currentLocation, userPhone: phoneNumber, method: 'Mobile OTP (9410)' });
+    showToast(`Verified! Welcome from ${currentLocation?.assembly || currentLocation?.locality || 'NowNine'}.`);
     setTimeout(() => onLoginSuccess(), 400);
   };
 
   const handleGoogleLogin = () => {
-    showToast('Signing in with Google Account...');
+    recordCitizenLogin({ location: currentLocation, userPhone: 'Google Account', method: 'Google Sign-In' });
+    showToast(`Signed in! Welcome from ${currentLocation?.assembly || currentLocation?.locality || 'NowNine'}.`);
     setTimeout(() => onLoginSuccess(), 500);
   };
 
@@ -589,7 +594,10 @@ export function ScreenLogin({
 
             <button
               type="button"
-              onClick={onSkipToHome}
+              onClick={() => {
+                recordCitizenLogin({ location: currentLocation, userPhone: 'Guest Citizen', method: 'Guest Access' });
+                onSkipToHome();
+              }}
               className="text-[11px] font-semibold text-gray-400 hover:text-[#F5C754] transition-colors inline-block pt-0.5 cursor-pointer"
             >
               Skip & Continue as Guest →

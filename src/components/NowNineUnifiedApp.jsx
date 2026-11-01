@@ -24,6 +24,7 @@ import {
 import ScreenAdminPanel from './ScreenAdminPanel';
 import NowNineAdminDashboard from './NowNineAdminDashboard';
 import { recordCustomerActivity } from '../data/customerActivityStore';
+import { recordCitizenLogin } from '../data/citizenSessionStore';
 import { 
   DEFAULT_DETECTED_LOCATION, 
   CONSTITUENCY_DATABASE,
@@ -122,6 +123,10 @@ export default function NowNineUnifiedApp() {
             badgeColor: 'sky',
             badgeText: 'GPS Verified'
           });
+          recordCitizenLogin({
+            location: resolvedLocation,
+            method: 'Auto GPS Detection'
+          });
         }
         setIsLocating(false);
       }, remaining);
@@ -167,6 +172,10 @@ export default function NowNineUnifiedApp() {
         icon: '📍',
         badgeColor: 'sky',
         badgeText: 'Constituency Selection'
+      });
+      recordCitizenLogin({
+        location: newLoc,
+        method: 'Manual Constituency Selection'
       });
     }
   };

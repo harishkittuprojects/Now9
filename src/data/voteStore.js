@@ -66,6 +66,8 @@ export function recordLiveBallot({ party, location, answers = {} }) {
     constituencyKey = 'gajwel';
   } else if (constituencyLower.includes('chandragiri') || constituencyLower.includes('tirupati')) {
     constituencyKey = 'chandragiri';
+  } else if (constituencyLower.includes('kurnool') || constituencyLower.includes('కర్నూలు')) {
+    constituencyKey = 'kurnool';
   } else if (constituencyLower.includes('vijayawada')) {
     constituencyKey = 'vijayawada';
   }

@@ -666,6 +666,91 @@ export const CONSTITUENCY_DATABASE = [
         manifestoPromises: ['Master plan roads completion', 'SVIMS super specialty grants']
       }
     ]
+  },
+  {
+    id: 'ap-kurnool',
+    locality: 'C-Camp & Old City (కర్నూలు)',
+    city: 'Kurnool',
+    district: 'Kurnool',
+    state: 'Andhra Pradesh',
+    pincode: '518002',
+    ward: 'Ward No. 18 (KMC Kurnool)',
+    assembly: 'Kurnool Assembly Constituency',
+    parliament: 'Kurnool Lok Sabha',
+    formattedAddress: 'C-Camp Centre, Kurnool, Andhra Pradesh - 518002',
+    exactAddress: 'C-Camp Centre, Kurnool, Andhra Pradesh - 518002',
+    gpsCoordinates: '15.8281° N, 78.0373° E',
+    detectionMethod: 'Auto-detected via GPS & Network 🛰️',
+    parties: [
+      {
+        id: 'tdp',
+        name: 'TDP (NDA Alliance)',
+        teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',
+        code: 'TDP',
+        symbol: '🚲',
+        candidate: 'T.G. Bharath',
+        role: 'Minister & Sitting MLA',
+        status: 'Minister & Sitting MLA',
+        color: '#EAB308',
+        badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+        voteShare: 52.4,
+        focus: 'కర్నూలు పారిశ్రామిక అభివృద్ధి, హైకోర్టు బెంచ్, రోడ్ల ఆధునీకరణ',
+        keyFocus: 'కర్నూలు పారిశ్రామిక అభివృద్ధి, హైకోర్టు బెంచ్, రోడ్ల ఆధునీకరణ',
+        promises: ['Kurnool Mega Industrial Park', 'Tungabhadra Riverfront Development', 'High Court Bench in Kurnool'],
+        manifestoPromises: ['Kurnool Mega Industrial Park', 'Tungabhadra Riverfront Development', 'High Court Bench in Kurnool']
+      },
+      {
+        id: 'ysrcp',
+        name: 'YSRCP',
+        teluguName: 'వైఎస్సార్సీపీ',
+        code: 'YSRCP',
+        symbol: '🪭',
+        candidate: 'A. Md. Imtiaz (Ex-Collector)',
+        role: 'Key Contender / Challenger',
+        status: 'Key Contender / Challenger',
+        color: '#0EA5E9',
+        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+        voteShare: 43.1,
+        focus: 'సంక్షేమ పథకాలు, మైనారిటీ సంక్షేమం, ప్రభుత్వ ఆసుపత్రి విస్తరణ',
+        keyFocus: 'సంక్షేమ పథకాలు, మైనారిటీ సంక్షేమం, ప్రభుత్వ ఆసుపత్రి విస్తరణ',
+        promises: ['GGH Kurnool super-specialty blocks', 'Old City drainage overhaul', 'Minority education grants'],
+        manifestoPromises: ['GGH Kurnool super-specialty blocks', 'Old City drainage overhaul', 'Minority education grants']
+      },
+      {
+        id: 'inc',
+        name: 'Congress (INC)',
+        teluguName: 'కాంగ్రెస్',
+        code: 'INC',
+        symbol: '✋',
+        candidate: 'Shaik Jailani Basha',
+        role: 'Contestant',
+        status: 'Contestant',
+        color: '#0284C7',
+        badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        voteShare: 3.2,
+        focus: 'రైతు భరోసా, పేదరిక నిర్మూలన',
+        keyFocus: 'రైతు భరోసా, పేదరిక నిర్మూలన',
+        promises: ['Farmer loan relief', 'Youth employment assistance'],
+        manifestoPromises: ['Farmer loan relief', 'Youth employment assistance']
+      },
+      {
+        id: 'oth',
+        name: 'Others & Independents',
+        teluguName: 'ఇతరులు',
+        code: 'OTH',
+        symbol: '🗳️',
+        candidate: 'Independent Contenders',
+        role: 'Independent',
+        status: 'Independent',
+        color: '#64748B',
+        badgeColor: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+        voteShare: 1.3,
+        focus: 'స్థానిక సమస్యల పరిష్కారం',
+        keyFocus: 'స్థానిక సమస్యల పరిష్కారం',
+        promises: ['Local ward civic governance'],
+        manifestoPromises: ['Local ward civic governance']
+      }
+    ]
   }
 ];
 
@@ -718,6 +803,35 @@ export function resolveConstituencyAndParties(detectedInfo) {
       gpsCoordinates: lat && lon ? `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E` : mbItem.gpsCoordinates,
       detectionMethod: method
     };
+  }
+
+  // Geofence check for Kurnool (AP-138):
+  const isKurnoolCoordinates = lat && lon && (lat >= 15.65 && lat <= 16.00 && lon >= 77.85 && lon <= 78.20);
+  const isKurnool = isKurnoolCoordinates ||
+    searchTarget.includes('kurnool') ||
+    searchTarget.includes('కర్నూలు') ||
+    searchTarget.includes('c-camp') ||
+    searchTarget.includes('kurnool urban') ||
+    (pincode && pincode.startsWith('518'));
+
+  if (isKurnool) {
+    const kurnoolItem = CONSTITUENCY_DATABASE.find(item => item.id === 'ap-kurnool');
+    if (kurnoolItem) {
+      const displayLocality = locality || 'C-Camp (కర్నూలు)';
+      return {
+        ...kurnoolItem,
+        locality: displayLocality,
+        city: 'Kurnool',
+        district: 'Kurnool',
+        assembly: 'Kurnool Assembly Constituency',
+        parliament: 'Kurnool Lok Sabha',
+        pincode: pincode || '518002',
+        formattedAddress: exactAddress || `${displayLocality}, Kurnool, Andhra Pradesh - ${pincode || '518002'}`,
+        exactAddress: exactAddress || `${displayLocality}, Kurnool, Andhra Pradesh - ${pincode || '518002'}`,
+        gpsCoordinates: lat && lon ? `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E` : kurnoolItem.gpsCoordinates,
+        detectionMethod: method
+      };
+    }
   }
 
   // 1. Try to find an exact match in our pre-curated database
