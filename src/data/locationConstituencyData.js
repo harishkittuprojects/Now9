@@ -1,5 +1,291 @@
 // Advanced Automatic Geolocation, Address Resolution, and Constituency Database for NowNine
 
+// ALL MAJOR POLITICAL PARTIES FOR TELANGANA (తెలంగాణ సమగ్ర పార్టీల జాబితా)
+export function getTelanganaAllParties(assembly = 'Telangana Assembly', locality = 'Local Area', overrides = {}) {
+  const cleanAssembly = (assembly || '').replace(/\s*Assembly\s*Constituency\s*/gi, '').replace(/\s*Assembly\s*/gi, '');
+  return [
+    {
+      id: 'inc',
+      name: 'Congress (INC)',
+      teluguName: 'భారత జాతీయ కాంగ్రెస్ (INC)',
+      code: 'INC',
+      symbol: '✋',
+      candidate: overrides.inc?.candidate || `Congress Candidate (${cleanAssembly})`,
+      role: overrides.inc?.role || 'Ruling Party in Telangana',
+      status: overrides.inc?.status || 'Ruling Party in Telangana',
+      color: '#0284C7',
+      badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+      voteShare: overrides.inc?.voteShare || 39.4,
+      focus: overrides.inc?.focus || 'రైతు భరోసా, 6 గ్యారెంటీలు, సివిక్ రోడ్ల విస్తరణ',
+      keyFocus: overrides.inc?.keyFocus || 'రైతు భరోసా, 6 గ్యారెంటీలు, సివిక్ రోడ్ల విస్తరణ',
+      promises: overrides.inc?.promises || [`24/7 drinking water in ${locality}`, 'Indiramma Housing assistance', 'Women free travel desks'],
+      manifestoPromises: overrides.inc?.manifestoPromises || [`24/7 drinking water in ${locality}`, 'Indiramma Housing assistance', 'Women free travel desks']
+    },
+    {
+      id: 'brs',
+      name: 'BRS',
+      teluguName: 'భారత్ రాష్ట్ర సమితి (BRS)',
+      code: 'BRS',
+      symbol: '🚗',
+      candidate: overrides.brs?.candidate || `BRS Nominee (${cleanAssembly})`,
+      role: overrides.brs?.role || 'Principal Opposition',
+      status: overrides.brs?.status || 'Principal Opposition',
+      color: '#E11D48',
+      badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+      voteShare: overrides.brs?.voteShare || 36.5,
+      focus: overrides.brs?.focus || 'రైతు బంధు, సంక్షేమ పథకాలు, స్థానిక సమస్యలపై పోరాటం',
+      keyFocus: overrides.brs?.keyFocus || 'రైతు బంధు, సంక్షేమ పథకాలు, స్థానిక సమస్యలపై పోరాటం',
+      promises: overrides.brs?.promises || [`Local ward infrastructure upgrade in ${locality}`, 'Drainage and road repair guarantee'],
+      manifestoPromises: overrides.brs?.promises || [`Local ward infrastructure upgrade in ${locality}`, 'Drainage and road repair guarantee']
+    },
+    {
+      id: 'bjp',
+      name: 'BJP',
+      teluguName: 'భారతీయ జనతా పార్టీ (BJP)',
+      code: 'BJP',
+      symbol: '🪷',
+      candidate: overrides.bjp?.candidate || `BJP Candidate (${cleanAssembly})`,
+      role: overrides.bjp?.role || 'National Party / Key Challenger',
+      status: overrides.bjp?.status || 'National Party / Key Challenger',
+      color: '#FF6F00',
+      badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+      voteShare: overrides.bjp?.voteShare || 15.2,
+      focus: overrides.bjp?.focus || 'అవినీతి రహిత పాలన, కేంద్ర పథకాల అమలు, స్మార్ట్ సిటీ నిధులు',
+      keyFocus: overrides.bjp?.keyFocus || 'అవినీతి రహిత పాలన, కేంద్ర పథకాల అమలు, స్మార్ట్ సిటీ నిధులు',
+      promises: overrides.bjp?.promises || ['PM Awas Yojana urban houses', 'Smart surveillance & Clean roads'],
+      manifestoPromises: overrides.bjp?.promises || ['PM Awas Yojana urban houses', 'Smart surveillance & Clean roads']
+    },
+    {
+      id: 'aimim',
+      name: 'AIMIM',
+      teluguName: 'ఎంఐఎం (AIMIM)',
+      code: 'AIMIM',
+      symbol: '🪁',
+      candidate: overrides.aimim?.candidate || `AIMIM Contestant (${cleanAssembly})`,
+      role: overrides.aimim?.role || 'Regional Minority Representation',
+      status: overrides.aimim?.status || 'Regional Minority Representation',
+      color: '#059669',
+      badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      voteShare: overrides.aimim?.voteShare || 3.8,
+      focus: overrides.aimim?.focus || 'మైనార్టీ హక్కులు, పాతబస్తీ అభివృద్ధి, ఉచిత విద్యా కేంద్రాలు',
+      keyFocus: overrides.aimim?.keyFocus || 'మైనార్టీ హక్కులు, పాతబస్తీ అభివృద్ధి, ఉచిత విద్యా కేంద్రాలు',
+      promises: overrides.aimim?.promises || ['Local community centers', 'Vocational training clinics'],
+      manifestoPromises: overrides.aimim?.promises || ['Local community centers', 'Vocational training clinics']
+    },
+    {
+      id: 'jsp',
+      name: 'JanaSena (JSP)',
+      teluguName: 'జనసేన పార్టీ (JSP)',
+      code: 'JSP',
+      symbol: '🍵',
+      candidate: overrides.jsp?.candidate || `JSP Youth Leader (${cleanAssembly})`,
+      role: overrides.jsp?.role || 'Youth & Change Vanguard',
+      status: overrides.jsp?.status || 'Youth & Change Vanguard',
+      color: '#DC2626',
+      badgeColor: 'bg-red-500/20 text-red-400 border-red-500/30',
+      voteShare: overrides.jsp?.voteShare || 2.2,
+      focus: overrides.jsp?.focus || 'యువత ఉపాధి, జవాబుదారీతనం, నవతరం రాజకీయాలు',
+      keyFocus: overrides.jsp?.keyFocus || 'యువత ఉపాధి, జవాబుదారీతనం, నవతరం రాజకీయాలు',
+      promises: overrides.jsp?.promises || ['Youth employment coaching centers', 'Citizen grievance helpline'],
+      manifestoPromises: overrides.jsp?.promises || ['Youth employment coaching centers', 'Citizen grievance helpline']
+    },
+    {
+      id: 'cpi',
+      name: 'CPI / Left Front',
+      teluguName: 'సీపీఐ / సీపీఎం (వామపక్షాలు)',
+      code: 'LEFT',
+      symbol: '🌾',
+      candidate: overrides.cpi?.candidate || `Left Front Nominee (${cleanAssembly})`,
+      role: overrides.cpi?.role || 'Working Class & Farmers Movement',
+      status: overrides.cpi?.status || 'Working Class & Farmers Movement',
+      color: '#BE123C',
+      badgeColor: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+      voteShare: overrides.cpi?.voteShare || 1.1,
+      focus: overrides.cpi?.focus || 'కార్మికుల కనీస వేతనాలు, భూమి సమస్యలు, ఉచిత విద్య & వైద్యం',
+      keyFocus: overrides.cpi?.keyFocus || 'కార్మికుల కనీస వేతనాలు, భూమి సమస్యలు, ఉచిత విద్య & వైద్యం',
+      promises: overrides.cpi?.promises || ['Workers grievance cell', 'Affordable civic housing'],
+      manifestoPromises: overrides.cpi?.promises || ['Workers grievance cell', 'Affordable civic housing']
+    },
+    {
+      id: 'bsp',
+      name: 'BSP',
+      teluguName: 'బహుజన్ సమాజ్ పార్టీ (BSP)',
+      code: 'BSP',
+      symbol: '🐘',
+      candidate: overrides.bsp?.candidate || `BSP Nominee (${cleanAssembly})`,
+      role: overrides.bsp?.role || 'Bahujan Representation',
+      status: overrides.bsp?.status || 'Bahujan Representation',
+      color: '#1D4ED8',
+      badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      voteShare: overrides.bsp?.voteShare || 0.8,
+      focus: overrides.bsp?.focus || 'సామాజిక న్యాయం, బహుజన రాజ్యాధికారం, విద్యారంగ అభివృద్ధి',
+      keyFocus: overrides.bsp?.keyFocus || 'సామాజిక న్యాయం, బహుజన రాజ్యాధికారం, విద్యారంగ అభివృద్ధి',
+      promises: overrides.bsp?.promises || ['Ambedkar Study Circles', 'Scholarship guarantee desks'],
+      manifestoPromises: overrides.bsp?.promises || ['Ambedkar Study Circles', 'Scholarship guarantee desks']
+    },
+    {
+      id: 'oth',
+      name: 'Others & Independents',
+      teluguName: 'స్వతంత్రులు & ఇతరులు',
+      code: 'IND',
+      symbol: '🗳️',
+      candidate: overrides.oth?.candidate || `Independent Contenders (${cleanAssembly})`,
+      role: overrides.oth?.role || 'Grassroots Contenders',
+      status: overrides.oth?.status || 'Grassroots Contenders',
+      color: '#64748B',
+      badgeColor: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+      voteShare: overrides.oth?.voteShare || 1.0,
+      focus: overrides.oth?.focus || 'స్థానిక సమస్యల తక్షణ పరిష్కారం, అవినీతి నిర్మూలన',
+      keyFocus: overrides.oth?.keyFocus || 'స్థానిక సమస్యల తక్షణ పరిష్కారం, అవినీతి నిర్మూలన',
+      promises: overrides.oth?.promises || ['Local sanitation monitoring', 'Direct ward complaints cell'],
+      manifestoPromises: overrides.oth?.promises || ['Local sanitation monitoring', 'Direct ward complaints cell']
+    }
+  ];
+}
+
+// ALL MAJOR POLITICAL PARTIES FOR ANDHRA PRADESH (ఆంధ్రప్రదేశ్ సమగ్ర పార్టీల జాబితా)
+export function getAndhraAllParties(assembly = 'Andhra Assembly', locality = 'Local Area', overrides = {}) {
+  const cleanAssembly = (assembly || '').replace(/\s*Assembly\s*Constituency\s*/gi, '').replace(/\s*Assembly\s*/gi, '');
+  return [
+    {
+      id: 'tdp',
+      name: 'TDP (Telugu Desam)',
+      teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',
+      code: 'TDP',
+      symbol: '🚲',
+      candidate: overrides.tdp?.candidate || `TDP Nominee / MLA (${cleanAssembly})`,
+      role: overrides.tdp?.role || 'Ruling Coalition Leader',
+      status: overrides.tdp?.status || 'Ruling Coalition Leader',
+      color: '#EAB308',
+      badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+      voteShare: overrides.tdp?.voteShare || 47.8,
+      focus: overrides.tdp?.focus || 'అమరావతి నిర్మాణం, సూపర్ 6 పథకాలు, రోడ్ల అభివృద్ధి',
+      keyFocus: overrides.tdp?.keyFocus || 'అమరావతి నిర్మాణం, సూపర్ 6 పథకాలు, రోడ్ల అభివృద్ధి',
+      promises: overrides.tdp?.promises || [`New civic roads in ${locality}`, 'Thalliki Vandanam program', 'Yuva Galam employment hub'],
+      manifestoPromises: overrides.tdp?.promises || [`New civic roads in ${locality}`, 'Thalliki Vandanam program', 'Yuva Galam employment hub']
+    },
+    {
+      id: 'ysrcp',
+      name: 'YSRCP',
+      teluguName: 'వైఎస్సార్ కాంగ్రెస్ పార్టీ (YSRCP)',
+      code: 'YSRCP',
+      symbol: '🪭',
+      candidate: overrides.ysrcp?.candidate || `YSRCP Incharge / Ex-MLA (${cleanAssembly})`,
+      role: overrides.ysrcp?.role || 'Principal Opposition',
+      status: overrides.ysrcp?.status || 'Principal Opposition',
+      color: '#0EA5E9',
+      badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+      voteShare: overrides.ysrcp?.voteShare || 41.5,
+      focus: overrides.ysrcp?.focus || 'నవరత్నాలు, సంక్షేమ పథకాలు, బస్తీ ఆరోగ్య కేంద్రాలు',
+      keyFocus: overrides.ysrcp?.keyFocus || 'నవరత్నాలు, సంక్షేమ పథకాలు, బస్తీ ఆరోగ్య కేంద్రాలు',
+      promises: overrides.ysrcp?.promises || ['Direct social pensions', 'Free municipal clinics', 'Fee reimbursement support'],
+      manifestoPromises: overrides.ysrcp?.promises || ['Direct social pensions', 'Free municipal clinics', 'Fee reimbursement support']
+    },
+    {
+      id: 'jsp',
+      name: 'JanaSena Party (JSP)',
+      teluguName: 'జనసేన పార్టీ (కూటమి)',
+      code: 'JSP',
+      symbol: '🍵',
+      candidate: overrides.jsp?.candidate || `JSP Alliance Nominee (${cleanAssembly})`,
+      role: overrides.jsp?.role || 'Ruling Coalition Partner',
+      status: overrides.jsp?.status || 'Ruling Coalition Partner',
+      color: '#DC2626',
+      badgeColor: 'bg-red-500/20 text-red-400 border-red-500/30',
+      voteShare: overrides.jsp?.voteShare || 4.5,
+      focus: overrides.jsp?.focus || 'పంచాయతీ రాజ్ బలోపేతం, పర్యావరణ పరిరక్షణ, యువత ఉపాధి',
+      keyFocus: overrides.jsp?.keyFocus || 'పంచాయతీ రాజ్ బలోపేతం, పర్యావరణ పరిరక్షణ, యువత ఉపాధి',
+      promises: overrides.jsp?.promises || ['Panchayat funds release', 'Farmer support grievance desks'],
+      manifestoPromises: overrides.jsp?.promises || ['Panchayat funds release', 'Farmer support grievance desks']
+    },
+    {
+      id: 'bjp',
+      name: 'BJP (Bharatiya Janata)',
+      teluguName: 'భారతీయ జనతా పార్టీ (కూటమి)',
+      code: 'BJP',
+      symbol: '🪷',
+      candidate: overrides.bjp?.candidate || `BJP Alliance Candidate (${cleanAssembly})`,
+      role: overrides.bjp?.role || 'Ruling Coalition Partner',
+      status: overrides.bjp?.status || 'Ruling Coalition Partner',
+      color: '#FF6F00',
+      badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+      voteShare: overrides.bjp?.voteShare || 2.4,
+      focus: overrides.bjp?.focus || 'కేంద్ర నిధులు, హైవే ప్రాజెక్టులు, పారిశ్రామిక నడవా',
+      keyFocus: overrides.bjp?.keyFocus || 'కేంద్ర నిధులు, హైవే ప్రాజెక్టులు, పారిశ్రామిక నడవా',
+      promises: overrides.bjp?.promises || ['Industrial corridor linkage', 'Central railway modernization'],
+      manifestoPromises: overrides.bjp?.promises || ['Industrial corridor linkage', 'Central railway modernization']
+    },
+    {
+      id: 'inc',
+      name: 'Congress (AP)',
+      teluguName: 'భారత జాతీయ కాంగ్రెస్ (INC)',
+      code: 'INC',
+      symbol: '✋',
+      candidate: overrides.inc?.candidate || `Congress Nominee (${cleanAssembly})`,
+      role: overrides.inc?.role || 'National Opposition',
+      status: overrides.inc?.status || 'National Opposition',
+      color: '#10B981',
+      badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      voteShare: overrides.inc?.voteShare || 1.8,
+      focus: overrides.inc?.focus || 'ప్రత్యేక హోదా & పారిశ్రామిక రాయితీలు, పోలవరం పూర్తి',
+      keyFocus: overrides.inc?.keyFocus || 'ప్రత్యేక హోదా & పారిశ్రామిక రాయితీలు, పోలవరం పూర్తి',
+      promises: overrides.inc?.promises || ['Special Category Status movement', 'Government job recruitment notification'],
+      manifestoPromises: overrides.inc?.promises || ['Special Category Status movement', 'Government job recruitment notification']
+    },
+    {
+      id: 'cpi',
+      name: 'CPI / Left Front',
+      teluguName: 'సీపీఐ / సీపీఎం (వామపక్షాలు)',
+      code: 'LEFT',
+      symbol: '🌾',
+      candidate: overrides.cpi?.candidate || `Left Front Contestant (${cleanAssembly})`,
+      role: overrides.cpi?.role || 'People’s Front / Labor Rights',
+      status: overrides.cpi?.status || 'People’s Front / Labor Rights',
+      color: '#BE123C',
+      badgeColor: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+      voteShare: overrides.cpi?.voteShare || 0.7,
+      focus: overrides.cpi?.focus || 'విశాఖ స్టీల్ ప్లాంట్ పరిరక్షణ, కనీస వేతనాలు, రైతు గిట్టుబాటు ధర',
+      keyFocus: overrides.cpi?.keyFocus || 'విశాఖ స్టీల్ ప్లాంట్ పరిరక్షణ, కనీస వేతనాలు, రైతు గిట్టుబాటు ధర',
+      promises: overrides.cpi?.promises || ['Protect public sector jobs', 'Farmer MSP guarantee centers'],
+      manifestoPromises: overrides.cpi?.promises || ['Protect public sector jobs', 'Farmer MSP guarantee centers']
+    },
+    {
+      id: 'bsp',
+      name: 'BSP',
+      teluguName: 'బహుజన్ సమాజ్ పార్టీ (BSP)',
+      code: 'BSP',
+      symbol: '🐘',
+      candidate: overrides.bsp?.candidate || `BSP Nominee (${cleanAssembly})`,
+      role: overrides.bsp?.role || 'Bahujan Social Justice',
+      status: overrides.bsp?.status || 'Bahujan Social Justice',
+      color: '#1D4ED8',
+      badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      voteShare: overrides.bsp?.voteShare || 0.5,
+      focus: overrides.bsp?.focus || 'సామాజిక న్యాయం, దళిత బహుజన హక్కులు',
+      keyFocus: overrides.bsp?.keyFocus || 'సామాజిక న్యాయం, దళిత బహుజన హక్కులు',
+      promises: overrides.bsp?.promises || ['Equal educational funding', 'Civic rights assistance'],
+      manifestoPromises: overrides.bsp?.promises || ['Equal educational funding', 'Civic rights assistance']
+    },
+    {
+      id: 'oth',
+      name: 'Others & Independents',
+      teluguName: 'స్వతంత్రులు & ఇతరులు',
+      code: 'IND',
+      symbol: '🗳️',
+      candidate: overrides.oth?.candidate || `Independent Contenders (${cleanAssembly})`,
+      role: overrides.oth?.role || 'Independent Candidates',
+      status: overrides.oth?.status || 'Independent Candidates',
+      color: '#64748B',
+      badgeColor: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+      voteShare: overrides.oth?.voteShare || 0.6,
+      focus: overrides.oth?.focus || 'స్థానిక సమస్యల పరిష్కారం, అవినీతి రహిత వార్డు',
+      keyFocus: overrides.oth?.keyFocus || 'స్థానిక సమస్యల పరిష్కారం, అవినీతి రహిత వార్డు',
+      promises: overrides.oth?.promises || ['Citizen complaints cell', 'Local sanitation monitoring'],
+      manifestoPromises: overrides.oth?.promises || ['Citizen complaints cell', 'Local sanitation monitoring']
+    }
+  ];
+}
+
 export const DEFAULT_DETECTED_LOCATION = {
   id: 'hyderabad-jubilee',
   locality: 'Jubilee Hills',
@@ -14,76 +300,12 @@ export const DEFAULT_DETECTED_LOCATION = {
   exactAddress: 'Road No. 36, Jubilee Hills, Hyderabad, Telangana - 500033',
   gpsCoordinates: '17.4325° N, 78.4071° E',
   detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-  parties: [
-    {
-      id: 'inc',
-      name: 'Congress (INC)',
-      teluguName: 'భారత జాతీయ కాంగ్రెస్',
-      code: 'INC',
-      symbol: '✋',
-      candidate: 'Danam Nagender / Azharuddin',
-      role: 'Ruling Party / Local MLA',
-      status: 'Ruling Party / Local MLA',
-      color: '#0284C7',
-      badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-      voteShare: 38.6,
-      focus: 'ఉద్యోగాల కల్పన, ఉచిత బస్సు ప్రయాణం, సివిక్ రోడ్ల విస్తరణ',
-      keyFocus: 'ఉద్యోగాల కల్పన, ఉచిత బస్సు ప్రయాణం, సివిక్ రోడ్ల విస్తరణ',
-      promises: ['New IT Skill Center in Jubilee Hills', 'Underground Drainage Modernization', '24/7 Citizen Health Clinic'],
-      manifestoPromises: ['New IT Skill Center in Jubilee Hills', 'Underground Drainage Modernization', '24/7 Citizen Health Clinic']
-    },
-    {
-      id: 'brs',
-      name: 'BRS',
-      teluguName: 'భారత్ రాష్ట్ర సమితి',
-      code: 'BRS',
-      symbol: '🚗',
-      candidate: 'Maganti Gopinath',
-      role: 'Sitting MLA / Candidate',
-      status: 'Sitting MLA / Candidate',
-      color: '#E11D48',
-      badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-      voteShare: 36.2,
-      focus: 'ఫ్లైఓవర్లు, మెట్రో ఫేజ్ 2, మిషన్ భగీరథ నీరు',
-      keyFocus: 'ఫ్లైఓవర్లు, మెట్రో ఫేజ్ 2, మిషన్ భగీరథ నీరు',
-      promises: ['Madhapur-Jubilee Link Flyover', 'Durgam Cheruvu Lake Rejuvenation', 'Free drinking water taps'],
-      manifestoPromises: ['Madhapur-Jubilee Link Flyover', 'Durgam Cheruvu Lake Rejuvenation', 'Free drinking water taps']
-    },
-    {
-      id: 'bjp',
-      name: 'BJP',
-      teluguName: 'భారతీయ జనతా పార్టీ',
-      code: 'BJP',
-      symbol: '🪷',
-      candidate: 'Lankala Deepak Reddy',
-      role: 'Key Challenger',
-      status: 'Key Challenger',
-      color: '#FF6F00',
-      badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-      voteShare: 18.4,
-      focus: 'అవినీతి రహిత పాలన, డ్రైనేజ్ ఆధునీకరణ, కేంద్ర నిధులు',
-      keyFocus: 'అవినీతి రహిత పాలన, డ్రైనేజ్ ఆధునీకరణ, కేంద్ర నిధులు',
-      promises: ['Smart Ward Digital Surveillance', 'Property Tax Rationalization', 'Clean Drinking Water RO Plants'],
-      manifestoPromises: ['Smart Ward Digital Surveillance', 'Property Tax Rationalization', 'Clean Drinking Water RO Plants']
-    },
-    {
-      id: 'aimim',
-      name: 'AIMIM / Others',
-      teluguName: 'మజ్లిస్ / ఇతరులు',
-      code: 'AIMIM',
-      symbol: '🪁',
-      candidate: 'Local Corporator / Independent',
-      role: 'Ward Representative',
-      status: 'Ward Representative',
-      color: '#16A34A',
-      badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-      voteShare: 6.8,
-      focus: 'బస్తీ దవాఖానాలు, వీధి దీపాలు, స్థానిక సదుపాయాలు',
-      keyFocus: 'బస్తీ దవాఖానాలు, వీధి దీపాలు, స్థానిక సదుపాయాలు',
-      promises: ['Community Hall renovation', 'Free Street light maintenance', 'Sanitation worker welfare'],
-      manifestoPromises: ['Community Hall renovation', 'Free Street light maintenance', 'Sanitation worker welfare']
-    }
-  ]
+  parties: getTelanganaAllParties('Jubilee Hills / Khairatabad Assembly', 'Jubilee Hills', {
+    inc: { candidate: 'Danam Nagender / Azharuddin', voteShare: 38.6 },
+    brs: { candidate: 'Maganti Gopinath', voteShare: 36.2 },
+    bjp: { candidate: 'Lankala Deepak Reddy', voteShare: 16.8 },
+    aimim: { candidate: 'Rashed Faraz Dildar', voteShare: 4.5 }
+  })
 };
 
 // Comprehensive Database covering key Telangana & Andhra Pradesh Constituencies
@@ -102,59 +324,11 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'Yenugonda, Mahabubnagar, Telangana - 509001',
     gpsCoordinates: '16.7645° N, 77.9860° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'inc',
-        name: 'Congress (INC)',
-        teluguName: 'భారత జాతీయ కాంగ్రెస్',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'Yennam Srinivas Reddy',
-        role: 'Sitting MLA / Ruling Party',
-        status: 'Sitting MLA / Ruling Party',
-        color: '#0284C7',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 45.6,
-        focus: 'మహబూబ్‌నగర్ మెడికల్ కాలేజీ విస్తరణ, పాలమూరు తాగునీరు, రోడ్ల అభివృద్ధి',
-        keyFocus: 'మహబూబ్‌నగర్ మెడికల్ కాలేజీ విస్తరణ, పాలమూరు తాగునీరు, రోడ్ల అభివృద్ధి',
-        promises: ['Yenugonda Lake beautification & walking track', 'Super specialty hospital upgrade', 'Youth skill employment hub in Mahabubnagar'],
-        manifestoPromises: ['Yenugonda Lake beautification & walking track', 'Super specialty hospital upgrade', 'Youth skill employment hub in Mahabubnagar']
-      },
-      {
-        id: 'brs',
-        name: 'BRS',
-        teluguName: 'భారత్ రాష్ట్ర సమితి',
-        code: 'BRS',
-        symbol: '🚗',
-        candidate: 'V. Srinivas Goud',
-        role: 'Ex-Minister / Candidate',
-        status: 'Ex-Minister / Candidate',
-        color: '#E11D48',
-        badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-        voteShare: 40.2,
-        focus: 'కేసీఆర్ ఎకో అర్బన్ పార్క్, మహబూబ్‌నగర్ ఐటీ టవర్, పాలమూరు రంగారెడ్డి ఎత్తిపోతలు',
-        keyFocus: 'కేసీఆర్ ఎకో అర్బన్ పార్క్, మహబూబ్‌నగర్ ఐటీ టవర్, పాలమూరు రంగారెడ్డి ఎత్తిపోతలు',
-        promises: ['IT Corridor extension to Yenugonda', 'Underground drainage completion', 'Palamuru Ranga Reddy water connections'],
-        manifestoPromises: ['IT Corridor extension to Yenugonda', 'Underground drainage completion', 'Palamuru Ranga Reddy water connections']
-      },
-      {
-        id: 'bjp',
-        name: 'BJP',
-        teluguName: 'భారతీయ జనతా పార్టీ',
-        code: 'BJP',
-        symbol: '🪷',
-        candidate: 'A.P. Mithun Kumar Reddy',
-        role: 'Key Contender',
-        status: 'Key Contender',
-        color: '#FF6F00',
-        badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-        voteShare: 11.8,
-        focus: 'అవినీతి రహిత పాలన, కేంద్ర ప్రాజెక్టులు, అమృత్ భారత్ స్టేషన్',
-        keyFocus: 'అవినీతి రహిత పాలన, కేంద్ర ప్రాజెక్టులు, అమృత్ భారత్ స్టేషన్',
-        promises: ['Amrit Bharat Mahabubnagar railway station upgrade', 'PM Awas urban housing in Yenugonda', 'Central highway bypass connectivity'],
-        manifestoPromises: ['Amrit Bharat Mahabubnagar railway station upgrade', 'PM Awas urban housing in Yenugonda', 'Central highway bypass connectivity']
-      }
-    ]
+    parties: getTelanganaAllParties('Mahabubnagar Assembly Constituency', 'Yenugonda', {
+      inc: { candidate: 'Yennam Srinivas Reddy (Sitting MLA)', voteShare: 45.6 },
+      brs: { candidate: 'V. Srinivas Goud (Ex-Minister)', voteShare: 40.2 },
+      bjp: { candidate: 'A.P. Mithun Kumar Reddy', voteShare: 11.8 }
+    })
   },
   DEFAULT_DETECTED_LOCATION,
   {
@@ -171,59 +345,11 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'Financial District, Gachibowli, Hyderabad, Telangana - 500081',
     gpsCoordinates: '17.4401° N, 78.3489° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'brs',
-        name: 'BRS',
-        teluguName: 'భారత్ రాష్ట్ర సమితి',
-        code: 'BRS',
-        symbol: '🚗',
-        candidate: 'Arekapudi Gandhi',
-        role: 'Incumbent MLA',
-        status: 'Incumbent MLA',
-        color: '#E11D48',
-        badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-        voteShare: 41.5,
-        focus: 'మెట్రో ఎయిర్‌పోర్ట్ కారిడార్, అండర్‌పాస్‌లు, ట్రాఫిక్ నివారణ',
-        keyFocus: 'మెట్రో ఎయిర్‌పోర్ట్ కారిడార్, అండర్‌పాస్‌లు, ట్రాఫిక్ నివారణ',
-        promises: ['Gachibowli-Airport Metro Station', 'Kondapur Traffic Relief Deck', 'Smart Signal Automation'],
-        manifestoPromises: ['Gachibowli-Airport Metro Station', 'Kondapur Traffic Relief Deck', 'Smart Signal Automation']
-      },
-      {
-        id: 'inc',
-        name: 'Congress (INC)',
-        teluguName: 'భారత జాతీయ కాంగ్రెస్',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'Jagadeeshwar Goud',
-        role: 'Ruling Party Contestant',
-        status: 'Ruling Party Contestant',
-        color: '#0284C7',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 35.8,
-        focus: 'ఐటీ ఉద్యోగుల హక్కులు, ప్రజా రవాణా విస్తరణ, ప్రభుత్వ పాఠశాలలు',
-        keyFocus: 'ఐటీ ఉద్యోగుల హక్కులు, ప్రజా రవాణా విస్తరణ, ప్రభుత్వ పాఠశాలలు',
-        promises: ['IT Employee Grievance Cell', 'Affordable Metro Feeder Busses', 'Free Civic WiFi'],
-        manifestoPromises: ['IT Employee Grievance Cell', 'Affordable Metro Feeder Busses', 'Free Civic WiFi']
-      },
-      {
-        id: 'bjp',
-        name: 'BJP',
-        teluguName: 'భారతీయ జనతా పార్టీ',
-        code: 'BJP',
-        symbol: '🪷',
-        candidate: 'Ravi Kumar Yadav',
-        role: 'Key Challenger',
-        status: 'Key Challenger',
-        color: '#FF6F00',
-        badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-        voteShare: 18.2,
-        focus: 'స్మార్ట్ సైబరాబాద్, కేంద్ర నిధులతో ఇన్ఫ్రాస్ట్రక్చర్',
-        keyFocus: 'స్మార్ట్ సైబరాబాద్, కేంద్ర నిధులతో ఇన్ఫ్రాస్ట్రక్చర్',
-        promises: ['Central Cyber Security Center', 'Green Eco-corridor in Miyapur', 'Clean Lake Protection'],
-        manifestoPromises: ['Central Cyber Security Center', 'Green Eco-corridor in Miyapur', 'Clean Lake Protection']
-      }
-    ]
+    parties: getTelanganaAllParties('Serilingampally Assembly', 'Gachibowli', {
+      brs: { candidate: 'Arekapudi Gandhi (Incumbent MLA)', voteShare: 41.5 },
+      inc: { candidate: 'Jagadeeshwar Goud', voteShare: 35.8 },
+      bjp: { candidate: 'Ravi Kumar Yadav', voteShare: 18.2 }
+    })
   },
   {
     id: 'hyderabad-kukatpally',
@@ -239,59 +365,11 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'Road No. 1, KPHB Colony, Kukatpally, Hyderabad, Telangana - 500072',
     gpsCoordinates: '17.4938° N, 78.3995° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'brs',
-        name: 'BRS',
-        teluguName: 'భారత్ రాష్ట్ర సమితి',
-        code: 'BRS',
-        symbol: '🚗',
-        candidate: 'Madhavaram Krishna Rao',
-        role: 'Incumbent MLA',
-        status: 'Incumbent MLA',
-        color: '#E11D48',
-        badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-        voteShare: 43.8,
-        focus: 'కైతలాపూర్ ఫ్లైఓవర్, వై-జంక్షన్ విస్తరణ, మంచి నీటి రిజర్వాయర్లు',
-        keyFocus: 'కైతలాపూర్ ఫ్లైఓవర్, వై-జంక్షన్ విస్తరణ, మంచి నీటి రిజర్వాయర్లు',
-        promises: ['Y-Junction Elevated Corridor', 'Underground Stormwater Drain System', 'KPHB Central Park Modernization'],
-        manifestoPromises: ['Y-Junction Elevated Corridor', 'Underground Stormwater Drain System', 'KPHB Central Park Modernization']
-      },
-      {
-        id: 'inc',
-        name: 'Congress (INC)',
-        teluguName: 'భారత జాతీయ కాంగ్రెస్',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'Bandi Ramesh',
-        role: 'Ruling Party Contestant',
-        status: 'Ruling Party Contestant',
-        color: '#0284C7',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 34.2,
-        focus: 'డ్రైనేజ్ సమస్యల పరిష్కారం, ప్రభుత్వ దవాఖానాల బలోపేతం',
-        keyFocus: 'డ్రైనేజ్ సమస్యల పరిష్కారం, ప్రభుత్వ దవాఖానాల బలోపేతం',
-        promises: ['New 100-bed Area Hospital in Kukatpally', 'Free Citizen Gyms & Youth Hubs'],
-        manifestoPromises: ['New 100-bed Area Hospital in Kukatpally', 'Free Citizen Gyms & Youth Hubs']
-      },
-      {
-        id: 'bjp',
-        name: 'BJP',
-        teluguName: 'భారతీయ జనతా పార్టీ',
-        code: 'BJP',
-        symbol: '🪷',
-        candidate: 'M. Prem Kumar',
-        role: 'Constituency Incharge',
-        status: 'Key Challenger',
-        color: '#FF6F00',
-        badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-        voteShare: 18.0,
-        focus: 'అవినీతి రహిత మున్సిపల్ సేవలు, పన్ను తగ్గింపు',
-        keyFocus: 'అవినీతి రహిత మున్సిపల్ సేవలు, పన్ను తగ్గింపు',
-        promises: ['Property Tax Relief for Middle Class', 'Digital Ward Offices'],
-        manifestoPromises: ['Property Tax Relief for Middle Class', 'Digital Ward Offices']
-      }
-    ]
+    parties: getTelanganaAllParties('Kukatpally Assembly', 'Kukatpally', {
+      brs: { candidate: 'Madhavaram Krishna Rao (Sitting MLA)', voteShare: 43.8 },
+      inc: { candidate: 'Bandi Ramesh', voteShare: 34.2 },
+      bjp: { candidate: 'M. Prem Kumar', voteShare: 18.0 }
+    })
   },
   {
     id: 'hyderabad-secunderabad',
@@ -307,59 +385,11 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'MG Road, Secunderabad Clock Tower, Hyderabad, Telangana - 500003',
     gpsCoordinates: '17.4411° N, 78.4983° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'brs',
-        name: 'BRS',
-        teluguName: 'భారత్ రాష్ట్ర సమితి',
-        code: 'BRS',
-        symbol: '🚗',
-        candidate: 'T. Padma Rao Goud',
-        role: 'Incumbent MLA',
-        status: 'Incumbent MLA',
-        color: '#E11D48',
-        badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-        voteShare: 42.1,
-        focus: 'మార్కెట్ల ఆధునీకరణ, రైల్వే టెర్మినల్ అనుసంధానం',
-        keyFocus: 'మార్కెట్ల ఆధునీకరణ, రైల్వే టెర్మినల్ అనుసంధానం',
-        promises: ['Clock Tower Heritage Corridor', 'Modern Monda Market Complex'],
-        manifestoPromises: ['Clock Tower Heritage Corridor', 'Modern Monda Market Complex']
-      },
-      {
-        id: 'inc',
-        name: 'Congress (INC)',
-        teluguName: 'భారత జాతీయ కాంగ్రెస్',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'Adam Santosh Kumar',
-        role: 'Ruling Party Contestant',
-        status: 'Ruling Party Contestant',
-        color: '#0284C7',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 33.9,
-        focus: 'బస్తీల్లో మౌలిక వసతులు, పేదలకు ఇందిరమ్మ ఇళ్లు',
-        keyFocus: 'బస్తీల్లో మౌలిక వసతులు, పేదలకు ఇందిరమ్మ ఇళ్లు',
-        promises: ['Indiramma Housing in Railway colonies', 'Drainage desilting before monsoon'],
-        manifestoPromises: ['Indiramma Housing in Railway colonies', 'Drainage desilting before monsoon']
-      },
-      {
-        id: 'bjp',
-        name: 'BJP',
-        teluguName: 'భారతీయ జనతా పార్టీ',
-        code: 'BJP',
-        symbol: '🪷',
-        candidate: 'Mekala Sarangapani',
-        role: 'Key Challenger',
-        status: 'Key Challenger',
-        color: '#FF6F00',
-        badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-        voteShare: 20.3,
-        focus: 'రైల్వే స్టేషన్ ఆధునీకరణ, రక్షణ శాఖ భూముల వివాద పరిష్కారం',
-        keyFocus: 'రైల్వే స్టేషన్ ఆధునీకరణ, రక్షణ శాఖ భూముల వివాద పరిష్కారం',
-        promises: ['Amrit Bharat Secunderabad Station Integration', 'Cantonment civilian road access'],
-        manifestoPromises: ['Amrit Bharat Secunderabad Station Integration', 'Cantonment civilian road access']
-      }
-    ]
+    parties: getTelanganaAllParties('Secunderabad Assembly', 'Secunderabad Clock Tower', {
+      brs: { candidate: 'T. Padma Rao Goud', voteShare: 42.1 },
+      inc: { candidate: 'Adam Santosh Kumar', voteShare: 33.9 },
+      bjp: { candidate: 'Mekala Sarangapani', voteShare: 20.3 }
+    })
   },
   {
     id: 'vijayawada-central',
@@ -375,59 +405,11 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'MG Road, Benz Circle, Vijayawada, Andhra Pradesh - 520002',
     gpsCoordinates: '16.5062° N, 80.6480° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'tdp',
-        name: 'TDP / NDA Alliance',
-        teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',
-        code: 'TDP',
-        symbol: '🚲',
-        candidate: 'Bonda Umamaheswara Rao',
-        role: 'Ruling Alliance MLA',
-        status: 'Ruling Alliance MLA',
-        color: '#EAB308',
-        badgeColor: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-        voteShare: 46.2,
-        focus: 'అమరావతి రాజధాని పునర్నిర్మాణం, సూపర్ 6 పథకాలు, మెట్రో రైల్',
-        keyFocus: 'అమరావతి రాజధాని పునర్నిర్మాణం, సూపర్ 6 పథకాలు, మెట్రో రైల్',
-        promises: ['Amaravati Expressway connectivity', 'Vijayawada Metro Rail DPR clearance', 'Unemployment Youth stipend'],
-        manifestoPromises: ['Amaravati Expressway connectivity', 'Vijayawada Metro Rail DPR clearance', 'Unemployment Youth stipend']
-      },
-      {
-        id: 'ysrcp',
-        name: 'YSRCP',
-        teluguName: 'వైఎస్సార్ కాంగ్రెస్ పార్టీ',
-        code: 'YSRCP',
-        symbol: '🪭',
-        candidate: 'Vellampalli Srinivas',
-        role: 'Opposition Challenger',
-        status: 'Opposition Challenger',
-        color: '#0EA5E9',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 43.1,
-        focus: 'నవరత్నాలు పథకాల పరిరక్షణ, కనకదుర్గ ఫ్లైఓవర్ పరిసరాల అభివృద్ధి',
-        keyFocus: 'నవరత్నాలు పథకాల పరిరక్షణ, కనకదుర్గ ఫ్లైఓవర్ పరిసరాల అభివృద్ధి',
-        promises: ['Direct benefit transfers continuation', 'Free healthcare expansion in Govt General Hospital'],
-        manifestoPromises: ['Direct benefit transfers continuation', 'Free healthcare expansion in Govt General Hospital']
-      },
-      {
-        id: 'inc',
-        name: 'Congress (AP)',
-        teluguName: 'కాంగ్రెస్ పార్టీ',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'YS Sharmila / Nominee',
-        role: 'Opposition',
-        status: 'Opposition',
-        color: '#10B981',
-        badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-        voteShare: 7.2,
-        focus: 'ప్రత్యేక హోదా & పోలవరం ప్రాజెక్ట్ వేగవంతం',
-        keyFocus: 'ప్రత్యేక హోదా & పోలవరం ప్రాజెక్ట్ వేగవంతం',
-        promises: ['Special Category Status for AP fight', 'Polavaram flood victim compensation'],
-        manifestoPromises: ['Special Category Status for AP fight', 'Polavaram flood victim compensation']
-      }
-    ]
+    parties: getAndhraAllParties('Vijayawada Central Assembly', 'Benz Circle', {
+      tdp: { candidate: 'Bonda Umamaheswara Rao', voteShare: 46.2 },
+      ysrcp: { candidate: 'Vellampalli Srinivas', voteShare: 43.1 },
+      inc: { candidate: 'YS Sharmila / Nominee', voteShare: 7.2 }
+    })
   },
   {
     id: 'vizag-east',
@@ -443,59 +425,10 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'Beach Road, MVP Colony, Visakhapatnam, Andhra Pradesh - 530017',
     gpsCoordinates: '17.7289° N, 83.3328° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'tdp',
-        name: 'TDP / NDA Alliance',
-        teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',
-        code: 'TDP',
-        symbol: '🚲',
-        candidate: 'Velagapudi Ramakrishna Babu',
-        role: 'Ruling Alliance MLA',
-        status: 'Ruling Alliance MLA',
-        color: '#EAB308',
-        badgeColor: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-        voteShare: 52.4,
-        focus: 'విశాఖ స్మార్ట్ సిటీ, ఐటీ హబ్, మెట్రో రైలు',
-        keyFocus: 'విశాఖ స్మార్ట్ సిటీ, ఐటీ హబ్, మెట్రో రైలు',
-        promises: ['Vizag Metro Rail Phase-1', 'Beach Road Beautification', 'IT SEZ Expansion in Rushikonda'],
-        manifestoPromises: ['Vizag Metro Rail Phase-1', 'Beach Road Beautification', 'IT SEZ Expansion in Rushikonda']
-      },
-      {
-        id: 'ysrcp',
-        name: 'YSRCP',
-        teluguName: 'వైఎస్సార్ కాంగ్రెస్ పార్టీ',
-        code: 'YSRCP',
-        symbol: '🪭',
-        candidate: 'MVV Satyanarayana',
-        role: 'Opposition Challenger',
-        status: 'Opposition Challenger',
-        color: '#0EA5E9',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 39.8,
-        focus: 'ఎగ్జిక్యూటివ్ క్యాపిటల్, భోగాపురం ఎయిర్‌పోర్ట్ కారిడార్',
-        keyFocus: 'ఎగ్జిక్యూటివ్ క్యాపిటల్, భోగాపురం ఎయిర్‌పోర్ట్ కారిడార్',
-        promises: ['Bhogapuram Airport Access Highway', 'Fishing Harbour modernization'],
-        manifestoPromises: ['Bhogapuram Airport Access Highway', 'Fishing Harbour modernization']
-      },
-      {
-        id: 'inc',
-        name: 'Congress / Left',
-        teluguName: 'కాంగ్రెస్ & వామపక్షాలు',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'Vizag Steel Plant Protection Forum',
-        role: 'Labour Platform',
-        status: 'Labour Platform',
-        color: '#DC2626',
-        badgeColor: 'bg-red-500/20 text-red-400 border-red-500/30',
-        voteShare: 7.8,
-        focus: 'విశాఖ ఉక్కు ప్రైవేటీకరణ వ్యతిరేక పోరాటం',
-        keyFocus: 'విశాఖ ఉక్కు ప్రైవేటీకరణ వ్యతిరేక పోరాటం',
-        promises: ['Save Vizag Steel Plant from privatization', 'Permanent jobs for contract workers'],
-        manifestoPromises: ['Save Vizag Steel Plant from privatization', 'Permanent jobs for contract workers']
-      }
-    ]
+    parties: getAndhraAllParties('Visakhapatnam East Assembly', 'MVP Colony', {
+      tdp: { candidate: 'Velagapudi Ramakrishna Babu (Ruling MLA)', voteShare: 52.4 },
+      ysrcp: { candidate: 'MVV Satyanarayana', voteShare: 39.8 }
+    })
   },
   {
     id: 'warangal-west',
@@ -511,59 +444,11 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'Collectorate Road, Subedari, Hanamkonda, Warangal, Telangana - 506001',
     gpsCoordinates: '17.9784° N, 79.5941° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'inc',
-        name: 'Congress (INC)',
-        teluguName: 'భారత జాతీయ కాంగ్రెస్',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'Naini Rajender Reddy',
-        role: 'Ruling Party MLA',
-        status: 'Ruling Party MLA',
-        color: '#0284C7',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 44.5,
-        focus: 'వరంగల్ మెగా టెక్స్‌టైల్ పార్క్, భూగర్భ డ్రైనేజీ',
-        keyFocus: 'వరంగల్ మెగా టెక్స్‌టైల్ పార్క్, భూగర్భ డ్రైనేజీ',
-        promises: ['Kakatiya Mega Textile Park expansion', 'Smart Bus Terminal', 'Bhadrakali Lake Bund Development'],
-        manifestoPromises: ['Kakatiya Mega Textile Park expansion', 'Smart Bus Terminal', 'Bhadrakali Lake Bund Development']
-      },
-      {
-        id: 'brs',
-        name: 'BRS',
-        teluguName: 'భారత్ రాష్ట్ర సమితి',
-        code: 'BRS',
-        symbol: '🚗',
-        candidate: 'Dasyam Vinay Bhasker',
-        role: 'Opposition Leader',
-        status: 'Opposition Leader',
-        color: '#E11D48',
-        badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-        voteShare: 37.8,
-        focus: 'వరంగల్ సూపర్ స్పెషాలిటీ ఆస్పత్రి, రింగ్ రోడ్',
-        keyFocus: 'వరంగల్ సూపర్ స్పెషాలిటీ ఆస్పత్రి, రింగ్ రోడ్',
-        promises: ['24-floor Super Specialty Hospital completion', 'Internal Ring Road connectivity'],
-        manifestoPromises: ['24-floor Super Specialty Hospital completion', 'Internal Ring Road connectivity']
-      },
-      {
-        id: 'bjp',
-        name: 'BJP',
-        teluguName: 'భారతీయ జనతా పార్టీ',
-        code: 'BJP',
-        symbol: '🪷',
-        candidate: 'Rao Padma',
-        role: 'Key Challenger',
-        status: 'Key Challenger',
-        color: '#FF6F00',
-        badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-        voteShare: 15.3,
-        focus: 'హెరిటేజ్ సిటీ సెంట్రల్ గ్రాంట్స్, మామునూరు ఎయిర్‌పోర్ట్',
-        keyFocus: 'హెరిటేజ్ సిటీ సెంట్రల్ గ్రాంట్స్, మామునూరు ఎయిర్‌పోర్ట్',
-        promises: ['Mamnoor Airport revival with central clearance', 'Historic Warangal Fort preservation funding'],
-        manifestoPromises: ['Mamnoor Airport revival with central clearance', 'Historic Warangal Fort preservation funding']
-      }
-    ]
+    parties: getTelanganaAllParties('Warangal West Assembly', 'Hanamkonda', {
+      inc: { candidate: 'Naini Rajender Reddy (Ruling MLA)', voteShare: 44.5 },
+      brs: { candidate: 'Dasyam Vinay Bhasker', voteShare: 37.8 },
+      bjp: { candidate: 'Rao Padma', voteShare: 15.3 }
+    })
   },
   {
     id: 'guntur-west',
@@ -579,42 +464,10 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'Main Road, Brodipet, Guntur, Andhra Pradesh - 522002',
     gpsCoordinates: '16.3067° N, 80.4365° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'tdp',
-        name: 'TDP / NDA Alliance',
-        teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',
-        code: 'TDP',
-        symbol: '🚲',
-        candidate: 'Galla Madhavi',
-        role: 'Ruling Alliance MLA',
-        status: 'Ruling Alliance MLA',
-        color: '#EAB308',
-        badgeColor: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-        voteShare: 49.3,
-        focus: 'మిర్చి యార్డ్ ఆధునీకరణ, అమరావతి కనెక్టివిటీ, అండర్‌గ్రౌండ్ డ్రైనేజ్',
-        keyFocus: 'మిర్చి యార్డ్ ఆధునీకరణ, అమరావతి కనెక్టివిటీ, అండర్‌గ్రౌండ్ డ్రైనేజ్',
-        promises: ['Asia’s largest Mirchi Yard digitization', 'Guntur-Vijayawada Metro corridor link'],
-        manifestoPromises: ['Asia’s largest Mirchi Yard digitization', 'Guntur-Vijayawada Metro corridor link']
-      },
-      {
-        id: 'ysrcp',
-        name: 'YSRCP',
-        teluguName: 'వైఎస్సార్ కాంగ్రెస్ పార్టీ',
-        code: 'YSRCP',
-        symbol: '🪭',
-        candidate: 'Vidadala Rajini',
-        role: 'Former Minister / Challenger',
-        status: 'Opposition Challenger',
-        color: '#0EA5E9',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 42.6,
-        focus: 'ప్రభుత్వ మెడికల్ కాలేజ్ విస్తరణ, నవరత్నాలు',
-        keyFocus: 'ప్రభుత్వ మెడికల్ కాలేజ్ విస్తరణ, నవరత్నాలు',
-        promises: ['Guntur GGH modernization', 'Direct citizen welfare desks'],
-        manifestoPromises: ['Guntur GGH modernization', 'Direct citizen welfare desks']
-      }
-    ]
+    parties: getAndhraAllParties('Guntur West Assembly', 'Brodipet', {
+      tdp: { candidate: 'Galla Madhavi (Ruling MLA)', voteShare: 49.3 },
+      ysrcp: { candidate: 'Vidadala Rajini', voteShare: 42.6 }
+    })
   },
   {
     id: 'tirupati-urban',
@@ -630,42 +483,10 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'Alipiri Road, Tirupati, Andhra Pradesh - 517501',
     gpsCoordinates: '13.6288° N, 79.4192° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'janasena-tdp',
-        name: 'Janasena / TDP Alliance',
-        teluguName: 'జనసేన - తెదేపా కూటమి',
-        code: 'JSP/TDP',
-        symbol: '🍶',
-        candidate: 'Arani Srinivasulu',
-        role: 'Ruling Alliance MLA',
-        status: 'Ruling Alliance MLA',
-        color: '#DC2626',
-        badgeColor: 'bg-red-500/20 text-red-400 border-red-500/30',
-        voteShare: 51.2,
-        focus: 'భక్తులకు మెరుగైన వసతులు, తిరుపతి స్మార్ట్ ట్రాఫిక్, ఆధ్యాత్మిక పర్యాటకం',
-        keyFocus: 'భక్తులకు మెరుగైన వసతులు, తిరుపతి స్మార్ట్ ట్రాఫిక్, ఆధ్యాత్మిక పర్యాటకం',
-        promises: ['Alipiri Footway Modernization', 'Garuda Varadhi Traffic Easing', 'Free Student Bus Passes'],
-        manifestoPromises: ['Alipiri Footway Modernization', 'Garuda Varadhi Traffic Easing', 'Free Student Bus Passes']
-      },
-      {
-        id: 'ysrcp',
-        name: 'YSRCP',
-        teluguName: 'వైఎస్సార్ కాంగ్రెస్ పార్టీ',
-        code: 'YSRCP',
-        symbol: '🪭',
-        candidate: 'Bhumana Abhinay Reddy',
-        role: 'Former Deputy Mayor / Challenger',
-        status: 'Opposition Challenger',
-        color: '#0EA5E9',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 42.8,
-        focus: 'తిరుపతి సివిక్ రోడ్ల విస్తరణ, కార్పొరేషన్ అభివృద్ధి',
-        keyFocus: 'తిరుపతి సివిక్ రోడ్ల విస్తరణ, కార్పొరేషన్ అభివృద్ధి',
-        promises: ['Master plan roads completion', 'SVIMS super specialty grants'],
-        manifestoPromises: ['Master plan roads completion', 'SVIMS super specialty grants']
-      }
-    ]
+    parties: getAndhraAllParties('Tirupati Assembly', 'Alipiri Road', {
+      tdp: { candidate: 'Arani Srinivasulu (Ruling MLA)', voteShare: 51.2 },
+      ysrcp: { candidate: 'Bhumana Abhinay Reddy', voteShare: 42.8 }
+    })
   },
   {
     id: 'ap-kurnool',
@@ -681,76 +502,11 @@ export const CONSTITUENCY_DATABASE = [
     exactAddress: 'C-Camp Centre, Kurnool, Andhra Pradesh - 518002',
     gpsCoordinates: '15.8281° N, 78.0373° E',
     detectionMethod: 'Auto-detected via GPS & Network 🛰️',
-    parties: [
-      {
-        id: 'tdp',
-        name: 'TDP (NDA Alliance)',
-        teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',
-        code: 'TDP',
-        symbol: '🚲',
-        candidate: 'T.G. Bharath',
-        role: 'Minister & Sitting MLA',
-        status: 'Minister & Sitting MLA',
-        color: '#EAB308',
-        badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
-        voteShare: 52.4,
-        focus: 'కర్నూలు పారిశ్రామిక అభివృద్ధి, హైకోర్టు బెంచ్, రోడ్ల ఆధునీకరణ',
-        keyFocus: 'కర్నూలు పారిశ్రామిక అభివృద్ధి, హైకోర్టు బెంచ్, రోడ్ల ఆధునీకరణ',
-        promises: ['Kurnool Mega Industrial Park', 'Tungabhadra Riverfront Development', 'High Court Bench in Kurnool'],
-        manifestoPromises: ['Kurnool Mega Industrial Park', 'Tungabhadra Riverfront Development', 'High Court Bench in Kurnool']
-      },
-      {
-        id: 'ysrcp',
-        name: 'YSRCP',
-        teluguName: 'వైఎస్సార్సీపీ',
-        code: 'YSRCP',
-        symbol: '🪭',
-        candidate: 'A. Md. Imtiaz (Ex-Collector)',
-        role: 'Key Contender / Challenger',
-        status: 'Key Contender / Challenger',
-        color: '#0EA5E9',
-        badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-        voteShare: 43.1,
-        focus: 'సంక్షేమ పథకాలు, మైనారిటీ సంక్షేమం, ప్రభుత్వ ఆసుపత్రి విస్తరణ',
-        keyFocus: 'సంక్షేమ పథకాలు, మైనారిటీ సంక్షేమం, ప్రభుత్వ ఆసుపత్రి విస్తరణ',
-        promises: ['GGH Kurnool super-specialty blocks', 'Old City drainage overhaul', 'Minority education grants'],
-        manifestoPromises: ['GGH Kurnool super-specialty blocks', 'Old City drainage overhaul', 'Minority education grants']
-      },
-      {
-        id: 'inc',
-        name: 'Congress (INC)',
-        teluguName: 'కాంగ్రెస్',
-        code: 'INC',
-        symbol: '✋',
-        candidate: 'Shaik Jailani Basha',
-        role: 'Contestant',
-        status: 'Contestant',
-        color: '#0284C7',
-        badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-        voteShare: 3.2,
-        focus: 'రైతు భరోసా, పేదరిక నిర్మూలన',
-        keyFocus: 'రైతు భరోసా, పేదరిక నిర్మూలన',
-        promises: ['Farmer loan relief', 'Youth employment assistance'],
-        manifestoPromises: ['Farmer loan relief', 'Youth employment assistance']
-      },
-      {
-        id: 'oth',
-        name: 'Others & Independents',
-        teluguName: 'ఇతరులు',
-        code: 'OTH',
-        symbol: '🗳️',
-        candidate: 'Independent Contenders',
-        role: 'Independent',
-        status: 'Independent',
-        color: '#64748B',
-        badgeColor: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-        voteShare: 1.3,
-        focus: 'స్థానిక సమస్యల పరిష్కారం',
-        keyFocus: 'స్థానిక సమస్యల పరిష్కారం',
-        promises: ['Local ward civic governance'],
-        manifestoPromises: ['Local ward civic governance']
-      }
-    ]
+    parties: getAndhraAllParties('Kurnool Assembly Constituency', 'C-Camp Centre', {
+      tdp: { candidate: 'T.G. Bharath (Sitting MLA / Minister)', voteShare: 48.4 },
+      ysrcp: { candidate: 'A. Md. Imtiaz (Ex-Collector)', voteShare: 42.1 },
+      inc: { candidate: 'Shaik Jailani Basha', voteShare: 3.2 }
+    })
   }
 ];
 
@@ -937,59 +693,7 @@ export function resolveConstituencyAndParties(detectedInfo) {
       exactAddress: exactAddress || `${areaName}, ${city}, Telangana - ${pincode}`,
       gpsCoordinates: lat && lon ? `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E` : '17.3850° N, 78.4867° E',
       detectionMethod: method,
-      parties: [
-        {
-          id: 'inc',
-          name: 'Congress (INC)',
-          teluguName: 'భారత జాతీయ కాంగ్రెస్',
-          code: 'INC',
-          symbol: '✋',
-          candidate: `Local MLA / Contestant (${resolvedAssembly.replace(' Assembly Constituency', '').replace(' Assembly', '')})`,
-          role: 'Ruling Party in Telangana',
-          status: 'Ruling Party in Telangana',
-          color: '#0284C7',
-          badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-          voteShare: 41.2,
-          focus: 'రైతు భరోసా, 6 గ్యారెంటీలు, సివిక్ రోడ్ల విస్తరణ',
-          keyFocus: 'రైతు భరోసా, 6 గ్యారెంటీలు, సివిక్ రోడ్ల విస్తరణ',
-          promises: [`24/7 drinking water in ${areaName}`, 'Indiramma Housing assistance', 'Women free travel desks'],
-          manifestoPromises: [`24/7 drinking water in ${areaName}`, 'Indiramma Housing assistance', 'Women free travel desks']
-        },
-        {
-          id: 'brs',
-          name: 'BRS',
-          teluguName: 'భారత్ రాష్ట్ర సమితి',
-          code: 'BRS',
-          symbol: '🚗',
-          candidate: `BRS Nominee (${resolvedAssembly.replace(' Assembly Constituency', '').replace(' Assembly', '')})`,
-          role: 'Main Opposition Party',
-          status: 'Main Opposition Party',
-          color: '#E11D48',
-          badgeColor: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
-          voteShare: 37.5,
-          focus: 'రైతు బంధు, సంక్షేమ పథకాలు, స్థానిక సమస్యలపై పోరాటం',
-          keyFocus: 'రైతు బంధు, సంక్షేమ పథకాలు, స్థానిక సమస్యలపై పోరాటం',
-          promises: [`Local ward infrastructure upgrade in ${areaName}`, 'Drainage and road repair guarantee'],
-          manifestoPromises: [`Local ward infrastructure upgrade in ${areaName}`, 'Drainage and road repair guarantee']
-        },
-        {
-          id: 'bjp',
-          name: 'BJP',
-          teluguName: 'భారతీయ జనతా పార్టీ',
-          code: 'BJP',
-          symbol: '🪷',
-          candidate: `BJP Candidate (${resolvedAssembly.replace(' Assembly Constituency', '').replace(' Assembly', '')})`,
-          role: 'Key Challenger',
-          status: 'Key Challenger',
-          color: '#FF6F00',
-          badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-          voteShare: 16.8,
-          focus: 'అవినీతి రహిత పాలన, కేంద్ర పథకాల అమలు',
-          keyFocus: 'అవినీతి రహిత పాలన, కేంద్ర పథకాల అమలు',
-          promises: ['PM Awas Yojana urban houses', 'Smart surveillance & Clean roads'],
-          manifestoPromises: ['PM Awas Yojana urban houses', 'Smart surveillance & Clean roads']
-        }
-      ]
+      parties: getTelanganaAllParties(resolvedAssembly, areaName)
     };
   }
 
@@ -1011,59 +715,7 @@ export function resolveConstituencyAndParties(detectedInfo) {
       exactAddress: exactAddress || `${areaName}, ${city}, Andhra Pradesh - ${pincode}`,
       gpsCoordinates: lat && lon ? `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E` : '16.5062° N, 80.6480° E',
       detectionMethod: method,
-      parties: [
-        {
-          id: 'tdp',
-          name: 'TDP / NDA Alliance',
-          teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',
-          code: 'TDP',
-          symbol: '🚲',
-          candidate: `Alliance Nominee (${areaName})`,
-          role: 'Ruling Alliance in AP',
-          status: 'Ruling Alliance in AP',
-          color: '#EAB308',
-          badgeColor: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-          voteShare: 49.5,
-          focus: 'అమరావతి రాజధాని, సూపర్ 6 పథకాలు, రోడ్ల అభివృద్ధి',
-          keyFocus: 'అమరావతి రాజధాని, సూపర్ 6 పథకాలు, రోడ్ల అభివృద్ధి',
-          promises: [`New civic roads in ${areaName}`, 'Unemployment allowance for youth', 'Drinking water taps'],
-          manifestoPromises: [`New civic roads in ${areaName}`, 'Unemployment allowance for youth', 'Drinking water taps']
-        },
-        {
-          id: 'ysrcp',
-          name: 'YSRCP',
-          teluguName: 'వైఎస్సార్ కాంగ్రెస్ పార్టీ',
-          code: 'YSRCP',
-          symbol: '🪭',
-          candidate: `YSRCP Incharge (${areaName})`,
-          role: 'Principal Opposition',
-          status: 'Principal Opposition',
-          color: '#0EA5E9',
-          badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-          voteShare: 43.5,
-          focus: 'నవరత్నాలు, ప్రభుత్వ సంక్షేమం, బస్తీ ఆరోగ్య కేంద్రాలు',
-          keyFocus: 'నవరత్నాలు, ప్రభుత్వ సంక్షేమం, బస్తీ ఆరోగ్య కేంద్రాలు',
-          promises: ['Direct social pensions', 'Free municipal clinics'],
-          manifestoPromises: ['Direct social pensions', 'Free municipal clinics']
-        },
-        {
-          id: 'inc',
-          name: 'Congress (AP)',
-          teluguName: 'కాంగ్రెస్ పార్టీ',
-          code: 'INC',
-          symbol: '✋',
-          candidate: `Congress Nominee (${areaName})`,
-          role: 'Opposition',
-          status: 'Opposition',
-          color: '#10B981',
-          badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-          voteShare: 5.5,
-          focus: 'ప్రత్యేక హోదా & పారిశ్రామిక రాయితీలు',
-          keyFocus: 'ప్రత్యేక హోదా & పారిశ్రామిక రాయితీలు',
-          promises: ['Special Category Status guarantee'],
-          manifestoPromises: ['Special Category Status guarantee']
-        }
-      ]
+      parties: getAndhraAllParties(`${areaName} Assembly`, areaName)
     };
   }
 

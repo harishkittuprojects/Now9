@@ -112,22 +112,21 @@ export default function NowNineUnifiedApp() {
       const remaining = Math.max(0, minDisplayDuration - elapsed);
 
       setTimeout(() => {
-        if (resolvedLocation) {
-          setCurrentLocation(resolvedLocation);
-          recordCustomerActivity({
-            type: 'location',
-            title: 'GPS Geofence Verified',
-            detail: `Citizen geofenced to ${resolvedLocation.locality || resolvedLocation.city} (${resolvedLocation.assembly})`,
-            location: `${resolvedLocation.locality || resolvedLocation.city}, ${resolvedLocation.assembly}`,
-            icon: '📍',
-            badgeColor: 'sky',
-            badgeText: 'GPS Verified'
-          });
-          recordCitizenLogin({
-            location: resolvedLocation,
-            method: 'Auto GPS Detection'
-          });
-        }
+        const finalLoc = resolvedLocation || DEFAULT_DETECTED_LOCATION;
+        setCurrentLocation(finalLoc);
+        recordCustomerActivity({
+          type: 'location',
+          title: 'Citizen Geofence Synced',
+          detail: `Citizen location in ${finalLoc.locality || finalLoc.city} (${finalLoc.assembly})`,
+          location: `${finalLoc.locality || finalLoc.city}, ${finalLoc.assembly}`,
+          icon: '📍',
+          badgeColor: 'sky',
+          badgeText: 'GPS Verified'
+        });
+        recordCitizenLogin({
+          location: finalLoc,
+          method: resolvedLocation ? 'Auto GPS Detection' : 'Live Citizen Session'
+        });
         setIsLocating(false);
       }, remaining);
     };

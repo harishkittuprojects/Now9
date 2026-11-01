@@ -44,6 +44,10 @@ export function recordLiveBallot({ party, location, answers = {} }) {
   else if (pNameLower.includes('tdp')) partyCode = 'tdp';
   else if (pNameLower.includes('ysr')) partyCode = 'ysrcp';
   else if (pNameLower.includes('aimim') || pNameLower.includes('mim')) partyCode = 'aimim';
+  else if (pNameLower.includes('janasena') || pNameLower.includes('jsp') || pNameLower.includes('jana sena')) partyCode = 'jsp';
+  else if (pNameLower.includes('cpi') || pNameLower.includes('cpm') || pNameLower.includes('left')) partyCode = 'cpi';
+  else if (pNameLower.includes('bsp')) partyCode = 'bsp';
+  else partyCode = 'oth';
 
   const ballotId = `#BLT-${String(nextCount).padStart(4, '0')}`;
   

@@ -230,8 +230,17 @@ export default function NowNineAdminDashboard({
         setActiveCitizenSession(session);
         if (session.constituencyKey) {
           setSelectedConstituencyKey(session.constituencyKey);
+          
+          // Auto un-filter if citizen state is currently excluded by regionFilter
+          const isApKey = ['kurnool', 'chandragiri', 'vijayawada', 'guntur', 'visakhapatnam', 'tirupati'].includes(session.constituencyKey);
+          if (isApKey) {
+            setRegionFilter(prev => prev === 'Telangana' ? 'All' : prev);
+          } else {
+            setRegionFilter(prev => prev === 'Andhra Pradesh' ? 'All' : prev);
+          }
+          
           setToastMsg(`⚡ Auto-Synced: Live citizen active in ${session.assembly || session.locality} (${session.method || 'Mobile App'})`);
-          setTimeout(() => setToastMsg(null), 4000);
+          setTimeout(() => setToastMsg(null), 4500);
         }
       }
     });
@@ -328,137 +337,32 @@ export default function NowNineAdminDashboard({
     showToast('🗑️ Citizen activity log cleared.');
   };
 
-  // Detailed Assembly Standings Data
+  // Detailed Assembly Standings Data covering ALL Parties across AP & Telangana
   const ALL_CONSTITUENCIES = {
-    mahabubnagar: {
-      id: 'mahabubnagar',
-      code: 'TS-74',
-      name: 'Mahabubnagar Assembly Constituency',
-      teluguName: 'మహబూబ్‌నగర్ శాసనసభ నియోజకవర్గం',
-      locality: 'Yenugonda (యెనుగొండ) & Mahabubnagar Urban',
-      district: 'Mahabubnagar',
-      state: 'Telangana',
-      totalVotes: 34850,
-      turnoutRate: '78.4%',
+    kurnool: {
+      id: 'kurnool',
+      code: 'AP-138',
+      name: 'Kurnool Assembly Constituency',
+      teluguName: 'కర్నూలు శాసనసభ నియోజకవర్గం',
+      locality: 'C-Camp (సి-క్యాంప్), Old City, Birla Gate',
+      district: 'Kurnool',
+      state: 'Andhra Pradesh',
+      totalVotes: 37400,
+      turnoutRate: '76.8%',
       verifiedRate: '99.8%',
-      leadingParty: 'Congress (INC)',
-      leadingCandidate: 'Yennam Srinivas Reddy',
-      margin: '+5.4% (1,881 Votes)',
-      parliament: 'Mahabubnagar Lok Sabha',
+      leadingParty: 'TDP / NDA Alliance',
+      leadingCandidate: 'T.G. Bharath',
+      margin: '+9.3% (3,478 Votes)',
+      parliament: 'Kurnool Lok Sabha',
       parties: [
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Yennam Srinivas Reddy (Sitting MLA)', symbol: '✋', voteShare: 45.6, votes: 15891, color: '#0284C7', trend: '+3.1%' },
-        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'V. Srinivas Goud (Ex-Minister)', symbol: '🚗', voteShare: 40.2, votes: 14010, color: '#EC4899', trend: '-1.4%' },
-        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'A.P. Mithun Kumar Reddy', symbol: '🪷', voteShare: 11.8, votes: 4112, color: '#F97316', trend: '+1.2%' },
-        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 2.4, votes: 837, color: '#64748B', trend: '-0.3%' },
-      ]
-    },
-    lbnagar: {
-      id: 'lbnagar',
-      code: 'TS-51',
-      name: 'LB Nagar Assembly Constituency',
-      teluguName: 'ఎల్బీ నగర్ శాసనసభ నియోజకవర్గం',
-      locality: 'Almasguda, Badangpet, Meerpet, Saroornagar',
-      district: 'Ranga Reddy',
-      state: 'Telangana',
-      totalVotes: 42180,
-      turnoutRate: '69.2%',
-      verifiedRate: '99.5%',
-      leadingParty: 'Congress (INC)',
-      leadingCandidate: 'Madhu Yaskhi Goud',
-      margin: '+3.7% (1,560 Votes)',
-      parliament: 'Chevella / Malkajgiri Lok Sabha',
-      parties: [
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Madhu Yaskhi Goud (Ruling Nominee)', symbol: '✋', voteShare: 41.2, votes: 17378, color: '#0284C7', trend: '+2.1%' },
-        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Devireddy Sudheer Reddy (Sitting MLA)', symbol: '🚗', voteShare: 37.5, votes: 15817, color: '#EC4899', trend: '-0.8%' },
-        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Sama Ranga Reddy', symbol: '🪷', voteShare: 16.8, votes: 7086, color: '#F97316', trend: '+1.4%' },
-        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 4.5, votes: 1899, color: '#64748B', trend: '-0.3%' },
-      ]
-    },
-    jubileehills: {
-      id: 'jubileehills',
-      code: 'TS-61',
-      name: 'Jubilee Hills Assembly Constituency',
-      teluguName: 'జూబ్లీ హిల్స్ శాసనసభ నియోజకవర్గం',
-      locality: 'Jubilee Hills, Film Nagar, Banjara Hills',
-      district: 'Hyderabad',
-      state: 'Telangana',
-      totalVotes: 38920,
-      turnoutRate: '64.5%',
-      verifiedRate: '99.9%',
-      leadingParty: 'BRS',
-      leadingCandidate: 'Maganti Gopinath',
-      margin: '+5.7% (2,218 Votes)',
-      parliament: 'Secunderabad Lok Sabha',
-      parties: [
-        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Maganti Gopinath (Sitting MLA)', symbol: '🚗', voteShare: 41.5, votes: 16151, color: '#EC4899', trend: '+1.2%' },
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Mohammed Azharuddin', symbol: '✋', voteShare: 35.8, votes: 13933, color: '#0284C7', trend: '+0.5%' },
-        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Lankala Deepak Reddy', symbol: '🪷', voteShare: 18.2, votes: 7083, color: '#F97316', trend: '-1.0%' },
-        { id: 'aimim', name: 'AIMIM / Others', telugu: 'మజ్లిస్ / ఇతరులు', candidate: 'Local Corporator', symbol: '🪁', voteShare: 4.5, votes: 1753, color: '#16A34A', trend: '-0.7%' },
-      ]
-    },
-    serilingampally: {
-      id: 'serilingampally',
-      code: 'TS-52',
-      name: 'Serilingampally Assembly Constituency',
-      teluguName: 'శేరిలింగంపల్లి శాసనసభ నియోజకవర్గం',
-      locality: 'Gachibowli, HITEC City, Madhapur, Kondapur, Miyapur',
-      district: 'Ranga Reddy',
-      state: 'Telangana',
-      totalVotes: 58240,
-      turnoutRate: '61.8%',
-      verifiedRate: '99.7%',
-      leadingParty: 'BRS',
-      leadingCandidate: 'Arekapudi Gandhi',
-      margin: '+5.7% (3,319 Votes)',
-      parliament: 'Chevella Lok Sabha',
-      parties: [
-        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Arekapudi Gandhi', symbol: '🚗', voteShare: 43.8, votes: 25509, color: '#EC4899', trend: '+1.8%' },
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Jagadeeshwar Goud', symbol: '✋', voteShare: 38.1, votes: 22189, color: '#0284C7', trend: '+1.1%' },
-        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Ravi Kumar Yadav', symbol: '🪷', voteShare: 15.3, votes: 8910, color: '#F97316', trend: '-2.0%' },
-        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 2.8, votes: 1632, color: '#64748B', trend: '-0.9%' },
-      ]
-    },
-    munugode: {
-      id: 'munugode',
-      code: 'TS-93',
-      name: 'Munugode Assembly Constituency',
-      teluguName: 'మునుగోడు శాసనసభ నియోజకవర్గం',
-      locality: 'Chandur, Choutuppal, Marriguda',
-      district: 'Nalgonda',
-      state: 'Telangana',
-      totalVotes: 32150,
-      turnoutRate: '86.4%',
-      verifiedRate: '99.4%',
-      leadingParty: 'Congress (INC)',
-      leadingCandidate: 'Komatireddy Raj Gopal Reddy',
-      margin: '+9.6% (3,086 Votes)',
-      parliament: 'Bhongir Lok Sabha',
-      parties: [
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Komatireddy Raj Gopal Reddy', symbol: '✋', voteShare: 43.8, votes: 14081, color: '#0284C7', trend: '+3.4%' },
-        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Kusukuntla Prabhakar Reddy', symbol: '🚗', voteShare: 34.2, votes: 10995, color: '#EC4899', trend: '-2.1%' },
-        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Boora Narsaiah Goud', symbol: '🪷', voteShare: 18.0, votes: 5787, color: '#F97316', trend: '+0.8%' },
-        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 4.0, votes: 1287, color: '#64748B', trend: '-2.1%' },
-      ]
-    },
-    gajwel: {
-      id: 'gajwel',
-      code: 'TS-40',
-      name: 'Gajwel Assembly Constituency',
-      teluguName: 'గజ్వేల్ శాసనసభ నియోజకవర్గం',
-      locality: 'Gajwel, Toopran, Wargal',
-      district: 'Siddipet',
-      state: 'Telangana',
-      totalVotes: 36400,
-      turnoutRate: '88.1%',
-      verifiedRate: '99.6%',
-      leadingParty: 'BRS',
-      leadingCandidate: 'K. Chandrashekar Rao',
-      margin: '+12.6% (4,586 Votes)',
-      parliament: 'Medak Lok Sabha',
-      parties: [
-        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'K. Chandrashekar Rao', symbol: '🚗', voteShare: 52.4, votes: 19073, color: '#EC4899', trend: '+1.5%' },
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Thumkunta Narsa Reddy', symbol: '✋', voteShare: 39.8, votes: 14487, color: '#0284C7', trend: '-0.4%' },
-        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Eatala Rajender', symbol: '🪷', voteShare: 7.8, votes: 2840, color: '#F97316', trend: '-1.1%' },
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'T.G. Bharath (Sitting MLA / Minister)', symbol: '🚲', voteShare: 48.4, votes: 18101, color: '#EAB308', trend: '+4.1%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'A. Md. Imtiaz (Ex-Collector)', symbol: '🪭', voteShare: 42.1, votes: 15745, color: '#0EA5E9', trend: '-2.8%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'District Alliance Contender', symbol: '🍵', voteShare: 4.6, votes: 1720, color: '#DC2626', trend: '+1.4%' },
+        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Kurnool City President', symbol: '🪷', voteShare: 2.2, votes: 822, color: '#FF6F00', trend: '+0.5%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Shaik Jailani Basha', symbol: '✋', voteShare: 1.5, votes: 561, color: '#10B981', trend: '-0.8%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Workers Union Nominee', symbol: '🌾', voteShare: 0.5, votes: 187, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 150, color: '#1D4ED8', trend: '0.0%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 0.3, votes: 114, color: '#64748B', trend: '-0.5%' },
       ]
     },
     chandragiri: {
@@ -477,10 +381,14 @@ export default function NowNineAdminDashboard({
       margin: '+8.4% (2,620 Votes)',
       parliament: 'Chittoor Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Pulivarthi Nani', symbol: '🚲', voteShare: 51.2, votes: 15974, color: '#EAB308', trend: '+2.8%' },
-        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Chevireddy Mohith Reddy', symbol: '🚁', voteShare: 42.8, votes: 13353, color: '#16A34A', trend: '-2.2%' },
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'K. Balaram', symbol: '✋', voteShare: 4.2, votes: 1310, color: '#0284C7', trend: '-0.3%' },
-        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 1.8, votes: 563, color: '#64748B', trend: '-0.3%' },
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Pulivarthi Nani (Sitting MLA)', symbol: '🚲', voteShare: 48.2, votes: 15038, color: '#EAB308', trend: '+2.8%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Chevireddy Mohith Reddy', symbol: '🪭', voteShare: 42.1, votes: 13135, color: '#0EA5E9', trend: '-2.2%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Tirupati Rural Incharge', symbol: '🍵', voteShare: 4.8, votes: 1497, color: '#DC2626', trend: '+1.5%' },
+        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Alliance Nominee', symbol: '🪷', voteShare: 2.3, votes: 717, color: '#FF6F00', trend: '+0.4%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'K. Balaram', symbol: '✋', voteShare: 1.4, votes: 437, color: '#10B981', trend: '-0.3%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Left Contender', symbol: '🌾', voteShare: 0.5, votes: 156, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 125, color: '#1D4ED8', trend: '0.0%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.3, votes: 95, color: '#64748B', trend: '-0.3%' },
       ]
     },
     vijayawada: {
@@ -499,32 +407,263 @@ export default function NowNineAdminDashboard({
       margin: '+9.4% (3,713 Votes)',
       parliament: 'Vijayawada Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Bonda Umamaheswara Rao', symbol: '🚲', voteShare: 49.3, votes: 19473, color: '#EAB308', trend: '+3.2%' },
-        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Velampalli Srinivasa Rao', symbol: '🪭', voteShare: 42.6, votes: 16827, color: '#0EA5E9', trend: '-2.5%' },
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City President Nominee', symbol: '✋', voteShare: 5.8, votes: 2291, color: '#10B981', trend: '-0.4%' },
-        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 2.3, votes: 909, color: '#64748B', trend: '-0.3%' },
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Bonda Umamaheswara Rao', symbol: '🚲', voteShare: 47.2, votes: 18644, color: '#EAB308', trend: '+3.2%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Velampalli Srinivasa Rao', symbol: '🪭', voteShare: 41.5, votes: 16392, color: '#0EA5E9', trend: '-2.5%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Pothina Mahesh / Youth Alliance', symbol: '🍵', voteShare: 5.8, votes: 2291, color: '#DC2626', trend: '+1.6%' },
+        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'City Leader', symbol: '🪷', voteShare: 2.6, votes: 1027, color: '#FF6F00', trend: '+0.5%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City President Nominee', symbol: '✋', voteShare: 1.8, votes: 711, color: '#10B981', trend: '-0.4%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Labor Union Nominee', symbol: '🌾', voteShare: 0.5, votes: 198, color: '#BE123C', trend: '-0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.3, votes: 118, color: '#1D4ED8', trend: '0.0%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.3, votes: 119, color: '#64748B', trend: '-0.3%' },
       ]
     },
-    kurnool: {
-      id: 'kurnool',
-      code: 'AP-138',
-      name: 'Kurnool Assembly Constituency',
-      teluguName: 'కర్నూలు శాసనసభ నియోజకవర్గం',
-      locality: 'C-Camp (సి-క్యాంప్), Old City, Birla Gate',
-      district: 'Kurnool',
+    guntur: {
+      id: 'guntur',
+      code: 'AP-86',
+      name: 'Guntur West Assembly',
+      teluguName: 'గుంటూరు పశ్చిమ శాసనసభ నియోజకవర్గం',
+      locality: 'Brodipet, Arundelpet, Pattabhipuram',
+      district: 'Guntur',
       state: 'Andhra Pradesh',
-      totalVotes: 37400,
-      turnoutRate: '76.8%',
-      verifiedRate: '99.8%',
+      totalVotes: 35500,
+      turnoutRate: '78.2%',
+      verifiedRate: '99.6%',
       leadingParty: 'TDP / NDA Alliance',
-      leadingCandidate: 'T.G. Bharath',
-      margin: '+9.3% (3,478 Votes)',
-      parliament: 'Kurnool Lok Sabha',
+      leadingCandidate: 'Galla Madhavi',
+      margin: '+8.2% (2,911 Votes)',
+      parliament: 'Guntur Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'T.G. Bharath (Sitting MLA / Minister)', symbol: '🚲', voteShare: 52.4, votes: 19597, color: '#EAB308', trend: '+4.1%' },
-        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'A. Md. Imtiaz (Ex-Collector)', symbol: '🪭', voteShare: 43.1, votes: 16119, color: '#0EA5E9', trend: '-2.8%' },
-        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Shaik Jailani Basha', symbol: '✋', voteShare: 3.2, votes: 1196, color: '#0284C7', trend: '-0.8%' },
-        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 1.3, votes: 488, color: '#64748B', trend: '-0.5%' },
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Galla Madhavi (Sitting MLA)', symbol: '🚲', voteShare: 48.5, votes: 17217, color: '#EAB308', trend: '+3.1%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Vidadala Rajini (Ex-Minister)', symbol: '🪭', voteShare: 41.8, votes: 14839, color: '#0EA5E9', trend: '-2.1%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Alliance Incharge', symbol: '🍵', voteShare: 4.8, votes: 1704, color: '#DC2626', trend: '+1.4%' },
+        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'City Incharge', symbol: '🪷', voteShare: 2.3, votes: 816, color: '#FF6F00', trend: '+0.4%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Guntur INC President', symbol: '✋', voteShare: 1.6, votes: 568, color: '#10B981', trend: '-0.3%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Labor Union Nominee', symbol: '🌾', voteShare: 0.5, votes: 178, color: '#BE123C', trend: '+0.1%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.5, votes: 178, color: '#64748B', trend: '-0.2%' },
+      ]
+    },
+    visakhapatnam: {
+      id: 'visakhapatnam',
+      code: 'AP-20',
+      name: 'Visakhapatnam East Assembly',
+      teluguName: 'విశాఖపట్నం తూర్పు శాసనసభ నియోజకవర్గం',
+      locality: 'MVP Colony, Beach Road, Siripuram',
+      district: 'Visakhapatnam',
+      state: 'Andhra Pradesh',
+      totalVotes: 47600,
+      turnoutRate: '71.5%',
+      verifiedRate: '99.9%',
+      leadingParty: 'TDP / NDA Alliance',
+      leadingCandidate: 'Velagapudi Ramakrishna Babu',
+      margin: '+12.8% (6,092 Votes)',
+      parliament: 'Visakhapatnam Lok Sabha',
+      parties: [
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Velagapudi Ramakrishna Babu (Sitting MLA)', symbol: '🚲', voteShare: 51.4, votes: 24466, color: '#EAB308', trend: '+4.2%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'MVV Satyanarayana', symbol: '🪭', voteShare: 38.6, votes: 18374, color: '#0EA5E9', trend: '-2.8%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Vizag North Alliance Team', symbol: '🍵', voteShare: 5.2, votes: 2475, color: '#DC2626', trend: '+1.8%' },
+        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Vizag City President', symbol: '🪷', voteShare: 2.4, votes: 1142, color: '#FF6F00', trend: '+0.6%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Steel Plant Forum / INC', symbol: '✋', voteShare: 1.4, votes: 666, color: '#10B981', trend: '-0.4%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Save Vizag Steel Forum', symbol: '🌾', voteShare: 0.6, votes: 286, color: '#BE123C', trend: '+0.2%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.4, votes: 191, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    tirupati: {
+      id: 'tirupati',
+      code: 'AP-168',
+      name: 'Tirupati Assembly Constituency',
+      teluguName: 'తిరుపతి శాసనసభ నియోజకవర్గం',
+      locality: 'Alipiri, KT Road, Tirumala Footway',
+      district: 'Tirupati',
+      state: 'Andhra Pradesh',
+      totalVotes: 38900,
+      turnoutRate: '81.4%',
+      verifiedRate: '99.7%',
+      leadingParty: 'TDP / NDA Alliance',
+      leadingCandidate: 'Arani Srinivasulu',
+      margin: '+8.6% (3,345 Votes)',
+      parliament: 'Tirupati Lok Sabha',
+      parties: [
+        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Arani Srinivasulu (Sitting MLA)', symbol: '🚲', voteShare: 50.8, votes: 19761, color: '#EAB308', trend: '+3.5%' },
+        { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Bhumana Abhinay Reddy', symbol: '🪭', voteShare: 42.2, votes: 16416, color: '#0EA5E9', trend: '-2.4%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Tirupati Urban Incharge', symbol: '🍵', voteShare: 4.2, votes: 1634, color: '#DC2626', trend: '+1.2%' },
+        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Temple City Leader', symbol: '🪷', voteShare: 1.6, votes: 622, color: '#FF6F00', trend: '+0.3%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City Incharge', symbol: '✋', voteShare: 0.6, votes: 233, color: '#10B981', trend: '-0.2%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.6, votes: 234, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    mahabubnagar: {
+      id: 'mahabubnagar',
+      code: 'TS-74',
+      name: 'Mahabubnagar Assembly Constituency',
+      teluguName: 'మహబూబ్‌నగర్ శాసనసభ నియోజకవర్గం',
+      locality: 'Yenugonda (యెనుగొండ) & Mahabubnagar Urban',
+      district: 'Mahabubnagar',
+      state: 'Telangana',
+      totalVotes: 34850,
+      turnoutRate: '78.4%',
+      verifiedRate: '99.8%',
+      leadingParty: 'Congress (INC)',
+      leadingCandidate: 'Yennam Srinivas Reddy',
+      margin: '+5.4% (1,881 Votes)',
+      parliament: 'Mahabubnagar Lok Sabha',
+      parties: [
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Yennam Srinivas Reddy (Sitting MLA)', symbol: '✋', voteShare: 44.2, votes: 15403, color: '#0284C7', trend: '+2.8%' },
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'V. Srinivas Goud (Ex-Minister)', symbol: '🚗', voteShare: 38.8, votes: 13521, color: '#EC4899', trend: '-1.4%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'A.P. Mithun Kumar Reddy', symbol: '🪷', voteShare: 11.5, votes: 4007, color: '#F97316', trend: '+1.1%' },
+        { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Constituency Incharge', symbol: '🪁', voteShare: 1.8, votes: 627, color: '#059669', trend: '+0.2%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'Palamuru Youth President', symbol: '🍵', voteShare: 1.6, votes: 557, color: '#DC2626', trend: '+0.5%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Rythu Sangham Nominee', symbol: '🌾', voteShare: 0.8, votes: 278, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.7, votes: 244, color: '#1D4ED8', trend: '0.0%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 0.6, votes: 209, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    lbnagar: {
+      id: 'lbnagar',
+      code: 'TS-51',
+      name: 'LB Nagar Assembly Constituency',
+      teluguName: 'ఎల్బీ నగర్ శాసనసభ నియోజకవర్గం',
+      locality: 'Almasguda, Badangpet, Meerpet, Saroornagar',
+      district: 'Ranga Reddy',
+      state: 'Telangana',
+      totalVotes: 42180,
+      turnoutRate: '69.2%',
+      verifiedRate: '99.5%',
+      leadingParty: 'Congress (INC)',
+      leadingCandidate: 'Madhu Yaskhi Goud',
+      margin: '+3.7% (1,560 Votes)',
+      parliament: 'Chevella / Malkajgiri Lok Sabha',
+      parties: [
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Madhu Yaskhi Goud (Ruling Nominee)', symbol: '✋', voteShare: 40.2, votes: 16956, color: '#0284C7', trend: '+2.1%' },
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Devireddy Sudheer Reddy (Sitting MLA)', symbol: '🚗', voteShare: 36.8, votes: 15522, color: '#EC4899', trend: '-0.8%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Sama Ranga Reddy', symbol: '🪷', voteShare: 17.2, votes: 7254, color: '#F97316', trend: '+1.4%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'Ranga Reddy Youth Incharge', symbol: '🍵', voteShare: 2.4, votes: 1012, color: '#DC2626', trend: '+0.6%' },
+        { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Local Contender', symbol: '🪁', voteShare: 1.6, votes: 674, color: '#059669', trend: '+0.1%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Workers Union Nominee', symbol: '🌾', voteShare: 0.7, votes: 295, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Contestant', symbol: '🐘', voteShare: 0.6, votes: 253, color: '#1D4ED8', trend: '0.0%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independent Contenders', symbol: '🗳️', voteShare: 0.5, votes: 214, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    jubileehills: {
+      id: 'jubileehills',
+      code: 'TS-61',
+      name: 'Jubilee Hills Assembly Constituency',
+      teluguName: 'జూబ్లీ హిల్స్ శాసనసభ నియోజకవర్గం',
+      locality: 'Jubilee Hills, Film Nagar, Banjara Hills',
+      district: 'Hyderabad',
+      state: 'Telangana',
+      totalVotes: 38920,
+      turnoutRate: '64.5%',
+      verifiedRate: '99.9%',
+      leadingParty: 'BRS',
+      leadingCandidate: 'Maganti Gopinath',
+      margin: '+5.7% (2,218 Votes)',
+      parliament: 'Secunderabad Lok Sabha',
+      parties: [
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Maganti Gopinath (Sitting MLA)', symbol: '🚗', voteShare: 39.5, votes: 15373, color: '#EC4899', trend: '+1.2%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Mohammed Azharuddin', symbol: '✋', voteShare: 35.2, votes: 13699, color: '#0284C7', trend: '+0.5%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Lankala Deepak Reddy', symbol: '🪷', voteShare: 17.5, votes: 6811, color: '#F97316', trend: '-1.0%' },
+        { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Rashed Faraz Dildar', symbol: '🪁', voteShare: 4.8, votes: 1868, color: '#059669', trend: '-0.7%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'Youth Wing Candidate', symbol: '🍵', voteShare: 1.4, votes: 545, color: '#DC2626', trend: '+0.4%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Left Contender', symbol: '🌾', voteShare: 0.6, votes: 233, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.5, votes: 195, color: '#1D4ED8', trend: '0.0%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.5, votes: 196, color: '#64748B', trend: '-0.4%' },
+      ]
+    },
+    serilingampally: {
+      id: 'serilingampally',
+      code: 'TS-52',
+      name: 'Serilingampally Assembly Constituency',
+      teluguName: 'శేరిలింగంపల్లి శాసనసభ నియోజకవర్గం',
+      locality: 'Gachibowli, HITEC City, Madhapur, Kondapur, Miyapur',
+      district: 'Ranga Reddy',
+      state: 'Telangana',
+      totalVotes: 58240,
+      turnoutRate: '61.8%',
+      verifiedRate: '99.7%',
+      leadingParty: 'BRS',
+      leadingCandidate: 'Arekapudi Gandhi',
+      margin: '+5.7% (3,319 Votes)',
+      parliament: 'Chevella Lok Sabha',
+      parties: [
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Arekapudi Gandhi (Sitting MLA)', symbol: '🚗', voteShare: 42.5, votes: 24752, color: '#EC4899', trend: '+1.8%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Jagadeeshwar Goud', symbol: '✋', voteShare: 37.2, votes: 21665, color: '#0284C7', trend: '+1.1%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Ravi Kumar Yadav', symbol: '🪷', voteShare: 15.5, votes: 9027, color: '#F97316', trend: '-2.0%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'IT Corridor Youth Wing', symbol: '🍵', voteShare: 2.4, votes: 1397, color: '#DC2626', trend: '+0.4%' },
+        { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Local Corporator Candidate', symbol: '🪁', voteShare: 1.0, votes: 582, color: '#059669', trend: '+0.1%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Labour Forum Nominee', symbol: '🌾', voteShare: 0.6, votes: 349, color: '#BE123C', trend: '+0.1%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.8, votes: 468, color: '#64748B', trend: '-0.9%' },
+      ]
+    },
+    kukatpally: {
+      id: 'kukatpally',
+      code: 'TS-46',
+      name: 'Kukatpally Assembly Constituency',
+      teluguName: 'కూకట్‌పల్లి శాసనసభ నియోజకవర్గం',
+      locality: 'KPHB Colony, Kukatpally, Moosapet',
+      district: 'Medchal-Malkajgiri',
+      state: 'Telangana',
+      totalVotes: 43800,
+      turnoutRate: '65.4%',
+      verifiedRate: '99.7%',
+      leadingParty: 'BRS',
+      leadingCandidate: 'Madhavaram Krishna Rao',
+      margin: '+9.6% (4,220 Votes)',
+      parliament: 'Malkajgiri Lok Sabha',
+      parties: [
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Madhavaram Krishna Rao (Sitting MLA)', symbol: '🚗', voteShare: 43.8, votes: 19184, color: '#EC4899', trend: '+1.6%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Bandi Ramesh', symbol: '✋', voteShare: 34.2, votes: 14979, color: '#0284C7', trend: '+0.8%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'M. Prem Kumar', symbol: '🪷', voteShare: 17.5, votes: 7665, color: '#F97316', trend: '-1.4%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'KPHB Colony Alliance Wing', symbol: '🍵', voteShare: 2.5, votes: 1095, color: '#DC2626', trend: '+0.5%' },
+        { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Constituency Nominee', symbol: '🪁', voteShare: 0.8, votes: 350, color: '#059669', trend: '+0.1%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 1.2, votes: 527, color: '#64748B', trend: '-0.3%' },
+      ]
+    },
+    munugode: {
+      id: 'munugode',
+      code: 'TS-93',
+      name: 'Munugode Assembly Constituency',
+      teluguName: 'మునుగోడు శాసనసభ నియోజకవర్గం',
+      locality: 'Chandur, Choutuppal, Marriguda',
+      district: 'Nalgonda',
+      state: 'Telangana',
+      totalVotes: 32150,
+      turnoutRate: '86.4%',
+      verifiedRate: '99.4%',
+      leadingParty: 'Congress (INC)',
+      leadingCandidate: 'Komatireddy Raj Gopal Reddy',
+      margin: '+9.6% (3,086 Votes)',
+      parliament: 'Bhongir Lok Sabha',
+      parties: [
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Komatireddy Raj Gopal Reddy (Sitting MLA)', symbol: '✋', voteShare: 43.1, votes: 13856, color: '#0284C7', trend: '+3.4%' },
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'Kusukuntla Prabhakar Reddy', symbol: '🚗', voteShare: 33.8, votes: 10866, color: '#EC4899', trend: '-2.1%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Boora Narsaiah Goud', symbol: '🪷', voteShare: 17.8, votes: 5722, color: '#F97316', trend: '+0.8%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Left Contender', symbol: '🌾', voteShare: 3.2, votes: 1028, color: '#BE123C', trend: '+0.5%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'Youth Wing Nominee', symbol: '🍵', voteShare: 1.1, votes: 353, color: '#DC2626', trend: '+0.2%' },
+        { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 1.0, votes: 325, color: '#64748B', trend: '-2.1%' },
+      ]
+    },
+    gajwel: {
+      id: 'gajwel',
+      code: 'TS-40',
+      name: 'Gajwel Assembly Constituency',
+      teluguName: 'గజ్వేల్ శాసనసభ నియోజకవర్గం',
+      locality: 'Gajwel, Toopran, Wargal',
+      district: 'Siddipet',
+      state: 'Telangana',
+      totalVotes: 36400,
+      turnoutRate: '88.1%',
+      verifiedRate: '99.6%',
+      leadingParty: 'BRS',
+      leadingCandidate: 'K. Chandrashekar Rao',
+      margin: '+12.6% (4,586 Votes)',
+      parliament: 'Medak Lok Sabha',
+      parties: [
+        { id: 'brs', name: 'BRS', telugu: 'భారత్ రాష్ట్ర సమితి', candidate: 'K. Chandrashekar Rao (Sitting MLA)', symbol: '🚗', voteShare: 51.5, votes: 18746, color: '#EC4899', trend: '+1.5%' },
+        { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Thumkunta Narsa Reddy', symbol: '✋', voteShare: 39.2, votes: 14268, color: '#0284C7', trend: '-0.4%' },
+        { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Eatala Rajender', symbol: '🪷', voteShare: 6.8, votes: 2475, color: '#F97316', trend: '-1.1%' },
+        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'Alliance Candidate', symbol: '🍵', voteShare: 1.1, votes: 400, color: '#DC2626', trend: '+0.2%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Peasant Forum Contender', symbol: '🌾', voteShare: 0.7, votes: 255, color: '#BE123C', trend: '+0.1%' },
+        { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.7, votes: 256, color: '#64748B', trend: '-0.3%' },
       ]
     }
   };
@@ -786,6 +925,9 @@ export default function NowNineAdminDashboard({
 
   // Filtered constituencies list based on region and search query
   const filteredConstituenciesList = Object.values(ALL_CONSTITUENCIES).filter(c => {
+    // If this constituency is where the citizen is currently logged in, NEVER filter it out
+    const isCitizenActive = activeCitizenSession?.constituencyKey === c.id;
+    if (isCitizenActive) return true;
     if (regionFilter !== 'All' && c.state !== regionFilter) return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
@@ -793,6 +935,12 @@ export default function NowNineAdminDashboard({
            c.locality.toLowerCase().includes(q) || 
            c.district.toLowerCase().includes(q) ||
            c.code.toLowerCase().includes(q);
+  }).sort((a, b) => {
+    const aActive = activeCitizenSession?.constituencyKey === a.id;
+    const bActive = activeCitizenSession?.constituencyKey === b.id;
+    if (aActive && !bActive) return -1;
+    if (!aActive && bActive) return 1;
+    return 0;
   });
 
   return (
@@ -847,9 +995,10 @@ export default function NowNineAdminDashboard({
             <span className="text-[10px] text-gray-400 font-mono">
               Total Ballots: <strong className="text-white">{totalVotesCount.toLocaleString()}</strong>
             </span>
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 text-[9.5px] font-bold ml-1">
-              <MapPin className="w-3 h-3 text-amber-400" />
-              <span>Active: <strong>{baseConstituency.name.replace(' Assembly Constituency', '')}</strong></span>
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-extrabold ml-1 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+              <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
+              <span>Active Citizen: <strong className="text-white font-black">{activeCitizenSession?.assembly?.replace(' Assembly Constituency', '').replace(' Assembly', '') || baseConstituency.name.replace(' Assembly Constituency', '')}</strong> ({activeCitizenSession?.locality || baseConstituency.locality})</span>
             </span>
           </div>
         </div>
@@ -2052,11 +2201,28 @@ export default function NowNineAdminDashboard({
 
               {/* Grid of All Target Assemblies */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredConstituenciesList.map(c => (
-                  <div 
-                    key={c.id}
-                    className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3 hover:border-amber-400/40 transition-all shadow-md"
-                  >
+                {filteredConstituenciesList.map(c => {
+                  const isCitizenActive = activeCitizenSession?.constituencyKey === c.id;
+                  return (
+                    <div 
+                      key={c.id}
+                      className={`p-4 rounded-2xl transition-all shadow-md relative space-y-3 ${
+                        isCitizenActive 
+                          ? 'bg-[#12111A] border-2 border-amber-400 ring-2 ring-amber-400/40 shadow-[0_0_30px_rgba(245,199,84,0.25)]' 
+                          : 'bg-[#0E0E14] border border-[#222232] hover:border-amber-400/40'
+                      }`}
+                    >
+                      {isCitizenActive && (
+                        <div className="flex items-center justify-between px-3 py-1.5 -mt-1 -mx-1 mb-2 bg-gradient-to-r from-amber-500/25 via-emerald-500/20 to-amber-500/25 rounded-xl border border-amber-400/50 text-[11px] font-black text-amber-300 animate-pulse">
+                          <span className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                            <span>🔴 LIVE CITIZEN LOGGED IN HERE</span>
+                          </span>
+                          <span className="text-gray-200 font-mono text-[10px] bg-black/40 px-2 py-0.5 rounded border border-amber-400/30">
+                            {activeCitizenSession?.locality || c.locality} • Auto-Synced
+                          </span>
+                        </div>
+                      )}
                     <div className="flex items-center justify-between pb-2 border-b border-[#1E1E28]">
                       <div>
                         <div className="flex items-center gap-2">
@@ -2084,7 +2250,7 @@ export default function NowNineAdminDashboard({
                             <span className="font-bold text-white flex items-center gap-1.5">
                               <span>{p.symbol}</span>
                               <span>{p.name}</span>
-                              <span className="text-[9.5px] text-gray-400 font-normal">({p.candidate.split('(')[0]})</span>
+                              <span className="text-[9.5px] text-gray-400 font-normal">({p.candidate})</span>
                             </span>
                             <span className="font-mono font-black" style={{ color: p.color }}>
                               {p.voteShare}%
@@ -2100,7 +2266,8 @@ export default function NowNineAdminDashboard({
                       ))}
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
             </div>
           )}
