@@ -439,6 +439,7 @@ export default function NowNineAdminDashboard({
         { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'City Incharge', symbol: '🪷', voteShare: 2.3, votes: 816, color: '#FF6F00', trend: '+0.4%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Guntur INC President', symbol: '✋', voteShare: 1.6, votes: 568, color: '#10B981', trend: '-0.3%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Labor Union Nominee', symbol: '🌾', voteShare: 0.5, votes: 178, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Guntur Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 142, color: '#1D4ED8', trend: '0.0%' },
         { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.5, votes: 178, color: '#64748B', trend: '-0.2%' },
       ]
     },
@@ -464,6 +465,7 @@ export default function NowNineAdminDashboard({
         { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Vizag City President', symbol: '🪷', voteShare: 2.4, votes: 1142, color: '#FF6F00', trend: '+0.6%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Steel Plant Forum / INC', symbol: '✋', voteShare: 1.4, votes: 666, color: '#10B981', trend: '-0.4%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Save Vizag Steel Forum', symbol: '🌾', voteShare: 0.6, votes: 286, color: '#BE123C', trend: '+0.2%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Vizag Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 190, color: '#1D4ED8', trend: '0.0%' },
         { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.4, votes: 191, color: '#64748B', trend: '-0.3%' },
       ]
     },
@@ -488,6 +490,8 @@ export default function NowNineAdminDashboard({
         { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Tirupati Urban Incharge', symbol: '🍵', voteShare: 4.2, votes: 1634, color: '#DC2626', trend: '+1.2%' },
         { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Temple City Leader', symbol: '🪷', voteShare: 1.6, votes: 622, color: '#FF6F00', trend: '+0.3%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City Incharge', symbol: '✋', voteShare: 0.6, votes: 233, color: '#10B981', trend: '-0.2%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Pilgrim Workers Union', symbol: '🌾', voteShare: 0.6, votes: 233, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.5, votes: 194, color: '#1D4ED8', trend: '0.0%' },
         { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.6, votes: 234, color: '#64748B', trend: '-0.3%' },
       ]
     },
@@ -591,6 +595,7 @@ export default function NowNineAdminDashboard({
         { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'IT Corridor Youth Wing', symbol: '🍵', voteShare: 2.4, votes: 1397, color: '#DC2626', trend: '+0.4%' },
         { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Local Corporator Candidate', symbol: '🪁', voteShare: 1.0, votes: 582, color: '#059669', trend: '+0.1%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Labour Forum Nominee', symbol: '🌾', voteShare: 0.6, votes: 349, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Cyberabad Bahujan Nominee', symbol: '🐘', voteShare: 0.5, votes: 291, color: '#1D4ED8', trend: '0.0%' },
         { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.8, votes: 468, color: '#64748B', trend: '-0.9%' },
       ]
     },
@@ -615,6 +620,8 @@ export default function NowNineAdminDashboard({
         { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'M. Prem Kumar', symbol: '🪷', voteShare: 17.5, votes: 7665, color: '#F97316', trend: '-1.4%' },
         { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'KPHB Colony Alliance Wing', symbol: '🍵', voteShare: 2.5, votes: 1095, color: '#DC2626', trend: '+0.5%' },
         { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Constituency Nominee', symbol: '🪁', voteShare: 0.8, votes: 350, color: '#059669', trend: '+0.1%' },
+        { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'KPHB Left Union Nominee', symbol: '🌾', voteShare: 0.6, votes: 262, color: '#BE123C', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.5, votes: 219, color: '#1D4ED8', trend: '0.0%' },
         { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 1.2, votes: 527, color: '#64748B', trend: '-0.3%' },
       ]
     },
@@ -639,6 +646,8 @@ export default function NowNineAdminDashboard({
         { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Boora Narsaiah Goud', symbol: '🪷', voteShare: 17.8, votes: 5722, color: '#F97316', trend: '+0.8%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Left Contender', symbol: '🌾', voteShare: 3.2, votes: 1028, color: '#BE123C', trend: '+0.5%' },
         { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'Youth Wing Nominee', symbol: '🍵', voteShare: 1.1, votes: 353, color: '#DC2626', trend: '+0.2%' },
+        { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Nalgonda District AIMIM Incharge', symbol: '🪁', voteShare: 0.8, votes: 257, color: '#059669', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.6, votes: 193, color: '#1D4ED8', trend: '0.0%' },
         { id: 'oth', name: 'Others', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 1.0, votes: 325, color: '#64748B', trend: '-2.1%' },
       ]
     },
@@ -663,6 +672,8 @@ export default function NowNineAdminDashboard({
         { id: 'bjp', name: 'BJP', telugu: 'బీజేపీ', candidate: 'Eatala Rajender', symbol: '🪷', voteShare: 6.8, votes: 2475, color: '#F97316', trend: '-1.1%' },
         { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ', candidate: 'Alliance Candidate', symbol: '🍵', voteShare: 1.1, votes: 400, color: '#DC2626', trend: '+0.2%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Peasant Forum Contender', symbol: '🌾', voteShare: 0.7, votes: 255, color: '#BE123C', trend: '+0.1%' },
+        { id: 'aimim', name: 'AIMIM', telugu: 'మజ్లిస్ (AIMIM)', candidate: 'Medak District AIMIM Incharge', symbol: '🪁', voteShare: 0.8, votes: 291, color: '#059669', trend: '+0.1%' },
+        { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.5, votes: 182, color: '#1D4ED8', trend: '0.0%' },
         { id: 'oth', name: 'Others & Independents', telugu: 'ఇతరులు', candidate: 'Independents', symbol: '🗳️', voteShare: 0.7, votes: 256, color: '#64748B', trend: '-0.3%' },
       ]
     }
@@ -1130,8 +1141,8 @@ export default function NowNineAdminDashboard({
         </div>
       </div>
 
-      {/* Live Citizen Active Constituency Sync Bar */}
-      {activeCitizenSession && (
+      {/* Live Citizen Active Constituency Sync Bar (Shown on secondary tabs for quick context) */}
+      {activeCitizenSession && activeTab !== 'overview' && (
         <div className="w-full bg-gradient-to-r from-amber-500/20 via-[#13121F] to-emerald-500/15 border-b border-amber-400/30 px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 shadow-md">
           <div className="flex items-center gap-2.5 flex-wrap">
             <span className="relative flex h-2.5 w-2.5">
@@ -1169,565 +1180,294 @@ export default function NowNineAdminDashboard({
         {/* Right Main Content Panel (100% width on mobile, full responsiveness) */}
         <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6 bg-[#07070A] w-full min-w-0">
 
-          {/* VIEW 1: DASHBOARD OVERVIEW */}
+          {/* VIEW 1: DASHBOARD OVERVIEW (Executive, Clean & Crystal Clear) */}
           {activeTab === 'overview' && (
-            <div className="space-y-6 animate-fadeIn">
+            <div className="space-y-5 animate-fadeIn">
               
-              {/* LIVE CITIZEN CONSTITUENCY INGESTION BANNER */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#101F1B] to-[#0E1522] border-2 border-emerald-500/50 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
+              {/* Sleek Executive Header Bar: Active Ingestion & Constituency Selector */}
+              <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black shadow-inner shrink-0">
-                    <MapPin className="w-5 h-5 text-emerald-400 animate-bounce" />
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black shadow-inner shrink-0">
+                    <Vote className="w-5 h-5 text-amber-400" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-black text-white">Live Citizen Ingestion:</span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-black border border-emerald-400/40 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                        <span>{baseConstituency.name} ({baseConstituency.code})</span>
+                      <h1 className="text-base sm:text-lg font-black text-white tracking-tight">
+                        Electoral Command Overview
+                      </h1>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-400/30 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Live Ingestion Active
                       </span>
-                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-400/30">
-                        ⚡ AUTO-SYNCED WITH MOBILE
-                      </span>
+                      {activeCitizenSession && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-400/30 flex items-center gap-1">
+                          📍 Citizen Synced: {activeCitizenSession.locality}
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs text-gray-300 mt-1">
-                      Citizen Locality: <strong className="text-white">{activeCitizenSession?.locality || baseConstituency.locality}</strong> • State: <strong className="text-amber-300">{baseConstituency.state}</strong> • Sign-In: <span className="font-mono text-emerald-300">{activeCitizenSession?.method || 'Active Ingestion'}</span>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Focus: <strong className="text-white">{activeConstituency.name} ({activeConstituency.code})</strong> • {activeConstituency.locality}, {activeConstituency.state}
                     </p>
                   </div>
                 </div>
 
-                {/* Quick 1-Click Citizen Constituency Simulators */}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10.5px] font-bold text-gray-400">Simulate Citizen Login:</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      recordCitizenLogin({
-                        location: {
-                          id: 'ap-kurnool',
-                          locality: 'C-Camp (సి-క్యాంప్)',
-                          city: 'Kurnool',
-                          assembly: 'Kurnool Assembly Constituency',
-                          district: 'Kurnool',
-                          state: 'Andhra Pradesh'
-                        },
-                        userPhone: '+91 94401 23456',
-                        method: 'Mobile OTP (Kurnool)'
-                      });
-                      setSelectedConstituencyKey('kurnool');
-                      showToast('⚡ Citizen login detected from Kurnool! Admin dashboard auto-switched to Kurnool.');
-                    }}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center gap-1 ${
-                      selectedConstituencyKey === 'kurnool'
-                        ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400 shadow-sm'
-                        : 'bg-[#141420] text-gray-300 border-[#26263A] hover:border-gray-500 hover:text-white'
-                    }`}
-                  >
-                    <span>📍 Kurnool (కర్నూలు)</span>
-                  </button>
+                {/* Constituency Selector + Subtle Controls */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 bg-[#14141E] border border-[#2A2A3E] rounded-xl px-2.5 py-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <select
+                      value={selectedConstituencyKey}
+                      onChange={(e) => setSelectedConstituencyKey(e.target.value)}
+                      className="bg-transparent text-white text-xs font-bold outline-none cursor-pointer pr-1"
+                    >
+                      {Object.values(ALL_CONSTITUENCIES).map(c => (
+                        <option key={c.id} value={c.id} className="bg-[#12121C] text-white">
+                          {c.name} ({c.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
                   <button
                     type="button"
                     onClick={() => {
-                      recordCitizenLogin({
-                        location: {
-                          id: 'ts-mahabubnagar',
-                          locality: 'Yenugonda (ఏనుగొండ)',
-                          city: 'Mahabubnagar',
-                          assembly: 'Mahabubnagar Assembly Constituency',
-                          district: 'Mahabubnagar',
-                          state: 'Telangana'
-                        },
-                        userPhone: '+91 98480 12345',
-                        method: 'Mobile OTP (Mahabubnagar)'
+                      recordLiveBallot({
+                        party: { name: activeConstituency.parties[0]?.name || 'Congress (INC)', candidate: activeConstituency.parties[0]?.candidate || '', id: activeConstituency.parties[0]?.id || 'inc' },
+                        location: { assembly: activeConstituency.name, locality: activeConstituency.locality?.split(',')[0] || 'Center', state: activeConstituency.state },
+                        answers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
                       });
-                      setSelectedConstituencyKey('mahabubnagar');
-                      showToast('⚡ Citizen login detected from Mahabubnagar! Admin dashboard auto-switched to Mahabubnagar.');
+                      showToast(`🗳️ 1 Live ballot recorded for ${activeConstituency.parties[0]?.name} in ${activeConstituency.name}!`);
                     }}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center gap-1 ${
-                      selectedConstituencyKey === 'mahabubnagar'
-                        ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400 shadow-sm'
-                        : 'bg-[#141420] text-gray-300 border-[#26263A] hover:border-gray-500 hover:text-white'
-                    }`}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                    title="Cast 1 test vote to test live increment"
                   >
-                    <span>📍 Mahabubnagar</span>
+                    <Vote className="w-3.5 h-3.5 text-amber-400" />
+                    <span>+1 Test Vote</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      recordCitizenLogin({
-                        location: {
-                          id: 'ts-lbnagar',
-                          locality: 'Badangpet (బడంగ్‌పేట్)',
-                          city: 'Hyderabad',
-                          assembly: 'LB Nagar Assembly Constituency',
-                          district: 'Rangareddy',
-                          state: 'Telangana'
-                        },
-                        userPhone: '+91 99887 65432',
-                        method: 'Mobile OTP (LB Nagar)'
-                      });
-                      setSelectedConstituencyKey('lbnagar');
-                      showToast('⚡ Citizen login detected from LB Nagar! Admin dashboard auto-switched to LB Nagar.');
-                    }}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center gap-1 ${
-                      selectedConstituencyKey === 'lbnagar'
-                        ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400 shadow-sm'
-                        : 'bg-[#141420] text-gray-300 border-[#26263A] hover:border-gray-500 hover:text-white'
-                    }`}
-                  >
-                    <span>📍 LB Nagar</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Header Banner */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1E1E2C]">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                    <span>Central Electoral Command Center</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 font-bold">
-                      Live Stream Active
-                    </span>
-                  </h1>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Real-time citizen opinion aggregation, constituency mapping, and anti-tamper ballot monitoring
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <select
-                    value={selectedConstituencyKey}
-                    onChange={(e) => setSelectedConstituencyKey(e.target.value)}
-                    className="bg-[#12121C] border border-[#2B2B3E] text-white text-xs font-bold rounded-xl px-3 py-2 outline-none focus:border-amber-400 cursor-pointer"
-                  >
-                    {Object.values(ALL_CONSTITUENCIES).map(c => (
-                      <option key={c.id} value={c.id}>{c.name} ({c.code})</option>
-                    ))}
-                  </select>
-
-                  {/* Real-time Demo Controls: Reset to 0 and +1 Test Vote */}
                   <button
                     type="button"
                     onClick={() => {
                       resetAllBallotsToZero();
                       showToast('🗑️ All ballots reset to 0! Ledger cleared.');
                     }}
-                    className="px-2.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                    className="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-all cursor-pointer"
                     title="Reset ballot count to 0"
                   >
-                    <RotateCcw className="w-3.5 h-3.5 text-red-400" />
-                    <span>Reset to 0</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      recordLiveBallot({
-                        party: { name: 'Congress (INC)', candidate: 'Yennam Srinivas Reddy', id: 'inc' },
-                        location: { assembly: 'Mahabubnagar Assembly Constituency', locality: 'Yenugonda', state: 'Telangana' },
-                        answers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
-                      });
-                      showToast('🗳️ 1 Live ballot recorded from Yenugonda (Mahabubnagar)!');
-                    }}
-                    className="px-2.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
-                    title="Cast 1 test vote to demonstrate real-time count increment"
-                  >
-                    <Vote className="w-3.5 h-3.5 text-amber-400" />
-                    <span>+1 Test Vote</span>
+                    <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
 
-              {/* SECTION 1: ELECTORAL COUNTERS & LIVE KPI METRICS */}
-              <div className="flex items-center justify-between pt-1">
-                <span className="px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10.5px] font-black border border-amber-400/30 flex items-center gap-1.5">
-                  <span>SECTION 1</span> • <span>ELECTORAL COUNTERS & REAL-TIME BALLOTS</span>
-                </span>
-                <span className="text-[10px] text-gray-400 font-mono">
-                  Auto-updates on every voter submit
-                </span>
-              </div>
+              {/* 4 Clean Metric Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
+                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
                   <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span className="font-extrabold text-white">Total Ballots Received</span>
-                    <Vote className="w-4 h-4 text-[#F5C754]" />
+                    <span className="font-bold text-gray-300">Total Ballots Cast</span>
+                    <Vote className="w-4 h-4 text-amber-400" />
                   </div>
                   <div className="text-2xl sm:text-3xl font-black text-white font-mono">
-                    {totalVotesCount.toLocaleString()}
+                    {totalVotesCount > 0 ? totalVotesCount.toLocaleString() : activeConstituency.totalVotes.toLocaleString()}
                   </div>
-                  {totalVotesCount === 0 ? (
-                    <span className="text-[10px] text-gray-400 font-bold mt-1 inline-flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                      0 recorded votes • Waiting for first voter
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-emerald-400 font-bold mt-1 inline-flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />
-                      +{totalVotesCount} verified real vote${totalVotesCount === 1 ? '' : 's'} recorded live
-                    </span>
-                  )}
-                </div>
-
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
-                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span>Target Constituencies</span>
-                    <MapPin className="w-4 h-4 text-sky-400" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-white font-mono">
-                    294
-                  </div>
-                  <span className="text-[10px] text-sky-300 font-bold mt-1 block">
-                    119 Telangana • 175 Andhra Pradesh
+                  <span className="text-[10px] text-emerald-400 font-bold mt-1 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    Verified Cryptographic Trail
                   </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
+                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
                   <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span>GPS Ingestion Integrity</span>
+                    <span className="font-bold text-gray-300">Active Constituency</span>
+                    <MapPin className="w-4 h-4 text-sky-400" />
+                  </div>
+                  <div className="text-lg sm:text-xl font-black text-white truncate">
+                    {activeConstituency.name}
+                  </div>
+                  <span className="text-[10px] text-gray-400 font-mono mt-1 block">
+                    {activeConstituency.code} • {activeConstituency.district}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
+                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
+                    <span className="font-bold text-gray-300">Leading Trend</span>
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="text-lg sm:text-xl font-black text-amber-300 truncate">
+                    {activeConstituency.leadingParty}
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-mono mt-1 block truncate">
+                    {activeConstituency.margin}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
+                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
+                    <span className="font-bold text-gray-300">Turnout & Integrity</span>
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   </div>
                   <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
-                    99.8%
+                    {activeConstituency.turnoutRate || '78.4%'}
                   </div>
                   <span className="text-[10px] text-gray-400 font-bold mt-1 block">
-                    Zero duplicate votes per device ID
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-[#161622] to-[#0E0E14] border border-[#262638] shadow-md">
-                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span>Public Results Embargo</span>
-                    <Lock className="w-4 h-4 text-amber-400" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-[#F5C754] font-mono">
-                    LOCKED
-                  </div>
-                  <span className="text-[10px] text-amber-300 font-bold mt-1 block">
-                    Confidential • Hidden from voter app
+                    99.8% Geofence Verified
                   </span>
                 </div>
               </div>
 
-              {/* SECTION 2: CONSTITUENCY CANDIDATE STANDINGS & VOTE SHARES */}
-              <div className="flex items-center justify-between pt-2">
-                <span className="px-2.5 py-0.5 rounded-md bg-sky-500/20 text-sky-300 font-mono text-[10.5px] font-black border border-sky-400/30 flex items-center gap-1.5">
-                  <span>SECTION 2</span> • <span>CONSTITUENCY CANDIDATE STANDINGS & VOTE SHARES</span>
-                </span>
-                <span className="text-[10px] text-gray-400 font-mono">
-                  {activeConstituency.totalVotes} votes in {activeConstituency.name}
-                </span>
-              </div>
-              <div className="p-5 rounded-3xl bg-gradient-to-b from-[#181826] via-[#12121C] to-[#0D0D14] border border-amber-500/30 shadow-2xl space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#232334] gap-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-black text-white">
-                        {activeConstituency.name}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[9px] font-mono font-bold">
-                        {activeConstituency.code}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-300 font-telugu mt-0.5">
-                      {activeConstituency.teluguName} • {activeConstituency.locality}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-right">
+              {/* Main Executive Two-Column Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                
+                {/* LEFT COLUMN: ACTIVE CONSTITUENCY LIVE STANDINGS (ALL 8 PARTIES) */}
+                <div className="lg:col-span-7 p-4 sm:p-5 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-md space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#1E1E2C]">
                     <div>
-                      <span className="text-[10px] text-gray-400 block">Total Ballots Counted</span>
-                      <span className="text-base font-black text-white font-mono">
-                        {activeConstituency.totalVotes.toLocaleString()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-gray-400 block">Frontrunner Lead</span>
-                      <span className="text-base font-black text-emerald-400 font-mono">
-                        {activeConstituency.margin}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Candidate Breakdown Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {activeConstituency.parties.map((party, rank) => (
-                    <div 
-                      key={party.id} 
-                      className="p-3.5 rounded-2xl bg-[#0F0F18] border border-[#222232] space-y-2 hover:border-amber-400/50 transition-all shadow-sm"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-[#1A1A28] border border-white/10 flex items-center justify-center text-xs font-mono font-bold">
-                            #{rank + 1}
-                          </span>
-                          <span className="text-2xl">{party.symbol}</span>
-                          <div>
-                            <h3 className="font-extrabold text-sm text-white leading-tight">
-                              {party.name}
-                            </h3>
-                            <span className="text-[9px] text-gray-400 font-telugu">{party.telugu}</span>
-                          </div>
-                        </div>
-                        <span className="text-sm font-black font-mono" style={{ color: party.color }}>
-                          {party.voteShare}%
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-base sm:text-lg font-black text-white">
+                          {activeConstituency.name}
+                        </h2>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[9px] font-mono font-bold">
+                          {activeConstituency.code}
                         </span>
                       </div>
-
-                      <p className="text-[10px] text-slate-300 line-clamp-1">
-                        {party.candidate}
+                      <p className="text-xs text-gray-400 font-telugu mt-0.5">
+                        {activeConstituency.teluguName} • {activeConstituency.locality}
                       </p>
+                    </div>
 
-                      <div className="space-y-1 pt-1">
+                    <div className="text-right">
+                      <span className="text-[10px] text-gray-400 block font-mono">Counted Ballots</span>
+                      <span className="text-sm font-black text-white font-mono">
+                        {activeConstituency.totalVotes.toLocaleString()} votes
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* All 8 Parties Standings List */}
+                  <div className="space-y-3">
+                    {activeConstituency.parties.map((party, rank) => (
+                      <div 
+                        key={party.id}
+                        className="p-3 rounded-xl bg-[#14141E] border border-[#20202E] hover:border-[#323248] transition-all space-y-2"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="w-5 h-5 rounded-full bg-[#1A1A28] border border-white/10 flex items-center justify-center text-[10px] font-mono font-bold shrink-0">
+                              #{rank + 1}
+                            </span>
+                            <span className="text-xl shrink-0">{party.symbol}</span>
+                            <div className="min-w-0 truncate">
+                              <span className="font-extrabold text-white text-xs sm:text-sm block truncate">
+                                {party.name}
+                              </span>
+                              <span className="text-[10px] text-gray-400 truncate block">
+                                {party.candidate}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="text-right shrink-0 ml-2">
+                            <span className="text-sm font-black font-mono block" style={{ color: party.color }}>
+                              {party.voteShare}%
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-mono">
+                              {party.votes.toLocaleString()} votes
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
                         <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
                           <div 
                             className="h-full rounded-full transition-all duration-700"
-                            style={{ width: `${party.voteShare}%`, backgroundColor: party.color }}
-                          ></div>
-                        </div>
-                        <div className="flex items-center justify-between text-[8.5px] text-gray-400 font-mono">
-                          <span>{party.votes.toLocaleString()} votes</span>
-                          <span className={party.trend.startsWith('+') ? 'text-emerald-400' : 'text-red-400'}>
-                            {party.trend}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Two Column Section: SECTION 3 (Key Battlegrounds / Pulse) & SECTION 4 (Audit Stream) */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                
-                {/* Battleground Assemblies Summary */}
-                <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#20202E] space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#1E1E2C]">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-black border border-emerald-400/30">
-                        SECTION 3
-                      </span>
-                      <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-                        <Vote className="w-4 h-4 text-amber-400" />
-                        <span>Battleground Assemblies</span>
-                      </h3>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('constituencies')}
-                      className="text-[10px] text-[#F5C754] font-bold hover:underline"
-                    >
-                      View All 8 Assemblies →
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {Object.values(ALL_CONSTITUENCIES).slice(0, 5).map(c => (
-                      <div 
-                        key={c.id}
-                        onClick={() => setSelectedConstituencyKey(c.id)}
-                        className={`p-2.5 rounded-xl border flex items-center justify-between text-xs cursor-pointer transition-all ${
-                          selectedConstituencyKey === c.id 
-                            ? 'bg-amber-500/10 border-amber-400/50' 
-                            : 'bg-[#12121A] border-[#1E1E28] hover:border-gray-600'
-                        }`}
-                      >
-                        <div>
-                          <div className="flex items-center gap-1.5 font-bold text-white">
-                            <span>{c.name}</span>
-                            <span className="text-[9px] text-gray-400 font-mono">({c.code})</span>
-                          </div>
-                          <span className="text-[10px] text-gray-400">{c.district} • {c.leadingParty} leading</span>
-                        </div>
-
-                        <div className="text-right">
-                          <span className="font-mono font-black text-amber-300 block">{c.margin}</span>
-                          <span className="text-[9px] text-gray-500 font-mono">{c.totalVotes.toLocaleString()} votes</span>
+                            style={{ width: `${Math.max(party.voteShare, 1)}%`, backgroundColor: party.color }}
+                          />
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
 
-                {/* Real-Time Geofence Stream */}
-                <div className="p-4 rounded-2xl bg-[#0E0E14] border border-[#20202E] space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#1E1E2C]">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-mono text-[9px] font-black border border-rose-400/30">
-                        SECTION 4
-                      </span>
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      <h3 className="text-sm font-extrabold text-white">Tamper-Proof Ballot Stream</h3>
-                    </div>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-mono">
-                      GPS Stream
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    {auditStream.length === 0 ? (
-                      <div className="p-4 text-center text-xs text-gray-500 bg-[#12121A] rounded-xl border border-dashed border-[#222232]">
-                        <p className="font-bold text-gray-400">0 Ballots Received Yet</p>
-                        <p className="text-[10px] text-gray-500 mt-1">Vote on mobile or click "+1 Vote" to see live cryptographic audit logs appear here.</p>
-                      </div>
-                    ) : (
-                      auditStream.slice(0, 5).map((log) => (
-                        <div key={log.id} className="p-2 rounded-xl bg-[#12121A] border border-[#1E1E28] flex items-center justify-between text-[10.5px]">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-amber-400 text-[10px]">{log.id}</span>
-                          <span className="font-semibold text-white">{log.party}</span>
-                          <span className="text-gray-400 text-[9.5px]">({log.locality})</span>
-                        </div>
-                        <div className="flex items-center gap-2 font-mono text-[9px]">
-                          <span className="text-gray-500">{log.time}</span>
-                          <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                            {log.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                    )}
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('constituencies')}
+                      className="text-xs text-amber-400 hover:text-amber-300 font-bold hover:underline transition-colors cursor-pointer"
+                    >
+                      View All 13 Assembly Standings & Vote Shares →
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* LIVE CUSTOMER / CITIZEN ACTIVITY STREAM (Real-time monitor of every task run on the website) */}
-              <div className="p-4 sm:p-5 rounded-3xl bg-[#0D0D15] border-2 border-emerald-500/40 shadow-2xl space-y-4">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-[#20202E]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-400 text-lg shadow-inner">
-                      <Activity className="w-5 h-5 animate-pulse" />
-                    </div>
-                    <div>
+                {/* RIGHT COLUMN: LIVE CITIZEN TASKS & ACTIVITY FEED */}
+                <div className="lg:col-span-5 p-4 sm:p-5 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-md space-y-4 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-3 border-b border-[#1E1E2C]">
                       <div className="flex items-center gap-2">
-                        <h2 className="text-base sm:text-lg font-black text-white">
-                          Live Customer Activity Stream
+                        <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+                        <h2 className="text-sm sm:text-base font-black text-white">
+                          Live Citizen Activity Stream
                         </h2>
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-mono font-bold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                          LIVE CITIZEN MONITOR
-                        </span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        Every task citizen users execute on the website appears here live: votes, surveys, live debates, Boss of House, news reads, and GPS geofences
-                      </p>
+                      <span className="text-[9.5px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-mono font-bold">
+                        {customerActivities.length} Tasks
+                      </span>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleSimulateCustomerTask}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-400/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                      title="Simulate a live citizen action"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>+ Simulate Citizen Task</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleClearActivities}
-                      className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 text-xs font-bold transition-all cursor-pointer"
-                      title="Clear activity log"
-                    >
-                      <span>Clear</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Filter Pills */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-                  {[
-                    { id: 'all', label: 'All Tasks', icon: '⚡', count: customerActivities.length },
-                    { id: 'vote', label: 'Electoral Ballots', icon: '🗳️', count: customerActivities.filter(a => a.type === 'vote').length },
-                    { id: 'survey', label: '5-Question Surveys', icon: '📊', count: customerActivities.filter(a => a.type === 'survey').length },
-                    { id: 'boss-house', label: 'Boss of House', icon: '👑', count: customerActivities.filter(a => a.type === 'boss-house').length },
-                    { id: 'live', label: 'Live Debates', icon: '🔴', count: customerActivities.filter(a => a.type === 'live').length },
-                    { id: 'news', label: 'News Reads', icon: '📰', count: customerActivities.filter(a => a.type === 'news').length },
-                    { id: 'location', label: 'GPS Geofences', icon: '📍', count: customerActivities.filter(a => a.type === 'location').length },
-                  ].map((f) => (
-                    <button
-                      key={f.id}
-                      type="button"
-                      onClick={() => setActivityFilter(f.id)}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
-                        activityFilter === f.id
-                          ? 'bg-emerald-500 text-black font-black shadow-md'
-                          : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#232332]'
-                      }`}
-                    >
-                      <span>{f.icon}</span>
-                      <span>{f.label}</span>
-                      <span className="font-mono text-[10px] px-1 rounded bg-black/30 text-white font-bold">{f.count}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Activity cards stream */}
-                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                  {customerActivities.filter(a => activityFilter === 'all' || a.type === activityFilter).length === 0 ? (
-                    <div className="p-8 text-center text-xs text-gray-500 bg-[#0E0E14] rounded-2xl border border-dashed border-[#222232]">
-                      <Activity className="w-8 h-8 text-gray-600 mx-auto mb-2 animate-pulse" />
-                      <p className="font-bold text-gray-400 text-sm">No tasks in this category yet</p>
-                      <p className="text-[11px] text-gray-500 mt-1">
-                        Interact on the website / mobile app or click "+ Simulate Citizen Task" above to see real-time updates!
-                      </p>
-                    </div>
-                  ) : (
-                    customerActivities
-                      .filter(a => activityFilter === 'all' || a.type === activityFilter)
-                      .slice(0, 30)
-                      .map((act) => (
-                        <div
-                          key={act.id}
-                          className="p-3 rounded-2xl bg-[#11111A] border border-[#222232] hover:border-emerald-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 animate-fadeIn"
-                        >
-                          <div className="flex items-start sm:items-center gap-3">
-                            <span className="text-2xl p-2 rounded-xl bg-[#171724] border border-[#262638] shrink-0">
-                              {act.icon}
-                            </span>
-                            <div>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase ${
-                                  act.badgeColor === 'emerald' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
-                                  act.badgeColor === 'amber' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
-                                  act.badgeColor === 'rose' ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' :
-                                  act.badgeColor === 'red' ? 'bg-red-500/20 text-red-300 border border-red-400/30' :
-                                  act.badgeColor === 'blue' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
-                                  'bg-sky-500/20 text-sky-300 border border-sky-400/30'
-                                }`}>
-                                  {act.badgeText || act.type}
+                    <div className="space-y-2.5 mt-3">
+                      {customerActivities.length === 0 ? (
+                        <div className="p-6 text-center text-xs text-gray-500 bg-[#12121A] rounded-xl border border-dashed border-[#222232]">
+                          <p className="font-bold text-gray-400">Waiting for live citizen actions</p>
+                          <p className="text-[10px] text-gray-500 mt-1">Actions performed on the citizen app appear here live.</p>
+                        </div>
+                      ) : (
+                        customerActivities.slice(0, 7).map((act) => (
+                          <div 
+                            key={act.id}
+                            className="p-2.5 rounded-xl bg-[#14141E] border border-[#20202E] flex items-start justify-between gap-2 text-xs"
+                          >
+                            <div className="flex items-start gap-2 min-w-0">
+                              <span className="text-base shrink-0 mt-0.5">{act.icon || '⚡'}</span>
+                              <div className="min-w-0">
+                                <span className="font-bold text-white block text-[11.5px] truncate">
+                                  {act.title}
                                 </span>
-                                <h4 className="font-extrabold text-sm text-white">{act.title}</h4>
-                                <span className="font-mono text-[10px] text-gray-500">{act.id}</span>
-                              </div>
-                              <p className="text-xs text-gray-300 mt-1 font-medium">{act.detail}</p>
-                              <div className="flex items-center gap-2 text-[10.5px] text-gray-400 mt-1">
-                                <span className="flex items-center gap-1 text-sky-400">
-                                  <MapPin className="w-3 h-3" />
+                                <span className="text-[10px] text-gray-300 block truncate">
+                                  {act.detail}
+                                </span>
+                                <span className="text-[9px] text-gray-500 block">
                                   {act.location}
                                 </span>
                               </div>
                             </div>
-                          </div>
-
-                          <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
-                            <span className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-gray-500" />
+                            <span className="text-[9px] text-gray-500 font-mono shrink-0 whitespace-nowrap">
                               {act.time}
                             </span>
-                            <span className="text-[9.5px] text-gray-500 font-mono">
-                              {new Date(act.timestamp || Date.now()).toLocaleTimeString()}
-                            </span>
                           </div>
-                        </div>
-                      ))
-                  )}
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-[#1E1E2C] flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleSimulateCustomerTask}
+                      className="text-xs text-gray-400 hover:text-white font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <span>Simulate 1 Task</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('customer-tasks')}
+                      className="text-xs text-amber-400 hover:text-amber-300 font-bold hover:underline transition-colors cursor-pointer"
+                    >
+                      View All Citizen Tasks →
+                    </button>
+                  </div>
                 </div>
+
               </div>
             </div>
           )}
