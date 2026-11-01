@@ -1394,7 +1394,7 @@ export function Screen2Home({
               </p>
               <p className="text-[8px] text-gray-400 mt-0.5">
                 {activeBroadcast?.isLive
-                  ? `Live with ${activeBroadcast.host} • 14,280 Citizens Tuned In`
+                  ? `Live with ${activeBroadcast.host} • 🌐 Global Broadcast (Visible to All Users) • 14,280 Watching`
                   : `${recordedSessions[0]?.host || 'Now9 Prime Desk'} • ${recordedSessions[0]?.duration || '28:40'} • ${recordedSessions[0]?.views || '14.8K views'}`}
               </p>
             </div>
@@ -2098,7 +2098,7 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
 
   const heroItem = activeBroadcast?.isLive ? {
     title: activeBroadcast.title,
-    subtitle: `Live Broadcast • ${activeBroadcast.host} • ${activeBroadcast.constituency}`,
+    subtitle: `🔴 Live Broadcast • ${activeBroadcast.host} • 🌐 All Users (Global Broadcast)`,
     views: `${(activeBroadcast.viewers / 1000).toFixed(1)}K Watching`,
     isLive: true,
     img: activeBroadcast.thumbnail || '/assets/news_debate_studio.jpg'
@@ -3411,7 +3411,7 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
             {debate.title}
           </h3>
           <p className="text-[9px] text-gray-400 mt-0.5">
-            {debate.subtitle || `Host: ${debate.host || 'Now9 Prime Desk'} • Constituency: ${debate.constituency || 'Mahabubnagar'}`}
+            {debate.subtitle || `Host: ${debate.host || 'Now9 Prime Desk'} • 🌐 Visible to All Users (Global Broadcast)`}
           </p>
           <div className="flex items-center gap-2 text-[8px] text-gray-400 mt-1">
             <span className="flex items-center gap-0.5">

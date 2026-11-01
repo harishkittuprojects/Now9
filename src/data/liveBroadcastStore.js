@@ -71,7 +71,7 @@ export function getRecordedSessions() {
   }
 }
 
-export function startLiveBroadcast({ title, host = 'Now9 Prime Editor', constituency = 'Mahabubnagar' }) {
+export function startLiveBroadcast({ title, host = 'Now9 Prime Editor', constituency = 'Global (All Constituencies)', isGlobal = true }) {
   if (typeof window === 'undefined') return;
   
   const activeData = {
@@ -79,7 +79,9 @@ export function startLiveBroadcast({ title, host = 'Now9 Prime Editor', constitu
     id: `live-${Date.now()}`,
     title: title?.trim() || '2026 ఎన్నికలు: ప్రజా తీర్పు & లైవ్ చర్చ',
     host: host || 'Now9 Prime Editor',
-    constituency: constituency || 'Mahabubnagar',
+    constituency: 'Global (All Constituencies)',
+    scope: 'All Users (AP & Telangana)',
+    isGlobal: true,
     startedAt: Date.now(),
     viewers: 14280,
     thumbnail: '/assets/news_debate_studio.jpg'

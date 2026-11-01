@@ -384,7 +384,8 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
                           startLiveBroadcast({
                             title: streamTitle,
                             host: 'Now9 Prime Host',
-                            constituency: districtName
+                            constituency: 'Global (All Constituencies)',
+                            isGlobal: true
                           });
                           setIsBroadcasting(true);
                         }}

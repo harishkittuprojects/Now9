@@ -161,10 +161,11 @@ export default function NowNineAdminDashboard({
     const broadcast = startLiveBroadcast({
       title: customDebateTitle.trim() || '2026 ఎన్నికలు: ఎవరికి అవకాశాలు?',
       host: debateHostName.trim() || 'Now9 Prime Editor',
-      constituency: selectedDebateConstituency || activeConstituency?.name || 'Mahabubnagar'
+      constituency: 'Global (All Constituencies)',
+      isGlobal: true
     });
     setActiveBroadcast(broadcast);
-    showToast('🔴 LIVE Broadcast is now ON AIR! Immediately visible on the citizen website.');
+    showToast('🔴 LIVE Broadcast is now ON AIR! Visible to ALL users across every constituency in AP & Telangana.');
   };
 
   const handleEndConductLive = () => {
@@ -1942,21 +1943,24 @@ export default function NowNineAdminDashboard({
 
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="text-xs font-bold text-gray-300 block mb-1">
-                            Target Constituency
+                          <label className="text-xs font-bold text-gray-300 block mb-1 flex items-center justify-between">
+                            <span>Broadcast Reach / Audience</span>
+                            <span className="text-[9.5px] text-emerald-400 font-bold flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              All Users
+                            </span>
                           </label>
-                          <select
-                            value={selectedDebateConstituency}
-                            onChange={(e) => setSelectedDebateConstituency(e.target.value)}
-                            className="w-full bg-[#12121A] border border-[#2B2B3E] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-red-500 cursor-pointer"
-                          >
-                            <option value="Mahabubnagar">Mahabubnagar</option>
-                            <option value="LB Nagar">LB Nagar</option>
-                            <option value="Jubilee Hills">Jubilee Hills</option>
-                            <option value="Nagarkurnool">Nagarkurnool</option>
-                            <option value="Guntur West">Guntur West</option>
-                            <option value="Vijayawada Central">Vijayawada Central</option>
-                          </select>
+                          <div className="w-full bg-[#12121A] border border-emerald-500/40 rounded-xl px-3 py-1.5 text-xs text-emerald-300 flex items-center gap-2 shadow-xs">
+                            <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <div className="min-w-0">
+                              <span className="font-extrabold text-white block truncate text-[11px]">
+                                🌐 Visible to All Users (Global)
+                              </span>
+                              <span className="text-[9px] text-gray-400 block truncate">
+                                Live across all AP & Telangana citizens
+                              </span>
+                            </div>
+                          </div>
                         </div>
 
                         <div>
