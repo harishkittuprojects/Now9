@@ -67,6 +67,11 @@ import {
   getSelectedDebate 
 } from '../data/liveBroadcastStore';
 import { getPublishedNews, subscribeNews } from '../data/newsStore';
+import { 
+  getPublishedHousemates, 
+  voteForHousemate, 
+  subscribeHousemates 
+} from '../data/bossStore';
 
 // Phone Status Bar (Cellular, Wifi, Battery icons removed as requested)
 export function PhoneStatusBar() {
@@ -3572,22 +3577,18 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
   const [selectedContestant, setSelectedContestant] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const [pollVotes, setPollVotes] = useState({ 1: null });
+  const [housemates, setHousemates] = useState(() => getPublishedHousemates());
 
-  const [contestants] = useState([
-    { id: 'sivaji', name: 'Sivaji', teluguName: 'శివాజీ', role: 'Strong Contender', votes: 34.6, isNominated: true, avatar: '👑', status: 'Nominated', votesCount: '124.5K' },
-    { id: 'pallavi', name: 'Pallavi Prashanth', teluguName: 'పల్లవి ప్రశాంత్', role: 'Rythu Bidda', votes: 29.8, isNominated: true, avatar: '🌾', status: 'Nominated', votesCount: '107.2K' },
-    { id: 'amardeep', name: 'Amardeep Chowdary', teluguName: 'అమర్‌దీప్ చౌదరి', role: 'Serial Star', votes: 18.2, isNominated: true, avatar: '🎭', status: 'Nominated', votesCount: '65.4K' },
-    { id: 'shobha', name: 'Shobha Shetty', teluguName: 'శోభా శెట్టి', role: 'Fierce Player', votes: 17.4, isNominated: true, avatar: '🔥', status: 'Nominated', votesCount: '62.8K' },
-  ]);
+  useEffect(() => {
+    const unsub = subscribeHousemates((updatedList) => {
+      setHousemates(updatedList);
+    });
+    return unsub;
+  }, []);
 
-  const allHousemates = [
-    { id: 1, name: 'Sivaji', role: 'Leader / Veteran', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '👑' },
-    { id: 2, name: 'Pallavi Prashanth', role: 'Common Man / Rythu', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '🌾' },
-    { id: 3, name: 'Amardeep Chowdary', role: 'Actor / Performer', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '🎭' },
-    { id: 4, name: 'Shobha Shetty', role: 'Actress / Monitha', status: 'Nominated', badge: 'bg-red-500/20 text-red-400 border-red-500/40', avatar: '🔥' },
-    { id: 5, name: 'Prince Yawar', role: 'Fitness Model', status: 'Safe', badge: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40', avatar: '⚡' },
-    { id: 6, name: 'Priyanka Jain', role: 'Captain of the House', status: 'Captain 👑', badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40', avatar: '🌟' },
-  ];
+  const nominatedContestants = housemates.filter(h => h.isNominated || h.status === 'Nominated' || h.status === 'Danger Zone');
+  const votingList = nominatedContestants.length > 0 ? nominatedContestants : housemates;
+  const totalVotesCount = housemates.reduce((sum, h) => sum + (h.votes || 0), 0);
 
   const highlights = [
     { id: 1, title: '🔥 కెప్టెన్సీ టాస్క్ హై-వోల్టేజ్ గొడవ! శివాజీ vs అమర్‌దీప్', views: '284K', time: '2h ago', duration: '03:45', thumbnail: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=400&q=80' },
@@ -3597,7 +3598,8 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
 
   const handleVoteContestant = (c) => {
     setSelectedContestant(c.id);
-    setToastMessage(`🎉 మీ ఓటు ${c.name} (${c.teluguName}) కి నమోదైంది! (Saved Vote Recorded)`);
+    voteForHousemate(c.id);
+    setToastMessage(`🎉 మీ ఓటు ${c.name} (${c.teluguName || c.name}) కి నమోదైంది! (Saved Vote Recorded)`);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
@@ -3640,7 +3642,7 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
         </div>
 
         <span className="text-[8px] font-mono font-bold text-amber-300 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-400/30">
-          359K Votes
+          {totalVotesCount > 0 ? `${totalVotesCount.toLocaleString()} Votes` : 'Official Voting'}
         </span>
       </div>
 
@@ -3690,7 +3692,7 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
 
             {/* 2x2 Nominated Contestant Cards */}
             <div className="grid grid-cols-2 gap-2.5">
-              {contestants.map((c) => {
+              {votingList.map((c) => {
                 const isSelected = selectedContestant === c.id;
                 return (
                   <div
@@ -3718,19 +3720,19 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
                       {c.name}
                     </h4>
                     <p className="text-[10px] text-amber-300 font-semibold font-telugu mt-0.5 leading-normal">
-                      {c.teluguName} • {c.role}
+                      {c.teluguName || c.name} • {c.role}
                     </p>
 
                     {/* Progress bar */}
                     <div className="w-full mt-2 space-y-0.5">
                       <div className="flex items-center justify-between text-[8.5px] text-slate-300 font-medium">
                         <span>Approval</span>
-                        <span className="font-mono font-bold text-white">{c.votes}%</span>
+                        <span className="font-mono font-bold text-white">{c.percent || 0}%</span>
                       </div>
                       <div className="w-full h-1 bg-[#1A1A24] rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500"
-                          style={{ width: `${c.votes}%` }}
+                          style={{ width: `${c.percent || 0}%` }}
                         ></div>
                       </div>
                     </div>
@@ -3826,25 +3828,35 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
         {/* VIEW 3: ALL HOUSEMATES DIRECTORY */}
         {activeTab === 'contestants' && (
           <div className="space-y-1.5">
-            {allHousemates.map((hm) => (
-              <div 
-                key={hm.id}
-                className="p-2.5 rounded-xl bg-[#121218] border border-[#22222E] flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-xl p-1 rounded-lg bg-[#181822] border border-[#2A2A38]">
-                    {hm.avatar}
-                  </span>
-                  <div>
-                    <h4 className="text-[10px] font-black text-white leading-tight">{hm.name}</h4>
-                    <p className="text-[8px] text-gray-400">{hm.role}</p>
+            {housemates.map((hm) => {
+              const badgeClass = hm.status === 'Safe' 
+                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' 
+                : (hm.status === 'Danger Zone' 
+                  ? 'bg-rose-500/20 text-rose-300 border-rose-400/40' 
+                  : 'bg-red-500/20 text-red-400 border-red-500/40');
+              return (
+                <div 
+                  key={hm.id}
+                  className="p-2.5 rounded-xl bg-[#121218] border border-[#22222E] flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl p-1 rounded-lg bg-[#181822] border border-[#2A2A38]">
+                      {hm.avatar}
+                    </span>
+                    <div>
+                      <h4 className="text-[10px] font-black text-white leading-tight">{hm.name}</h4>
+                      <p className="text-[8px] text-gray-400 font-telugu">{hm.teluguName || hm.name} • {hm.role}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-mono font-bold text-amber-400">{hm.percent || 0}%</span>
+                    <span className={`text-[8px] font-extrabold px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                      {hm.status}
+                    </span>
                   </div>
                 </div>
-                <span className={`text-[8px] font-extrabold px-2 py-0.5 rounded-full border ${hm.badge}`}>
-                  {hm.status}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -66,6 +66,14 @@ import {
   deleteNewsItem, 
   subscribeNews 
 } from '../data/newsStore';
+import { 
+  getPublishedHousemates, 
+  addHousemate, 
+  updateHousemate, 
+  deleteHousemate, 
+  resetHousemateVotes, 
+  subscribeHousemates 
+} from '../data/bossStore';
 
 export default function NowNineAdminDashboard({ 
   onClose, 
@@ -525,13 +533,59 @@ export default function NowNineAdminDashboard({
   });
 
   // Boss of House (Entertainment Contestants) Voting
-  const [bossContestants, setBossContestants] = useState([
-    { id: 'c1', name: 'Prerana', role: 'Actress', votes: 94250, percent: 31.4, status: 'Safe', avatar: '👑' },
-    { id: 'c2', name: 'Nikhil', role: 'YouTuber', votes: 81400, percent: 27.1, status: 'Safe', avatar: '⚡' },
-    { id: 'c3', name: 'Vishnupriya', role: 'Anchor', votes: 58900, percent: 19.6, status: 'Safe', avatar: '🌟' },
-    { id: 'c4', name: 'Gautham', role: 'Doctor/Actor', votes: 41200, percent: 13.7, status: 'Danger Zone', avatar: '🔥' },
-    { id: 'c5', name: 'Teja', role: 'Content Creator', votes: 24250, percent: 8.2, status: 'Nominated', avatar: '🎭' },
-  ]);
+  const [bossContestants, setBossContestants] = useState(() => getPublishedHousemates());
+  const [newHousemateName, setNewHousemateName] = useState('');
+  const [newHousemateTelugu, setNewHousemateTelugu] = useState('');
+  const [newHousemateRole, setNewHousemateRole] = useState('Actress / Actor');
+  const [newHousemateStatus, setNewHousemateStatus] = useState('Nominated');
+  const [newHousemateAvatar, setNewHousemateAvatar] = useState('🌟');
+
+  useEffect(() => {
+    const unsub = subscribeHousemates((updatedList) => {
+      setBossContestants(updatedList);
+    });
+    return unsub;
+  }, []);
+
+  const handleAddHousemate = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!newHousemateName.trim()) {
+      showToast('⚠️ Please enter the housemate name.');
+      return;
+    }
+    const created = addHousemate({
+      name: newHousemateName.trim(),
+      teluguName: newHousemateTelugu.trim() || newHousemateName.trim(),
+      role: newHousemateRole.trim() || 'Housemate',
+      status: newHousemateStatus,
+      avatar: newHousemateAvatar
+    });
+    if (created) {
+      setBossContestants(getPublishedHousemates());
+      setNewHousemateName('');
+      setNewHousemateTelugu('');
+      showToast(`✅ Housemate "${created.name}" published live to Boss of House voting!`);
+    }
+  };
+
+  const handleToggleHousemateStatus = (id, currentStatus) => {
+    const nextStatus = currentStatus === 'Nominated' ? 'Safe' : (currentStatus === 'Safe' ? 'Danger Zone' : 'Nominated');
+    const updated = updateHousemate(id, { status: nextStatus });
+    setBossContestants(updated);
+    showToast(`Status updated to "${nextStatus}"`);
+  };
+
+  const handleDeleteHousemate = (id, name) => {
+    const updated = deleteHousemate(id);
+    setBossContestants(updated);
+    showToast(`🗑️ Removed ${name} from housemates.`);
+  };
+
+  const handleResetHousemateTally = () => {
+    const reset = resetHousemateVotes();
+    setBossContestants(reset);
+    showToast('🔄 Elimination votes reset to 0 for the new voting week!');
+  };
 
 // Real-time auditStream managed via voteStore
 
@@ -2067,58 +2121,199 @@ export default function NowNineAdminDashboard({
 
           {/* VIEW 6: BOSS OF HOUSE VOTING */}
           {activeTab === 'boss-house' && (
-            <div className="space-y-5 animate-fadeIn">
-              <div className="flex items-center justify-between pb-3 border-b border-[#20202E]">
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-3">
                 <div>
                   <h2 className="text-xl font-black text-white flex items-center gap-2">
                     <Eye className="w-5 h-5 text-amber-400" />
-                    <span>Boss of House (Telugu) • Live Elimination Tally</span>
+                    <span>Boss of House (Telugu) • Contestants & Elimination Voting</span>
                   </h2>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    Live votes tally, contestant rankings, and safe/danger zone analytics
+                    Enter housemate names, publish contestants live to the mobile voting screen, and monitor live tallies
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => showToast('🔄 Elimination votes reset for new voting week')}
-                  className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-amber-300 text-xs font-bold hover:bg-[#1E1E2E] cursor-pointer"
-                >
-                  Reset Week Tally
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-amber-400 font-mono px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 font-bold">
+                    {bossContestants.length} Housemates Live
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleResetHousemateTally}
+                    className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-amber-300 text-xs font-bold hover:bg-[#1E1E2E] cursor-pointer transition-colors"
+                  >
+                    Reset Week Tally
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bossContestants.map((c, rank) => (
-                  <div key={c.id} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-3xl">{c.avatar}</span>
-                        <div>
-                          <h3 className="font-extrabold text-sm text-white">{c.name}</h3>
-                          <span className="text-[10px] text-gray-400">{c.role}</span>
-                        </div>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${
-                        c.status === 'Safe' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40' : 'bg-red-500/20 text-red-300 border border-red-400/40'
-                      }`}>
-                        {c.status}
-                      </span>
+              {/* Form to Enter Housemate Names and Publish */}
+              <form onSubmit={handleAddHousemate} className="p-5 rounded-2xl bg-[#0E0E14] border-2 border-[#20202E] space-y-4 shadow-xl">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1E1E28]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                      👥
                     </div>
-
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="text-gray-400">{c.votes.toLocaleString()} votes</span>
-                        <span className="text-amber-400 font-bold">{c.percent}%</span>
-                      </div>
-                      <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full" 
-                          style={{ width: `${c.percent}%` }}
-                        ></div>
-                      </div>
+                    <div>
+                      <h3 className="text-sm font-extrabold text-white">Enter Housemate Details & Publish Names</h3>
+                      <p className="text-[11px] text-gray-400">Add housemates to appear in the citizen mobile app for live elimination voting</p>
                     </div>
                   </div>
-                ))}
+                  <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Syncs Live to Mobile Voting
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-gray-300 block mb-1">
+                      Housemate Name (English) *
+                    </label>
+                    <input
+                      type="text"
+                      value={newHousemateName}
+                      onChange={(e) => setNewHousemateName(e.target.value)}
+                      placeholder="e.g. Sivaji, Prerana, Harish..."
+                      className="w-full bg-[#12121A] border border-[#2B2B3E] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-300 block mb-1">
+                      Telugu Name (తెలుగు పేరు)
+                    </label>
+                    <input
+                      type="text"
+                      value={newHousemateTelugu}
+                      onChange={(e) => setNewHousemateTelugu(e.target.value)}
+                      placeholder="ఉదా: శివాజీ, ప్రేరణ..."
+                      className="w-full bg-[#12121A] border border-[#2B2B3E] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400 font-telugu"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-300 block mb-1">
+                      Profession / Role
+                    </label>
+                    <input
+                      type="text"
+                      value={newHousemateRole}
+                      onChange={(e) => setNewHousemateRole(e.target.value)}
+                      placeholder="e.g. Actress, Anchor, Singer..."
+                      className="w-full bg-[#12121A] border border-[#2B2B3E] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-300 block mb-1">
+                      Nomination / Voting Status
+                    </label>
+                    <select
+                      value={newHousemateStatus}
+                      onChange={(e) => setNewHousemateStatus(e.target.value)}
+                      className="w-full bg-[#12121A] border border-[#2B2B3E] rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-amber-400 cursor-pointer"
+                    >
+                      <option value="Nominated">Nominated (Voting Open 🗳️)</option>
+                      <option value="Danger Zone">Danger Zone (Bottom 2 🔥)</option>
+                      <option value="Safe">Safe (Not in Elimination ✅)</option>
+                      <option value="Captain">Captain of the House 👑</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Emoji Avatar Selector & Publish Button */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-[#1C1C28]">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-semibold">Avatar Badge:</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {['🌟', '👑', '⚡', '🔥', '🌾', '🎭', '🎤', '💃', '🥊'].map((emoji) => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => setNewHousemateAvatar(emoji)}
+                          className={`w-7 h-7 rounded-lg text-sm flex items-center justify-center transition-all cursor-pointer ${
+                            newHousemateAvatar === emoji 
+                              ? 'bg-amber-500/30 border border-amber-400 scale-110 shadow-md' 
+                              : 'bg-[#181824] border border-[#28283A] text-gray-300 hover:scale-105'
+                          }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 active:scale-95 text-black font-extrabold text-xs shadow-lg shadow-amber-500/25 cursor-pointer flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Plus className="w-4 h-4 text-black stroke-[3]" />
+                    <span>Publish Housemate Live</span>
+                  </button>
+                </div>
+              </form>
+
+              {/* Published Housemates Directory & Standings */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-extrabold text-sm text-white">Live Housemates Roster & Elimination Votes</h3>
+                  <span className="text-xs text-gray-400">Click any status badge to quickly toggle Safe/Nominated</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {bossContestants.map((c) => (
+                    <div key={c.id} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3 hover:border-amber-500/30 transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-3xl p-1.5 rounded-xl bg-[#14141E] border border-[#242436]">{c.avatar}</span>
+                          <div>
+                            <h3 className="font-extrabold text-sm text-white">{c.name}</h3>
+                            <span className="text-[10px] text-gray-400 font-telugu block">{c.teluguName || c.name} • {c.role}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleHousemateStatus(c.id, c.status)}
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-black cursor-pointer transition-all ${
+                              c.status === 'Safe' 
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40' 
+                                : (c.status === 'Danger Zone' 
+                                  ? 'bg-rose-500/20 text-rose-300 border border-rose-400/40' 
+                                  : 'bg-red-500/20 text-red-300 border border-red-400/40')
+                            }`}
+                            title="Click to toggle nomination status"
+                          >
+                            {c.status}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteHousemate(c.id, c.name)}
+                            className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-white/5 cursor-pointer"
+                            title="Remove housemate"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-gray-400">{(c.votes || 0).toLocaleString()} votes</span>
+                          <span className="text-amber-400 font-bold">{c.percent || 0}%</span>
+                        </div>
+                        <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" 
+                            style={{ width: `${c.percent || 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
