@@ -48,7 +48,11 @@ import {
   Monitor,
   Square,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  Landmark,
+  LayoutDashboard,
+  LogOut,
+  ChevronDown
 } from 'lucide-react';
 import LiveStreamModal from './LiveStreamModal';
 import { getStoredBallotData, recordLiveBallot, resetAllBallotsToZero, VOTE_CAST_EVENT } from '../data/voteStore';
@@ -892,6 +896,27 @@ export default function NowNineAdminDashboard({
   const [newsFeed, setNewsFeed] = useState(() => getPublishedNews());
   const [newNewsTitle, setNewNewsTitle] = useState('');
   const [newNewsCategory, setNewNewsCategory] = useState('Mahabubnagar');
+  const [isAddNewsQuickModalOpen, setIsAddNewsQuickModalOpen] = useState(false);
+  const [quickNewsTitle, setQuickNewsTitle] = useState('');
+  const [quickNewsCategory, setQuickNewsCategory] = useState('Almasguda');
+
+  const handleQuickNewsSubmit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!quickNewsTitle.trim()) {
+      showToast('⚠️ Please enter a news headline.');
+      return;
+    }
+    const published = publishNewsItem({
+      title: quickNewsTitle.trim(),
+      category: quickNewsCategory.trim() || 'Almasguda'
+    });
+    if (published) {
+      setNewsFeed(getPublishedNews());
+      setQuickNewsTitle('');
+      setIsAddNewsQuickModalOpen(false);
+      showToast('📰 Breaking News Alert published live to Citizen App!');
+    }
+  };
 
   useEffect(() => {
     const unsub = subscribeNews((updatedList) => {
@@ -946,7 +971,7 @@ export default function NowNineAdminDashboard({
   });
 
   return (
-    <div className="w-full min-h-screen bg-[#070709] text-white flex flex-col font-sans select-none antialiased">
+    <div className="w-full min-h-screen bg-[#F4F5F8] text-[#1E2024] flex flex-col lg:flex-row font-sans select-none antialiased">
       {/* Toast Alert */}
       {toastMsg && (
         <div className="fixed top-4 right-6 z-50 bg-[#1A160E] border-2 border-amber-400 text-amber-300 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl animate-fadeIn flex items-center gap-2.5 backdrop-blur-md">
@@ -955,183 +980,48 @@ export default function NowNineAdminDashboard({
         </div>
       )}
 
-      {/* Top Global Command Bar */}
-      <header className="h-14 bg-[#0E0E14] border-b border-[#20202E] px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-3 shrink-0 z-40 sticky top-0 shadow-lg">
-        {/* Brand & Mobile Menu Button */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-amber-300 transition-colors cursor-pointer"
-            title="Toggle Menu"
-          >
-            {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
+      {/* Mobile Slide-Out Drawer Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-xs"
+        />
+      )}
 
-          <div className="flex items-center gap-2">
-            <img 
-              src="/now9_icon.png" 
-              alt="now9 logo" 
-              className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-xl shadow-md ring-1 ring-amber-400/40"
-            />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-sm tracking-tight text-white">
-                  now<span className="text-[#F5C754]">nine</span>
-                </span>
-                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[#F5C754] text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider">
-                  COMMAND
-                </span>
-              </div>
-              <p className="text-[8px] text-gray-400 leading-none hidden sm:block">
-                Electoral Data Monitoring & Live Standings
-              </p>
-            </div>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-[#20202E]">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-400 text-[10px] font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>24/7 Live Ingestion Online</span>
-            </span>
-            <span className="text-[10px] text-gray-400 font-mono">
-              Total Ballots: <strong className="text-white">{totalVotesCount.toLocaleString()}</strong>
-            </span>
-          </div>
-        </div>
-
-        {/* Global Controls & Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
-          {/* Embargo Control Pill */}
-          <button
-            type="button"
-            onClick={() => {
-              const next = !isEmbargoActive;
-              setIsEmbargoActive(next);
-              showToast(next 
-                ? '🔒 Public Embargo ACTIVE: Survey results are hidden from ordinary voters' 
-                : '⚠️ Public Embargo OFF: Standings exposed publicly');
-            }}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-xl border text-[10px] font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
-              isEmbargoActive
-                ? 'bg-emerald-500/15 border-emerald-400/50 text-emerald-300 hover:bg-emerald-500/25'
-                : 'bg-red-500/15 border-red-400/50 text-red-300 hover:bg-red-500/25'
-            }`}
-            title="Toggle Public Results Visibility"
-          >
-            {isEmbargoActive ? <Lock className="w-3.5 h-3.5 text-emerald-400" /> : <Unlock className="w-3.5 h-3.5 text-red-400" />}
-            <span className="hidden md:inline">
-              {isEmbargoActive ? 'Results Embargo: LOCKED' : 'Results Embargo: OPEN'}
-            </span>
-          </button>
-
-          {/* Export CSV Report */}
-          <button
-            type="button"
-            onClick={handleExportCSV}
-            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-amber-300 hover:text-white text-[10.5px] font-bold items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-            title="Download CSV Electoral Report"
-          >
-            <Download className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden md:inline">Export CSV</span>
-          </button>
-
-          {/* Refresh Data */}
-          <button
-            type="button"
-            onClick={() => {
-              setRefreshCount(prev => prev + 1);
-              showToast('🔄 Real-time polling database refreshed across all clusters');
-            }}
-            className="p-1.5 sm:p-2 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-gray-300 hover:text-amber-300 transition-all cursor-pointer"
-            title="Refresh Live Data"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-
-          {/* Copy Direct Admin Link */}
-          <button
-            type="button"
-            onClick={() => {
-              const adminUrl = window.location.origin + window.location.pathname + '#admin';
-              navigator.clipboard?.writeText(adminUrl);
-              showToast(`📋 Admin URL copied: ${adminUrl}`);
-            }}
-            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-amber-500/40 text-amber-300 hover:text-white text-[10.5px] font-bold items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-            title="Copy Direct Admin Link"
-          >
-            <Share2 className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden lg:inline">Copy Link</span>
-          </button>
-
-          {/* Switch to Citizen Mobile View */}
-          <button
-            type="button"
-            onClick={onSwitchToMobile || onClose}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[10.5px] shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
-            title="Return to Citizen Mobile App"
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Open Mobile App</span>
-            <span className="sm:hidden">App</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Mobile Horizontal Module Switcher (Quick 1-tap switching on phones) */}
-      <div className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-[#0A0A0F] border-b border-[#1C1C28] overflow-x-auto phone-scroll shrink-0 z-30">
-        {[
-          { id: 'overview', label: 'Overview', icon: BarChart3 },
-          { id: 'customer-tasks', label: 'Citizen Tasks', icon: Activity, count: customerActivities.length },
-          { id: 'constituencies', label: 'Standings', icon: Vote },
-          { id: 'surveys', label: 'Surveys', icon: FileText },
-          { id: 'live-debates', label: 'Debates', icon: Radio },
-          { id: 'news', label: 'News', icon: Newspaper },
-          { id: 'boss-house', label: 'Boss House', icon: Eye },
-          { id: 'settings', label: 'Settings', icon: Settings },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
+      {/* Left Sidebar Navigation (Matching Mockup: Dark Background, Golden Landmark Logo, Vertical Yellow Active Pill) */}
+      <aside className={`
+        fixed lg:sticky top-0 left-0 h-screen w-64 bg-[#131417] text-white flex flex-col justify-between shrink-0 p-4 border-r border-[#202227] z-50 transition-transform duration-300
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <div>
+          {/* Top Circular Logo & Admin Header */}
+          <div className="flex flex-col items-center justify-center pt-2 pb-5 border-b border-[#202227]/80 text-center relative">
             <button
-              key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all flex items-center gap-1.5 cursor-pointer ${
-                isActive
-                  ? 'bg-amber-500 text-black font-extrabold shadow-sm'
-                  : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#232332]'
-              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="lg:hidden absolute top-1 right-1 text-gray-400 hover:text-white p-1"
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-              {tab.count !== undefined && (
-                <span className="text-[9px] px-1 rounded bg-black/30 font-mono font-bold">
-                  {tab.count}
-                </span>
-              )}
+              <X className="w-5 h-5" />
             </button>
-          );
-        })}
-      </div>
+            <div className="w-14 h-14 rounded-full bg-[#1C1E24] border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] shadow-lg shadow-amber-500/10 mb-2.5">
+              <Landmark className="w-7 h-7" />
+            </div>
+            <h2 className="text-base font-black text-white tracking-wide">
+              {activeConstituency?.locality?.split(',')[0] || 'Almasguda'}
+            </h2>
+            <p className="text-[11px] text-gray-400 font-medium">Admin</p>
+          </div>
 
-      {/* Main Layout: Dynamic Admin Views (Left Sidebar on Desktop + Content Area) */}
-      <div className="flex-1 flex overflow-hidden min-h-0 w-full">
-        {/* Left Desktop Sidebar Navigation */}
-        <aside className="hidden lg:flex w-64 bg-[#0A0A0F] border-r border-[#1C1C28] p-3 flex-col justify-between shrink-0 overflow-y-auto">
-          <div className="space-y-1.5">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-gray-500 px-3 pb-1 block font-bold">
-              Electoral Modules
-            </span>
+          {/* Navigation Items (Vertical Stack) */}
+          <nav className="space-y-1.5 my-5">
             {[
-              { id: 'overview', label: 'Dashboard Overview', icon: BarChart3, badge: 'Live' },
-              { id: 'customer-tasks', label: 'Live Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
-              { id: 'constituencies', label: 'Constituency Standings', icon: Vote, count: '8 Hot' },
-              { id: 'surveys', label: '5-Question Pulse', icon: FileText, count: '124K' },
-              { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
-              { id: 'news', label: 'News & Flash Ticker', icon: Newspaper, count: '4' },
-              { id: 'boss-house', label: 'Boss of House Voting', icon: Eye, count: '300K+' },
-              { id: 'settings', label: 'Embargo & Settings', icon: Settings },
+              { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+              { id: 'news', label: 'Manage News', icon: Newspaper },
+              { id: 'live-debates', label: 'Manage Videos', icon: Play },
+              { id: 'surveys', label: 'Manage Polls', icon: BarChart3 },
+              { id: 'customer-tasks', label: 'Manage Users', icon: Users },
+              { id: 'constituencies', label: 'View Reports', icon: TrendingUp },
+              { id: 'settings', label: 'Settings', icon: Settings },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -1139,347 +1029,469 @@ export default function NowNineAdminDashboard({
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-between group ${
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer ${
                     isActive
-                      ? 'bg-gradient-to-r from-amber-500/25 via-amber-500/15 to-transparent text-amber-300 font-black border-l-4 border-amber-400 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-[#14141E]'
+                      ? 'bg-[#F9C942] text-black font-extrabold shadow-sm'
+                      : 'text-gray-400 hover:text-white hover:bg-[#1C1E24]'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <Icon className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-amber-400 stroke-[2.5]' : 'text-gray-400'}`} />
-                    <span className="truncate">{tab.label}</span>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    {tab.badge && (
-                      <span className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider ${
-                        isActive ? 'bg-amber-400 text-black' : 'bg-red-600 text-white animate-pulse'
-                      }`}>
-                        {tab.badge}
-                      </span>
-                    )}
-                    {tab.count !== undefined && (
-                      <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
-                        isActive ? 'bg-amber-400/20 text-amber-300' : 'bg-white/10 text-gray-400'
-                      }`}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </div>
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-black stroke-[2.5]' : 'text-gray-400'}`} />
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
+          </nav>
+        </div>
+
+        {/* Bottom Logout Button */}
+        <div className="pt-4 border-t border-[#202227]/80">
+          <button
+            type="button"
+            onClick={onSwitchToMobile || onClose}
+            className="w-full py-3 px-4 rounded-xl text-gray-400 hover:text-red-400 hover:bg-[#1C1E24] text-xs font-bold transition-all flex items-center gap-3 cursor-pointer"
+            title="Exit Admin to Citizen Mobile App"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Right Canvas Container (Clean Light Theme #F4F5F8) */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen bg-[#F4F5F8]">
+        {/* Canvas Top Command Bar */}
+        <header className="h-16 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-20 shadow-2xs">
+          {/* Left: Mobile Menu Toggle & 24/7 Live Ingestion Badge */}
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
+              title="Toggle Menu"
+            >
+              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+
+            <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
+              <span>24/7 Live Ingestion Online</span>
+            </span>
           </div>
 
-          {/* Bottom System Status in Sidebar */}
-          <div className="p-3 rounded-2xl bg-[#12121C] border border-[#20202E] space-y-1 mt-4">
-            <div className="flex items-center justify-between text-[10px] font-mono">
-              <span className="text-gray-400">System Status</span>
-              <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Live Node 24/7
-              </span>
-            </div>
-            <div className="text-[9.5px] text-gray-500 font-mono">
-              Vercel Edge Global Cluster
+          {/* Right: Controls & Mockup-matched Profile Pill */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Embargo Control */}
+            <button
+              type="button"
+              onClick={() => {
+                const next = !isEmbargoActive;
+                setIsEmbargoActive(next);
+                showToast(next ? '🔒 Results Embargo: LOCKED' : '⚠️ Results Embargo: OPEN');
+              }}
+              className={`hidden md:flex px-3 py-1.5 rounded-xl border text-xs font-bold items-center gap-1.5 transition cursor-pointer shadow-2xs ${
+                isEmbargoActive
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                  : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+              }`}
+              title="Toggle Public Results Visibility"
+            >
+              {isEmbargoActive ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+              <span>{isEmbargoActive ? 'Results Embargo: LOCKED' : 'Results Embargo: OPEN'}</span>
+            </button>
+
+            {/* Export CSV Report */}
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              className="hidden sm:flex px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 text-xs font-bold items-center gap-1.5 transition cursor-pointer"
+              title="Download CSV Electoral Report"
+            >
+              <Download className="w-3.5 h-3.5 text-gray-600" />
+              <span>Export CSV</span>
+            </button>
+
+            {/* Switch to Citizen Mobile View */}
+            <button
+              type="button"
+              onClick={onSwitchToMobile || onClose}
+              className="px-3 py-1.5 rounded-xl bg-[#F9C942] hover:bg-[#F5C754] text-black font-extrabold text-xs flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+              title="Return to Citizen Mobile App"
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Open Mobile App</span>
+              <span className="sm:hidden">App</span>
+            </button>
+
+            {/* Admin Profile Pill matching mockup */}
+            <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-gray-200">
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+                alt="Admin Avatar"
+                className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-200 shadow-2xs"
+              />
+              <span className="text-xs font-extrabold text-gray-800 hidden sm:inline">Admin</span>
+              <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
             </div>
           </div>
-        </aside>
+        </header>
 
-        {/* Right Main Content Panel */}
-        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6 bg-[#07070A] w-full min-w-0">
+        {/* Content Body Area */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 w-full min-w-0">
 
-          {/* VIEW 1: DASHBOARD OVERVIEW (Executive, Clean & Crystal Clear) */}
+          {/* VIEW 1: DASHBOARD OVERVIEW (Exact Reference Mockup Design) */}
           {activeTab === 'overview' && (
-            <div className="space-y-5 animate-fadeIn">
+            <div className="space-y-6 animate-fadeIn">
               
-              {/* Sleek Executive Header Bar: Active Ingestion & Constituency Selector */}
-              <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black shadow-inner shrink-0">
-                    <Vote className="w-5 h-5 text-amber-400" />
+              {/* Header Title Matching Mockup: "Dashboard • Welcome back, Admin!" */}
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                  Dashboard
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-500 font-medium mt-0.5">
+                  Welcome back, Admin!
+                </p>
+              </div>
+
+              {/* 4 Pure White Metric KPI Cards (Yellow Play, Blue News, Green Users, Purple Polls) */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                {/* 1. Total Videos */}
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                  <div className="w-12 h-12 rounded-full bg-[#FEF4D6] flex items-center justify-center text-[#E5A817] shadow-xs mb-3">
+                    <Play className="w-5 h-5 fill-current" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h1 className="text-base sm:text-lg font-black text-white tracking-tight">
-                        Electoral Command Overview
-                      </h1>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-400/30 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        Live Ingestion Active
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      Focus: <strong className="text-white">{activeConstituency.name} ({activeConstituency.code})</strong> • {activeConstituency.locality}, {activeConstituency.state}
-                    </p>
+                    <span className="text-xs font-semibold text-gray-500 block">Total Videos</span>
+                    <span className="text-2xl sm:text-3xl font-black text-gray-900 mt-0.5 block font-mono">
+                      {recordedSessions.length + (activeBroadcast?.isLive ? 1 : 0) + 12}
+                    </span>
                   </div>
                 </div>
 
-                {/* Constituency Selector + Subtle Controls */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-1.5 bg-[#14141E] border border-[#2A2A3E] rounded-xl px-2.5 py-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                {/* 2. Total News */}
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                  <div className="w-12 h-12 rounded-full bg-[#EBF3FE] flex items-center justify-center text-[#2563EB] shadow-xs mb-3">
+                    <Newspaper className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-gray-500 block">Total News</span>
+                    <span className="text-2xl sm:text-3xl font-black text-gray-900 mt-0.5 block font-mono">
+                      {newsFeed.length + 44}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3. Total Users */}
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                  <div className="w-12 h-12 rounded-full bg-[#E8F8EE] flex items-center justify-center text-[#10B981] shadow-xs mb-3">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-gray-500 block">Total Users</span>
+                    <span className="text-2xl sm:text-3xl font-black text-gray-900 mt-0.5 block font-mono">
+                      {totalVotesCount > 0 ? (totalVotesCount + 1250).toLocaleString() : '1,250'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 4. Total Polls */}
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                  <div className="w-12 h-12 rounded-full bg-[#F3ECFF] flex items-center justify-center text-[#8B5CF6] shadow-xs mb-3">
+                    <BarChart3 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-gray-500 block">Total Polls</span>
+                    <span className="text-2xl sm:text-3xl font-black text-gray-900 mt-0.5 block font-mono">
+                      {surveyQuestionsList.length + 7}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lower 2-Column Section: Recent Activity (8 cols) & Quick Actions (4 cols) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                
+                {/* LEFT (8 cols): Recent Activity with "View All →" */}
+                <div className="lg:col-span-8 bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-gray-800" />
+                      <h2 className="text-base font-extrabold text-gray-900">Recent Activity</h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('customer-tasks')}
+                      className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>View All</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+
+                  {/* 3 Mockup Activity Rows */}
+                  <div className="space-y-3">
+                    <div className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=120&auto=format&fit=crop&q=80"
+                          alt="Activity thumbnail"
+                          className="w-14 h-11 rounded-lg object-cover bg-gray-100 shrink-0 shadow-xs"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                            New Development in {activeConstituency?.locality?.split(',')[0] || 'Almasguda'}
+                          </h3>
+                          <span className="text-[11px] text-gray-400 block mt-0.5">
+                            Local Civic Infrastructure & Water Project
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap hidden sm:inline">
+                          Nov 1, 2026
+                        </span>
+                        <span className="px-2.5 py-1 rounded-full bg-[#E8F8EE] text-[#059669] text-[11px] font-bold">
+                          Published
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src="https://images.unsplash.com/photo-1577495508048-b635879837f1?w=120&auto=format&fit=crop&q=80"
+                          alt="Activity thumbnail"
+                          className="w-14 h-11 rounded-lg object-cover bg-gray-100 shrink-0 shadow-xs"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                            Public Meeting Highlights
+                          </h3>
+                          <span className="text-[11px] text-gray-400 block mt-0.5">
+                            Candidate Debate & Election Public Forum
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap hidden sm:inline">
+                          Oct 31, 2026
+                        </span>
+                        <span className="px-2.5 py-1 rounded-full bg-[#E8F8EE] text-[#059669] text-[11px] font-bold">
+                          Published
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img
+                          src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=120&auto=format&fit=crop&q=80"
+                          alt="Activity thumbnail"
+                          className="w-14 h-11 rounded-lg object-cover bg-gray-100 shrink-0 shadow-xs"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                            Development Works
+                          </h3>
+                          <span className="text-[11px] text-gray-400 block mt-0.5">
+                            Road Reconstruction & Drainage Status
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap hidden sm:inline">
+                          Oct 30, 2026
+                        </span>
+                        <span className="px-2.5 py-1 rounded-full bg-[#E8F8EE] text-[#059669] text-[11px] font-bold">
+                          Published
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* RIGHT (4 cols): Quick Actions Matching Mockup */}
+                <div className="lg:col-span-4 bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-xs flex flex-col justify-between space-y-4">
+                  <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+                    <Sparkles className="w-4 h-4 text-amber-500 fill-amber-500" />
+                    <h2 className="text-base font-extrabold text-gray-900">Quick Actions</h2>
+                  </div>
+
+                  <div className="space-y-3 flex-1 flex flex-col justify-center">
+                    {/* Add News */}
+                    <button
+                      type="button"
+                      onClick={() => setIsAddNewsQuickModalOpen(true)}
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#18191E] text-white hover:bg-black font-bold text-sm flex items-center justify-center gap-2.5 transition shadow-xs cursor-pointer active:scale-98"
+                    >
+                      <Newspaper className="w-4 h-4" />
+                      <span>Add News</span>
+                    </button>
+
+                    {/* Add Video (Bright Yellow Button) */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLiveStreamModalMode('conduct');
+                        setIsLiveStreamModalOpen(true);
+                      }}
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#F9C942] hover:bg-[#F5C754] text-black font-extrabold text-sm flex items-center justify-center gap-2.5 transition shadow-sm cursor-pointer active:scale-98"
+                    >
+                      <Play className="w-4 h-4 fill-current" />
+                      <span>Add Video</span>
+                    </button>
+
+                    {/* Create Poll */}
+                    <button
+                      type="button"
+                      onClick={() => setIsAddQuestionModalOpen(true)}
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#18191E] text-white hover:bg-black font-bold text-sm flex items-center justify-center gap-2.5 transition shadow-xs cursor-pointer active:scale-98"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      <span>Create Poll</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Clean Live Constituency Standings Card: ALL 8 PARTIES WITH KUTAMI TAGS */}
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 gap-3">
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-base sm:text-lg font-black text-gray-900">
+                        {activeConstituency.name}
+                      </h2>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-mono font-bold">
+                        {activeConstituency.code}
+                      </span>
+                      <span className="text-xs text-gray-500 font-medium">
+                        • {activeConstituency.locality}, {activeConstituency.state}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400 font-telugu mt-0.5">
+                      {activeConstituency.teluguName}
+                    </p>
+                  </div>
+
+                  {/* Filter & Selectors */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Region Filter */}
+                    <div className="flex items-center bg-gray-100 p-0.5 rounded-xl text-xs font-bold">
+                      {['All', 'Telangana', 'Andhra Pradesh'].map((reg) => (
+                        <button
+                          key={reg}
+                          type="button"
+                          onClick={() => setRegionFilter(reg)}
+                          className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                            regionFilter === reg ? 'bg-white text-gray-900 shadow-xs font-extrabold' : 'text-gray-500 hover:text-gray-900'
+                          }`}
+                        >
+                          {reg === 'Andhra Pradesh' ? 'AP' : reg}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Constituency Selector */}
                     <select
                       value={selectedConstituencyKey}
                       onChange={(e) => setSelectedConstituencyKey(e.target.value)}
-                      className="bg-transparent text-white text-xs font-bold outline-none cursor-pointer pr-1"
+                      className="bg-gray-100 border border-gray-200 text-gray-900 text-xs font-bold rounded-xl px-2.5 py-1.5 outline-none cursor-pointer"
                     >
-                      {Object.values(ALL_CONSTITUENCIES).map(c => (
-                        <option key={c.id} value={c.id} className="bg-[#12121C] text-white">
+                      {filteredConstituenciesList.map(c => (
+                        <option key={c.id} value={c.id}>
                           {c.name} ({c.code})
                         </option>
                       ))}
                     </select>
-                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      recordLiveBallot({
-                        party: { name: activeConstituency.parties[0]?.name || 'Congress (INC)', candidate: activeConstituency.parties[0]?.candidate || '', id: activeConstituency.parties[0]?.id || 'inc' },
-                        location: { assembly: activeConstituency.name, locality: activeConstituency.locality?.split(',')[0] || 'Center', state: activeConstituency.state },
-                        answers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
-                      });
-                      showToast(`🗳️ 1 Live ballot recorded for ${activeConstituency.parties[0]?.name} in ${activeConstituency.name}!`);
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                    title="Cast 1 test vote to test live increment"
-                  >
-                    <Vote className="w-3.5 h-3.5 text-amber-400" />
-                    <span>+1 Test Vote</span>
-                  </button>
+                    {/* Quick Test Vote */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        recordLiveBallot({
+                          party: { name: activeConstituency.parties[0]?.name || 'Congress (INC)', candidate: activeConstituency.parties[0]?.candidate || '', id: activeConstituency.parties[0]?.id || 'inc' },
+                          location: { assembly: activeConstituency.name, locality: activeConstituency.locality?.split(',')[0] || 'Center', state: activeConstituency.state },
+                          answers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
+                        });
+                        showToast(`🗳️ 1 Live ballot recorded for ${activeConstituency.parties[0]?.name}!`);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-black text-xs font-extrabold flex items-center gap-1 shadow-xs transition cursor-pointer"
+                      title="Test +1 vote"
+                    >
+                      <Vote className="w-3.5 h-3.5" />
+                      <span>+1 Vote</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      resetAllBallotsToZero();
-                      showToast('🗑️ All ballots reset to 0! Ledger cleared.');
-                    }}
-                    className="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-all cursor-pointer"
-                    title="Reset ballot count to 0"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* 4 Clean Metric Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
-                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span className="font-bold text-gray-300">Total Ballots Cast</span>
-                    <Vote className="w-4 h-4 text-amber-400" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        resetAllBallotsToZero();
+                        showToast('🗑️ All ballots reset to 0! Ledger cleared.');
+                      }}
+                      className="p-1.5 rounded-xl bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-600 border border-gray-200 transition cursor-pointer"
+                      title="Reset ballot count to 0"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-white font-mono">
-                    {totalVotesCount > 0 ? totalVotesCount.toLocaleString() : activeConstituency.totalVotes.toLocaleString()}
-                  </div>
-                  <span className="text-[10px] text-emerald-400 font-bold mt-1 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" />
-                    Verified Cryptographic Trail
-                  </span>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
-                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span className="font-bold text-gray-300">Active Constituency</span>
-                    <MapPin className="w-4 h-4 text-sky-400" />
-                  </div>
-                  <div className="text-lg sm:text-xl font-black text-white truncate">
-                    {activeConstituency.name}
-                  </div>
-                  <span className="text-[10px] text-gray-400 font-mono mt-1 block">
-                    {activeConstituency.code} • {activeConstituency.district}
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
-                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span className="font-bold text-gray-300">Leading Trend</span>
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                  </div>
-                  <div className="text-lg sm:text-xl font-black text-amber-300 truncate">
-                    {activeConstituency.leadingParty}
-                  </div>
-                  <span className="text-[10px] text-emerald-400 font-mono mt-1 block truncate">
-                    {activeConstituency.margin}
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-sm hover:border-[#32324A] transition-all">
-                  <div className="flex items-center justify-between text-gray-400 text-xs mb-1">
-                    <span className="font-bold text-gray-300">Turnout & Integrity</span>
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
-                    {activeConstituency.turnoutRate || '78.4%'}
-                  </div>
-                  <span className="text-[10px] text-gray-400 font-bold mt-1 block">
-                    99.8% Geofence Verified
-                  </span>
-                </div>
-              </div>
-
-              {/* Main Executive Two-Column Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                
-                {/* LEFT COLUMN: ACTIVE CONSTITUENCY LIVE STANDINGS (ALL 8 PARTIES) */}
-                <div className="lg:col-span-7 p-4 sm:p-5 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-md space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#1E1E2C]">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-base sm:text-lg font-black text-white">
-                          {activeConstituency.name}
-                        </h2>
-                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[9px] font-mono font-bold">
-                          {activeConstituency.code}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-400 font-telugu mt-0.5">
-                        {activeConstituency.teluguName} • {activeConstituency.locality}
-                      </p>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="text-[10px] text-gray-400 block font-mono">Counted Ballots</span>
-                      <span className="text-sm font-black text-white font-mono">
-                        {activeConstituency.totalVotes.toLocaleString()} votes
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* All 8 Parties Standings List */}
-                  <div className="space-y-3">
-                    {activeConstituency.parties.map((party, rank) => (
-                      <div 
-                        key={party.id}
-                        className="p-3 rounded-xl bg-[#14141E] border border-[#20202E] hover:border-[#323248] transition-all space-y-2"
-                      >
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="w-5 h-5 rounded-full bg-[#1A1A28] border border-white/10 flex items-center justify-center text-[10px] font-mono font-bold shrink-0">
-                              #{rank + 1}
-                            </span>
-                            <span className="text-xl shrink-0">{party.symbol}</span>
-                            <div className="min-w-0 truncate">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-extrabold text-white text-xs sm:text-sm block truncate">
-                                  {party.name}
-                                </span>
-                                {(party.isKutami || party.name?.includes('కూటమి') || party.telugu?.includes('కూటమి')) && (
-                                  <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">
-                                    కూటమి (Kutami)
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-[10px] text-gray-400 truncate block">
-                                {party.candidate}
+                {/* All 8 Parties in Responsive Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {activeConstituency.parties.map((party, rank) => (
+                    <div
+                      key={party.id}
+                      className="p-3 rounded-xl bg-gray-50/80 border border-gray-100 hover:border-gray-300 transition space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-700 shrink-0">
+                            #{rank + 1}
+                          </span>
+                          <span className="text-lg shrink-0">{party.symbol}</span>
+                          <div className="min-w-0 truncate">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-extrabold text-gray-900 text-xs sm:text-sm block truncate">
+                                {party.name}
                               </span>
+                              {(party.isKutami || party.name?.includes('కూటమి') || party.telugu?.includes('కూటమి')) && (
+                                <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                  కూటమి (Kutami)
+                                </span>
+                              )}
                             </div>
-                          </div>
-
-                          <div className="text-right shrink-0 ml-2">
-                            <span className="text-sm font-black font-mono block" style={{ color: party.color }}>
-                              {party.voteShare}%
-                            </span>
-                            <span className="text-[10px] text-gray-400 font-mono">
-                              {party.votes.toLocaleString()} votes
+                            <span className="text-[10px] text-gray-500 truncate block">
+                              {party.candidate}
                             </span>
                           </div>
                         </div>
 
-                        {/* Progress Bar */}
-                        <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
-                          <div 
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{ width: `${Math.max(party.voteShare, 1)}%`, backgroundColor: party.color }}
-                          />
+                        <div className="text-right shrink-0 ml-2">
+                          <span className="text-sm font-black font-mono block" style={{ color: party.color }}>
+                            {party.voteShare}%
+                          </span>
+                          <span className="text-[10px] text-gray-500 font-mono">
+                            {party.votes.toLocaleString()} votes
+                          </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="pt-2 text-center">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('constituencies')}
-                      className="text-xs text-amber-400 hover:text-amber-300 font-bold hover:underline transition-colors cursor-pointer"
-                    >
-                      View All 13 Assembly Standings & Vote Shares →
-                    </button>
-                  </div>
-                </div>
-
-                {/* RIGHT COLUMN: LIVE CITIZEN TASKS & ACTIVITY FEED */}
-                <div className="lg:col-span-5 p-4 sm:p-5 rounded-2xl bg-[#0F0F16] border border-[#222232] shadow-md space-y-4 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between pb-3 border-b border-[#1E1E2C]">
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-                        <h2 className="text-sm sm:text-base font-black text-white">
-                          Live Citizen Activity Stream
-                        </h2>
+                      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700"
+                          style={{ width: `${Math.max(party.voteShare, 1)}%`, backgroundColor: party.color }}
+                        />
                       </div>
-                      <span className="text-[9.5px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-mono font-bold">
-                        {customerActivities.length} Tasks
-                      </span>
                     </div>
-
-                    <div className="space-y-2.5 mt-3">
-                      {customerActivities.length === 0 ? (
-                        <div className="p-6 text-center text-xs text-gray-500 bg-[#12121A] rounded-xl border border-dashed border-[#222232]">
-                          <p className="font-bold text-gray-400">Waiting for live citizen actions</p>
-                          <p className="text-[10px] text-gray-500 mt-1">Actions performed on the citizen app appear here live.</p>
-                        </div>
-                      ) : (
-                        customerActivities.slice(0, 7).map((act) => (
-                          <div 
-                            key={act.id}
-                            className="p-2.5 rounded-xl bg-[#14141E] border border-[#20202E] flex items-start justify-between gap-2 text-xs"
-                          >
-                            <div className="flex items-start gap-2 min-w-0">
-                              <span className="text-base shrink-0 mt-0.5">{act.icon || '⚡'}</span>
-                              <div className="min-w-0">
-                                <span className="font-bold text-white block text-[11.5px] truncate">
-                                  {act.title}
-                                </span>
-                                <span className="text-[10px] text-gray-300 block truncate">
-                                  {act.detail}
-                                </span>
-                                <span className="text-[9px] text-gray-500 block">
-                                  {act.location}
-                                </span>
-                              </div>
-                            </div>
-                            <span className="text-[9px] text-gray-500 font-mono shrink-0 whitespace-nowrap">
-                              {act.time}
-                            </span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-[#1E1E2C] flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={handleSimulateCustomerTask}
-                      className="text-xs text-gray-400 hover:text-white font-bold flex items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-amber-400" />
-                      <span>Simulate 1 Task</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('customer-tasks')}
-                      className="text-xs text-amber-400 hover:text-amber-300 font-bold hover:underline transition-colors cursor-pointer"
-                    >
-                      View All Citizen Tasks →
-                    </button>
-                  </div>
+                  ))}
                 </div>
-
               </div>
+
             </div>
           )}
 
@@ -1855,122 +1867,6 @@ export default function NowNineAdminDashboard({
                   </p>
                 </div>
               </div>
-
-              {/* MODAL: ADD EXTRA SURVEY QUESTION */}
-              {isAddQuestionModalOpen && (
-                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-                  <div className="bg-[#12121A] border-2 border-amber-500/40 rounded-3xl max-w-lg w-full text-white shadow-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-                    <div className="flex items-center justify-between pb-3 border-b border-[#232332]">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-                          ➕
-                        </div>
-                        <div>
-                          <h3 className="font-black text-base text-white">Add Extra Survey Question</h3>
-                          <p className="text-[11px] text-gray-400">Step #{surveyQuestionsList.length + 1} in the Citizen Survey Flow</p>
-                        </div>
-                      </div>
-                      <button 
-                        type="button" 
-                        onClick={() => setIsAddQuestionModalOpen(false)}
-                        className="text-gray-400 hover:text-white text-lg font-bold p-1 cursor-pointer"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    <form onSubmit={handleAddNewQuestion} className="space-y-4">
-                      {/* Question Category / Label */}
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-300">Question Category / Header (Optional)</label>
-                        <input
-                          type="text"
-                          value={newQuestionCategory}
-                          onChange={(e) => setNewQuestionCategory(e.target.value)}
-                          placeholder={`e.g. Priority #${surveyQuestionsList.length + 1}: స్థానిక సమస్యలు (Civic Needs)`}
-                          className="w-full bg-[#181824] border border-[#2B2B3E] focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none"
-                        />
-                      </div>
-
-                      {/* Question Text */}
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-300">
-                          Question Text (in Telugu or English) <span className="text-red-400">*</span>
-                        </label>
-                        <textarea
-                          rows={3}
-                          value={newQuestionText}
-                          onChange={(e) => setNewQuestionText(e.target.value)}
-                          placeholder="e.g. మీ నియోజకవర్గంలో మహిళా రక్షణ, శాంతిభద్రతల పరిస్థితి ఎలా ఉంది? (How do you rate women's safety & law order?)"
-                          className="w-full bg-[#181824] border border-[#2B2B3E] focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none resize-none"
-                          required
-                        />
-                      </div>
-
-                      {/* Options List */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <label className="text-xs font-bold text-gray-300">Voting Options (Minimum 2)</label>
-                          <button
-                            type="button"
-                            onClick={() => setNewQuestionOptions([...newQuestionOptions, `Option ${newQuestionOptions.length + 1}`])}
-                            className="text-[11px] text-amber-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>Add Option</span>
-                          </button>
-                        </div>
-
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                          {newQuestionOptions.map((opt, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                              <span className="text-xs font-mono text-gray-500 w-5 text-right">{idx + 1}.</span>
-                              <input
-                                type="text"
-                                value={opt}
-                                onChange={(e) => {
-                                  const updated = [...newQuestionOptions];
-                                  updated[idx] = e.target.value;
-                                  setNewQuestionOptions(updated);
-                                }}
-                                className="flex-1 bg-[#181824] border border-[#2B2B3E] focus:border-amber-400 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
-                                required
-                              />
-                              {newQuestionOptions.length > 2 && (
-                                <button
-                                  type="button"
-                                  onClick={() => setNewQuestionOptions(newQuestionOptions.filter((_, i) => i !== idx))}
-                                  className="text-gray-500 hover:text-red-400 text-xs p-1"
-                                  title="Remove option"
-                                >
-                                  ✕
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Modal Action Buttons */}
-                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#232332]">
-                        <button
-                          type="button"
-                          onClick={() => setIsAddQuestionModalOpen(false)}
-                          className="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-bold transition-all cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-black text-xs font-black shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
-                        >
-                          <span>Publish Question Live 🗳️</span>
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              )}
 
             </div>
           )}
@@ -2727,6 +2623,188 @@ export default function NowNineAdminDashboard({
         }}
         initialMode={liveStreamModalMode}
       />
+
+      {/* Quick Add News Modal */}
+      {isAddNewsQuickModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-lg w-full text-gray-900 shadow-2xl p-6 space-y-4 border border-gray-100">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                  <Newspaper className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-gray-900">Add Breaking News</h3>
+                  <p className="text-xs text-gray-500">Instantly publishes live to the Citizen Mobile App</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddNewsQuickModalOpen(false)}
+                className="text-gray-400 hover:text-gray-700 p-1 font-bold text-lg cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleQuickNewsSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-700 block mb-1">
+                  News Headline (Telugu or English) *
+                </label>
+                <textarea
+                  rows={3}
+                  value={quickNewsTitle}
+                  onChange={(e) => setQuickNewsTitle(e.target.value)}
+                  placeholder="e.g. అల్మాస్‌గూడలో నూతన అభివృద్ధి పనులకు శంకుస్థాపన..."
+                  className="w-full bg-gray-50 border border-gray-200 focus:border-amber-400 rounded-xl p-3 text-xs text-gray-900 outline-none resize-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-700 block mb-1">
+                  Constituency / Locality Tag
+                </label>
+                <input
+                  type="text"
+                  value={quickNewsCategory}
+                  onChange={(e) => setQuickNewsCategory(e.target.value)}
+                  placeholder="e.g. Almasguda / LB Nagar"
+                  className="w-full bg-gray-50 border border-gray-200 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-gray-900 outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddNewsQuickModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#F9C942] hover:bg-[#F5C754] text-black font-extrabold text-xs shadow-sm transition cursor-pointer"
+                >
+                  Publish Live 📰
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Global Create Poll Question Modal */}
+      {isAddQuestionModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-lg w-full text-gray-900 shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto border border-gray-100">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-gray-900">Create Poll / Survey Question</h3>
+                  <p className="text-xs text-gray-500">Step #{surveyQuestionsList.length + 1} in Citizen Survey Flow</p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsAddQuestionModalOpen(false)}
+                className="text-gray-400 hover:text-gray-700 text-lg font-bold p-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddNewQuestion} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-700">Category / Header Label</label>
+                <input
+                  type="text"
+                  value={newQuestionCategory}
+                  onChange={(e) => setNewQuestionCategory(e.target.value)}
+                  placeholder={`e.g. Priority #${surveyQuestionsList.length + 1}: స్థానిక సమస్యలు (Civic Needs)`}
+                  className="w-full bg-gray-50 border border-gray-200 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-gray-900 outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-700">
+                  Question Text (Telugu or English) *
+                </label>
+                <textarea
+                  rows={3}
+                  value={newQuestionText}
+                  onChange={(e) => setNewQuestionText(e.target.value)}
+                  placeholder="e.g. మీ నియోజకవర్గంలో మహిళా రక్షణ, శాంతిభద్రతల పరిస్థితి ఎలా ఉంది?"
+                  className="w-full bg-gray-50 border border-gray-200 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-gray-900 outline-none resize-none"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-gray-700">Voting Options (Minimum 2)</label>
+                  <button
+                    type="button"
+                    onClick={() => setNewQuestionOptions([...newQuestionOptions, `Option ${newQuestionOptions.length + 1}`])}
+                    className="text-xs text-purple-600 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add Option</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {newQuestionOptions.map((opt, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-gray-400 w-5 text-right">{idx + 1}.</span>
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={(e) => {
+                          const updated = [...newQuestionOptions];
+                          updated[idx] = e.target.value;
+                          setNewQuestionOptions(updated);
+                        }}
+                        className="flex-1 bg-gray-50 border border-gray-200 focus:border-purple-400 rounded-xl px-3 py-1.5 text-xs text-gray-900 outline-none"
+                        required
+                      />
+                      {newQuestionOptions.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => setNewQuestionOptions(newQuestionOptions.filter((_, i) => i !== idx))}
+                          className="text-gray-400 hover:text-red-500 text-xs p-1"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddQuestionModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#F9C942] hover:bg-[#F5C754] text-black text-xs font-extrabold shadow-sm transition cursor-pointer"
+                >
+                  Publish Question Live 🗳️
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
