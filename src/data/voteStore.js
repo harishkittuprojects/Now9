@@ -1,5 +1,7 @@
 // Central Real-Time Voting & Ballot Ledger for NowNine
-import { recordCustomerActivity } from './customerActivityStore';
+// Bridges real-time votes between mobile voters and desktop admin dashboards across the cloud
+import { recordCustomerActivity } from './customerActivityStore.js';
+import { publishCloudEvent, subscribeCloudEvents } from './cloudSyncService.js';
 
 export const BALLOT_COUNT_KEY = 'now9_total_ballots_live_v4';
 export const BALLOT_LOGS_KEY = 'now9_ballot_logs_live_v4';
@@ -13,7 +15,6 @@ export function getStoredBallotData() {
   }
   try {
     const rawCount = localStorage.getItem(BALLOT_COUNT_KEY);
-    // Explicitly start at 0 if not set
     const count = rawCount !== null ? parseInt(rawCount, 10) : 0;
     const logs = JSON.parse(localStorage.getItem(BALLOT_LOGS_KEY) || '[]');
     const constituencyVotes = JSON.parse(localStorage.getItem(CONSTITUENCY_VOTES_KEY) || '{}');
@@ -30,12 +31,12 @@ export function recordLiveBallot({ party, location, answers = {} }) {
   const current = getStoredBallotData();
   const nextCount = current.count + 1;
   
-  const constituencyName = location?.assembly || location?.locality || 'Mahabubnagar Constituency';
-  const localityName = location?.locality || location?.city || 'Yenugonda';
+  const constituencyName = location?.assembly || location?.locality || 'Visakhapatnam East Assembly';
+  const localityName = location?.locality || location?.city || 'Rushikonda';
   const partyName = party?.name || 'Congress (INC)';
   const candidateName = party?.candidate || 'Local Candidate';
   
-  // Normalize party code to match party.id in ALL_CONSTITUENCIES ('inc', 'brs', 'bjp', 'oth', 'tdp', 'ysrcp', 'aimim')
+  // Normalize party code
   const pNameLower = (partyName + ' ' + (party?.id || '')).toLowerCase();
   let partyCode = 'oth';
   if (pNameLower.includes('congress') || pNameLower.includes('inc')) partyCode = 'inc';
@@ -52,28 +53,46 @@ export function recordLiveBallot({ party, location, answers = {} }) {
   const ballotId = `#BLT-${String(nextCount).padStart(4, '0')}`;
   
   // Normalize constituency key
-  const constituencyLower = (constituencyName + ' ' + localityName).toLowerCase();
-  let constituencyKey = 'mahabubnagar';
-  if (constituencyLower.includes('mahabubnagar') || constituencyLower.includes('yenugonda') || constituencyLower.includes('palamuru')) {
+  const constituencyLower = (constituencyName + ' ' + localityName + ' ' + (location?.city || '') + ' ' + (location?.district || '')).toLowerCase();
+  let constituencyKey = 'visakhapatnam';
+  
+  if (
+    constituencyLower.includes('visakhapatnam') || 
+    constituencyLower.includes('vishaka') || 
+    constituencyLower.includes('rushikonda') || 
+    constituencyLower.includes('bheemili') || 
+    constituencyLower.includes('vizag') || 
+    constituencyLower.includes('mvp') || 
+    constituencyLower.includes('gajuwaka') ||
+    constituencyLower.includes('విశాఖ')
+  ) {
+    constituencyKey = 'visakhapatnam';
+  } else if (constituencyLower.includes('kurnool') || constituencyLower.includes('కర్నూలు') || constituencyLower.includes('c-camp')) {
+    constituencyKey = 'kurnool';
+  } else if (constituencyLower.includes('chandragiri') || constituencyLower.includes('చంద్రగిరి')) {
+    constituencyKey = 'chandragiri';
+  } else if (constituencyLower.includes('tirupati') || constituencyLower.includes('తిరుపతి') || constituencyLower.includes('alipiri')) {
+    constituencyKey = 'tirupati';
+  } else if (constituencyLower.includes('vijayawada') || constituencyLower.includes('విజయవాడ') || constituencyLower.includes('benz')) {
+    constituencyKey = 'vijayawada';
+  } else if (constituencyLower.includes('guntur') || constituencyLower.includes('గుంటూరు') || constituencyLower.includes('brodipet')) {
+    constituencyKey = 'guntur';
+  } else if (constituencyLower.includes('mahabubnagar') || constituencyLower.includes('yenugonda') || constituencyLower.includes('palamuru')) {
     constituencyKey = 'mahabubnagar';
   } else if (constituencyLower.includes('lb nagar') || constituencyLower.includes('almasguda') || constituencyLower.includes('badangpet') || constituencyLower.includes('saroornagar')) {
     constituencyKey = 'lbnagar';
-  } else if (constituencyLower.includes('jubilee')) {
+  } else if (constituencyLower.includes('jubilee') || constituencyLower.includes('banjara')) {
     constituencyKey = 'jubileehills';
-  } else if (constituencyLower.includes('khairatabad')) {
-    constituencyKey = 'khairatabad';
-  } else if (constituencyLower.includes('serilingampally') || constituencyLower.includes('gachibowli')) {
+  } else if (constituencyLower.includes('serilingampally') || constituencyLower.includes('gachibowli') || constituencyLower.includes('hitec')) {
     constituencyKey = 'serilingampally';
+  } else if (constituencyLower.includes('kukatpally') || constituencyLower.includes('kphb')) {
+    constituencyKey = 'kukatpally';
   } else if (constituencyLower.includes('munugode')) {
     constituencyKey = 'munugode';
   } else if (constituencyLower.includes('gajwel')) {
     constituencyKey = 'gajwel';
-  } else if (constituencyLower.includes('chandragiri') || constituencyLower.includes('tirupati')) {
-    constituencyKey = 'chandragiri';
-  } else if (constituencyLower.includes('kurnool') || constituencyLower.includes('కర్నూలు')) {
-    constituencyKey = 'kurnool';
-  } else if (constituencyLower.includes('vijayawada')) {
-    constituencyKey = 'vijayawada';
+  } else if ((location?.state || '').toLowerCase().includes('andhra')) {
+    constituencyKey = 'visakhapatnam';
   }
 
   const newLog = {
@@ -84,7 +103,7 @@ export function recordLiveBallot({ party, location, answers = {} }) {
     constituencyKey: constituencyKey,
     locality: `${localityName} (${constituencyName.replace(/\s*Constituency\s*/gi, '')})`,
     constituency: constituencyName,
-    state: location?.state || 'Telangana',
+    state: location?.state || 'Andhra Pradesh',
     time: 'Just now',
     timestamp: Date.now(),
     answers: answers,
@@ -121,13 +140,12 @@ export function recordLiveBallot({ party, location, answers = {} }) {
     console.error('Failed to save ballot to localStorage:', e);
   }
   
-  // Notify all listening components in real-time
-  try {
-    window.dispatchEvent(new CustomEvent(VOTE_CAST_EVENT, { 
-      detail: { count: nextCount, log: newLog, constituencyVotes, questionVotes } 
-    }));
+  const detail = { count: nextCount, log: newLog, constituencyVotes, questionVotes };
 
-    // Record as omni-channel customer activity
+  // 1. Dispatch locally on same device
+  try {
+    window.dispatchEvent(new CustomEvent(VOTE_CAST_EVENT, { detail }));
+
     recordCustomerActivity({
       type: 'vote',
       title: 'Electoral Ballot Submitted',
@@ -136,11 +154,14 @@ export function recordLiveBallot({ party, location, answers = {} }) {
       icon: '🗳️',
       badgeColor: 'emerald',
       badgeText: 'Official Ballot',
-      metadata: { ballotId, party: partyName, candidate: candidateName }
+      metadata: { ballotId, party: partyName, candidate: candidateName, constituencyKey }
     });
   } catch (e) {}
 
-  return { count: nextCount, log: newLog, constituencyVotes, questionVotes };
+  // 2. Publish to Cross-Device Cloud Sync Channel (bridges mobile voter to laptop admin!)
+  publishCloudEvent('BALLOT_CAST', detail);
+
+  return detail;
 }
 
 export function resetAllBallotsToZero() {
@@ -154,4 +175,39 @@ export function resetAllBallotsToZero() {
       detail: { count: 0, log: null, constituencyVotes: {}, questionVotes: {} } 
     }));
   } catch (e) {}
+
+  publishCloudEvent('BALLOT_RESET', {});
+}
+
+// Global Cloud Listener for incoming ballots across devices
+if (typeof window !== 'undefined') {
+  subscribeCloudEvents((cloudData) => {
+    if (cloudData.type === 'BALLOT_CAST' && cloudData.payload) {
+      const { count, log, constituencyVotes, questionVotes } = cloudData.payload;
+      try {
+        const cur = getStoredBallotData();
+        const mergedCount = Math.max(cur.count, count || (cur.count + 1));
+        const mergedLogs = log ? [log, ...cur.logs.filter(l => l.id !== log.id)].slice(0, 50) : cur.logs;
+        
+        localStorage.setItem(BALLOT_COUNT_KEY, mergedCount.toString());
+        localStorage.setItem(BALLOT_LOGS_KEY, JSON.stringify(mergedLogs));
+        if (constituencyVotes) localStorage.setItem(CONSTITUENCY_VOTES_KEY, JSON.stringify(constituencyVotes));
+        if (questionVotes) localStorage.setItem(QUESTION_VOTES_KEY, JSON.stringify(questionVotes));
+
+        window.dispatchEvent(new CustomEvent(VOTE_CAST_EVENT, { 
+          detail: { count: mergedCount, log, constituencyVotes: constituencyVotes || cur.constituencyVotes, questionVotes: questionVotes || cur.questionVotes } 
+        }));
+      } catch (err) {}
+    } else if (cloudData.type === 'BALLOT_RESET') {
+      try {
+        localStorage.setItem(BALLOT_COUNT_KEY, '0');
+        localStorage.setItem(BALLOT_LOGS_KEY, JSON.stringify([]));
+        localStorage.setItem(CONSTITUENCY_VOTES_KEY, JSON.stringify({}));
+        localStorage.setItem(QUESTION_VOTES_KEY, JSON.stringify({}));
+        window.dispatchEvent(new CustomEvent(VOTE_CAST_EVENT, { 
+          detail: { count: 0, log: null, constituencyVotes: {}, questionVotes: {} } 
+        }));
+      } catch (err) {}
+    }
+  });
 }

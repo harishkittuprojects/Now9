@@ -448,7 +448,7 @@ export default function NowNineAdminDashboard({
       code: 'AP-20',
       name: 'Visakhapatnam East Assembly',
       teluguName: 'విశాఖపట్నం తూర్పు శాసనసభ నియోజకవర్గం',
-      locality: 'MVP Colony, Beach Road, Siripuram',
+      locality: 'Rushikonda, MVP Colony, Beach Road',
       district: 'Visakhapatnam',
       state: 'Andhra Pradesh',
       totalVotes: 47600,

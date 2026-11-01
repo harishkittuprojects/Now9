@@ -1,5 +1,7 @@
 // Central Customer / Citizen Live Activity Store for NowNine
 // Captures and streams EVERY customer action from the website directly to the Admin Dashboard
+// Bridges real-time citizen tasks between mobile phones and laptops across the cloud
+import { publishCloudEvent, subscribeCloudEvents } from './cloudSyncService.js';
 
 export const CUSTOMER_ACTIVITY_KEY = 'now9_customer_activities_v1';
 export const CUSTOMER_ACTIVITY_EVENT = 'now9_customer_activity_event';
@@ -10,8 +12,8 @@ export const INITIAL_ACTIVITIES = [
     id: 'ACT-901',
     type: 'vote',
     title: 'Constituency Ballot Cast',
-    detail: 'Citizen cast official ballot for Congress (INC) - Yennam Srinivas Reddy in Mahabubnagar',
-    location: 'Yenugonda, Mahabubnagar',
+    detail: 'Citizen cast official ballot for TDP (NDA) in Visakhapatnam East',
+    location: 'Rushikonda, Visakhapatnam',
     time: 'Just now',
     timestamp: Date.now() - 15000,
     icon: '🗳️',
@@ -23,7 +25,7 @@ export const INITIAL_ACTIVITIES = [
     type: 'survey',
     title: 'Governance Survey Answered',
     detail: 'Citizen answered Priority #1: "నాయకత్వంపై నమ్మకం (Leadership Trust)"',
-    location: 'Mahabubnagar Constituency',
+    location: 'Visakhapatnam Constituency',
     time: '1m ago',
     timestamp: Date.now() - 65000,
     icon: '📊',
@@ -47,7 +49,7 @@ export const INITIAL_ACTIVITIES = [
     type: 'live',
     title: 'Live Debate Joined',
     detail: 'Citizen tuned into live broadcast: "2026 ఎన్నికలు: ఎవరికి అవకాశాలు?"',
-    location: 'LB Nagar, Hyderabad',
+    location: 'Beach Road, Visakhapatnam',
     time: '4m ago',
     timestamp: Date.now() - 240000,
     icon: '🔴',
@@ -58,8 +60,8 @@ export const INITIAL_ACTIVITIES = [
     id: 'ACT-905',
     type: 'news',
     title: 'News Article Read',
-    detail: 'Citizen opened breaking report: "తెలంగాణ అసెంబ్లీ నియోజకవర్గాల్లో ముమ్మర ప్రచారం"',
-    location: 'Khairatabad, Hyderabad',
+    detail: 'Citizen opened breaking report: "ఆంధ్రప్రదేశ్ అసెంబ్లీ నియోజకవర్గాల్లో ముమ్మర ప్రచారం"',
+    location: 'MVP Colony, Visakhapatnam',
     time: '7m ago',
     timestamp: Date.now() - 420000,
     icon: '📰',
@@ -70,8 +72,8 @@ export const INITIAL_ACTIVITIES = [
     id: 'ACT-906',
     type: 'location',
     title: 'GPS Location Verified',
-    detail: 'Citizen geofence verified in Mahabubnagar District (Assembly Constituency #74)',
-    location: 'Mahabubnagar (GPS Lat: 16.74, Lon: 77.98)',
+    detail: 'Citizen geofence verified in Visakhapatnam District (Rushikonda / East Assembly)',
+    location: 'Rushikonda, Visakhapatnam',
     time: '10m ago',
     timestamp: Date.now() - 600000,
     icon: '📍',
@@ -125,14 +127,17 @@ export function recordCustomerActivity({
   };
 
   const current = getCustomerActivities();
-  // Keep latest 80 activities
-  const updated = [newActivity, ...current].slice(0, 80);
+  // Filter out any existing activity with same id
+  const updated = [newActivity, ...current.filter(a => a.id !== newActivity.id)].slice(0, 80);
 
   try {
     localStorage.setItem(CUSTOMER_ACTIVITY_KEY, JSON.stringify(updated));
     window.dispatchEvent(
       new CustomEvent(CUSTOMER_ACTIVITY_EVENT, { detail: { newActivity, activities: updated } })
     );
+
+    // Cross-device cloud publish
+    publishCloudEvent('CUSTOMER_ACTIVITY', newActivity);
   } catch (e) {
     console.error('Failed to save customer activity:', e);
   }
@@ -158,9 +163,25 @@ export function subscribeCustomerActivities(callback) {
   };
   window.addEventListener(CUSTOMER_ACTIVITY_EVENT, handler);
   window.addEventListener('storage', handler);
+
+  // Cross-device cloud sync listener
+  const unsubCloud = subscribeCloudEvents((cloudData) => {
+    if (cloudData.type === 'CUSTOMER_ACTIVITY' && cloudData.payload) {
+      const newAct = cloudData.payload;
+      try {
+        const cur = getCustomerActivities();
+        if (!cur.some(a => a.id === newAct.id)) {
+          const merged = [newAct, ...cur].slice(0, 80);
+          localStorage.setItem(CUSTOMER_ACTIVITY_KEY, JSON.stringify(merged));
+          callback(merged);
+        }
+      } catch (err) {}
+    }
+  });
+
   return () => {
     window.removeEventListener(CUSTOMER_ACTIVITY_EVENT, handler);
     window.removeEventListener('storage', handler);
+    unsubCloud();
   };
 }
-

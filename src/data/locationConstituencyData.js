@@ -590,6 +590,47 @@ export function resolveConstituencyAndParties(detectedInfo) {
     }
   }
 
+  // Geofence & Keyword check for Visakhapatnam / Vizag (including Rushikonda, MVP Colony, Bheemili, Gajuwaka):
+  const isVizagCoordinates = lat && lon && (lat >= 17.50 && lat <= 18.00 && lon >= 83.10 && lon <= 83.50);
+  const isVisakhapatnam = isVizagCoordinates ||
+    searchTarget.includes('visakhapatnam') ||
+    searchTarget.includes('vishaka') ||
+    searchTarget.includes('rushikonda') ||
+    searchTarget.includes('ఋషికొండ') ||
+    searchTarget.includes('bheemili') ||
+    searchTarget.includes('భీమిలి') ||
+    searchTarget.includes('vizag') ||
+    searchTarget.includes('mvp colony') ||
+    searchTarget.includes('gajuwaka') ||
+    searchTarget.includes('pendurthi') ||
+    searchTarget.includes('anakapalle') ||
+    searchTarget.includes('విశాఖ') ||
+    (pincode && (pincode.startsWith('530') || pincode.startsWith('531')));
+
+  if (isVisakhapatnam) {
+    const vizagItem = CONSTITUENCY_DATABASE.find(item => item.id === 'vizag-east');
+    const displayLocality = locality || 'Rushikonda (రుషికొండ)';
+    return {
+      ...(vizagItem || CONSTITUENCY_DATABASE[0]),
+      id: 'ap-visakhapatnam',
+      locality: displayLocality,
+      city: 'Visakhapatnam',
+      district: 'Visakhapatnam',
+      assembly: 'Visakhapatnam East Assembly',
+      parliament: 'Visakhapatnam Lok Sabha',
+      state: 'Andhra Pradesh',
+      pincode: pincode || '530045',
+      formattedAddress: exactAddress || `${displayLocality}, Visakhapatnam, Andhra Pradesh - ${pincode || '530045'}`,
+      exactAddress: exactAddress || `${displayLocality}, Visakhapatnam, Andhra Pradesh - ${pincode || '530045'}`,
+      gpsCoordinates: lat && lon ? `${Number(lat).toFixed(4)}° N, ${Number(lon).toFixed(4)}° E` : '17.7818° N, 83.3794° E',
+      detectionMethod: method,
+      parties: getAndhraAllParties('Visakhapatnam East Assembly', displayLocality, {
+        tdp: { candidate: 'Velagapudi Ramakrishna Babu (Sitting MLA)', voteShare: 51.4 },
+        ysrcp: { candidate: 'MVV Satyanarayana', voteShare: 38.6 }
+      })
+    };
+  }
+
   // 1. Try to find an exact match in our pre-curated database
   const matched = CONSTITUENCY_DATABASE.find(item => {
     const itemTarget = `${item.locality} ${item.city} ${item.assembly}`.toLowerCase();
