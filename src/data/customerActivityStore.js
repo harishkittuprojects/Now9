@@ -163,3 +163,4 @@ export function subscribeCustomerActivities(callback) {
     window.removeEventListener('storage', handler);
   };
 }
+

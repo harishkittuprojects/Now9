@@ -18,6 +18,8 @@ import {
   AlertCircle,
   FileText,
   Sliders,
+  Menu,
+  X,
   Check,
   Search,
   Radio,
@@ -93,6 +95,7 @@ export default function NowNineAdminDashboard({
   const [isEmbargoActive, setIsEmbargoActive] = useState(true);
   const [toastMsg, setToastMsg] = useState(null);
   const [refreshCount, setRefreshCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Live Broadcast & Stream Conduct State (Synced to Citizen Website)
   const [isLiveStreamModalOpen, setIsLiveStreamModalOpen] = useState(false);
@@ -743,25 +746,34 @@ export default function NowNineAdminDashboard({
       )}
 
       {/* Top Global Command Bar */}
-      <header className="h-14 bg-[#0E0E14] border-b border-[#20202E] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 z-40 sticky top-0 shadow-lg">
-        {/* Brand & System Status */}
-        <div className="flex items-center gap-3">
+      <header className="h-14 bg-[#0E0E14] border-b border-[#20202E] px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-3 shrink-0 z-40 sticky top-0 shadow-lg">
+        {/* Brand & Mobile Menu Button */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-amber-300 transition-colors cursor-pointer"
+            title="Toggle Menu"
+          >
+            {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
+
           <div className="flex items-center gap-2">
             <img 
               src="/now9_icon.png" 
               alt="now9 logo" 
-              className="w-8 h-8 object-contain rounded-xl shadow-md ring-1 ring-amber-400/40"
+              className="w-7 h-7 sm:w-8 sm:h-8 object-contain rounded-xl shadow-md ring-1 ring-amber-400/40"
             />
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <span className="font-black text-sm tracking-tight text-white">
                   now<span className="text-[#F5C754]">nine</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[#F5C754] text-[8px] font-black uppercase tracking-wider">
-                  COMMAND CENTER
+                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[#F5C754] text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider">
+                  COMMAND
                 </span>
               </div>
-              <p className="text-[8.5px] text-gray-400 leading-none">
+              <p className="text-[8px] text-gray-400 leading-none hidden sm:block">
                 Electoral Data Monitoring & Live Standings
               </p>
             </div>
@@ -779,7 +791,7 @@ export default function NowNineAdminDashboard({
         </div>
 
         {/* Global Controls & Actions */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Embargo Control Pill */}
           <button
             type="button"
@@ -790,7 +802,7 @@ export default function NowNineAdminDashboard({
                 ? '🔒 Public Embargo ACTIVE: Survey results are hidden from ordinary voters' 
                 : '⚠️ Public Embargo OFF: Standings exposed publicly');
             }}
-            className={`px-3 py-1.5 rounded-xl border text-[10px] font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-xl border text-[10px] font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
               isEmbargoActive
                 ? 'bg-emerald-500/15 border-emerald-400/50 text-emerald-300 hover:bg-emerald-500/25'
                 : 'bg-red-500/15 border-red-400/50 text-red-300 hover:bg-red-500/25'
@@ -798,8 +810,8 @@ export default function NowNineAdminDashboard({
             title="Toggle Public Results Visibility"
           >
             {isEmbargoActive ? <Lock className="w-3.5 h-3.5 text-emerald-400" /> : <Unlock className="w-3.5 h-3.5 text-red-400" />}
-            <span className="hidden sm:inline">
-              {isEmbargoActive ? 'Results Embargo: LOCKED (Confidential)' : 'Results Embargo: UNLOCKED'}
+            <span className="hidden md:inline">
+              {isEmbargoActive ? 'Results Embargo: LOCKED' : 'Results Embargo: OPEN'}
             </span>
           </button>
 
@@ -807,7 +819,7 @@ export default function NowNineAdminDashboard({
           <button
             type="button"
             onClick={handleExportCSV}
-            className="px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-amber-300 hover:text-white text-[10.5px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-amber-300 hover:text-white text-[10.5px] font-bold items-center gap-1.5 transition-all cursor-pointer shadow-xs"
             title="Download CSV Electoral Report"
           >
             <Download className="w-3.5 h-3.5 text-amber-400" />
@@ -821,7 +833,7 @@ export default function NowNineAdminDashboard({
               setRefreshCount(prev => prev + 1);
               showToast('🔄 Real-time polling database refreshed across all clusters');
             }}
-            className="p-2 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-gray-300 hover:text-amber-300 transition-all cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-[#2B2B3E] text-gray-300 hover:text-amber-300 transition-all cursor-pointer"
             title="Refresh Live Data"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -835,31 +847,154 @@ export default function NowNineAdminDashboard({
               navigator.clipboard?.writeText(adminUrl);
               showToast(`📋 Admin URL copied: ${adminUrl}`);
             }}
-            className="px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-amber-500/40 text-amber-300 hover:text-white text-[10.5px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#161622] hover:bg-[#1E1E30] border border-amber-500/40 text-amber-300 hover:text-white text-[10.5px] font-bold items-center gap-1.5 transition-all cursor-pointer shadow-xs"
             title="Copy Direct Admin Link"
           >
             <Share2 className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden lg:inline">Copy Admin Link</span>
+            <span className="hidden lg:inline">Copy Link</span>
           </button>
 
           {/* Switch to Citizen Mobile View */}
           <button
             type="button"
             onClick={onSwitchToMobile || onClose}
-            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[10.5px] shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#F8CD55] to-[#E3A336] text-black font-extrabold text-[10.5px] shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
             title="Return to Citizen Mobile App"
           >
             <Smartphone className="w-3.5 h-3.5" />
-            <span>Open Mobile App</span>
+            <span className="hidden sm:inline">Open Mobile App</span>
+            <span className="sm:hidden">App</span>
           </button>
         </div>
       </header>
 
-      {/* Main Layout: Sidebar Navigation + Dynamic Admin Views */}
+      {/* Mobile Horizontal Module Switcher (Quick 1-tap switching on phones) */}
+      <div className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-[#0A0A0F] border-b border-[#1C1C28] overflow-x-auto phone-scroll shrink-0 z-30">
+        {[
+          { id: 'overview', label: 'Overview', icon: '📊' },
+          { id: 'customer-tasks', label: 'Citizen Tasks', icon: '⚡', count: customerActivities.length },
+          { id: 'constituencies', label: 'Standings', icon: '🗳️' },
+          { id: 'surveys', label: 'Surveys', icon: '📝' },
+          { id: 'live-debates', label: 'Live Debates', icon: '🔴' },
+          { id: 'news', label: 'News', icon: '📰' },
+          { id: 'boss-house', label: 'Boss House', icon: '👑' },
+          { id: 'settings', label: 'Settings', icon: '⚙️' },
+        ].map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            onClick={() => {
+              setActiveTab(m.id);
+              setIsMobileMenuOpen(false);
+            }}
+            className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === m.id
+                ? 'bg-amber-500 text-black font-black shadow-md shadow-amber-500/20'
+                : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#232332]'
+            }`}
+          >
+            <span>{m.icon}</span>
+            <span>{m.label}</span>
+            {m.count !== undefined && (
+              <span className="font-mono text-[9.5px] px-1 rounded bg-black/40 text-amber-300 font-bold">{m.count}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile Off-Canvas Drawer (When Menu button is tapped) */}
+      {isMobileMenuOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex animate-fadeIn"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <aside 
+            className="w-72 max-w-[85vw] h-full bg-[#0A0A0F] border-r border-[#20202E] p-4 flex flex-col justify-between overflow-y-auto animate-slideInLeft"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between pb-3 border-b border-[#1C1C28]">
+                <div className="flex items-center gap-2">
+                  <img src="/now9_icon.png" alt="now9 logo" className="w-6 h-6 object-contain rounded-lg" />
+                  <span className="font-black text-sm text-white">now<span className="text-[#F5C754]">nine</span> Modules</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {[
+                  { id: 'overview', label: 'Dashboard Overview', icon: BarChart3, badge: 'Live' },
+                  { id: 'customer-tasks', label: 'Live Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
+                  { id: 'constituencies', label: 'Constituency Standings', icon: Vote, count: '8 Hot' },
+                  { id: 'surveys', label: '5-Question Pulse', icon: FileText, count: '124K' },
+                  { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
+                  { id: 'news', label: 'News & Flash Ticker', icon: Newspaper, count: '4' },
+                  { id: 'boss-house', label: 'Boss of House Voting', icon: Eye, count: '300K+' },
+                  { id: 'settings', label: 'Embargo & Settings', icon: Settings },
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`w-full px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                        isActive
+                          ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-sm'
+                          : 'text-gray-400 hover:text-white hover:bg-[#14141E]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-[#F5C754]' : 'text-gray-400'}`} />
+                        <span>{tab.label}</span>
+                      </div>
+                      {tab.badge && (
+                        <span className="px-1.5 py-0.2 rounded-full bg-red-600/80 text-white text-[7.5px] font-black uppercase animate-pulse">
+                          {tab.badge}
+                        </span>
+                      )}
+                      {tab.count && (
+                        <span className="px-1.5 py-0.2 rounded bg-white/10 text-gray-300 text-[8px] font-mono">
+                          {tab.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-[#1C1C28]">
+              <div className="p-2.5 rounded-xl bg-[#12121A] border border-[#20202E] text-[8.5px] space-y-1">
+                <div className="flex items-center justify-between text-gray-400">
+                  <span>Electoral Version</span>
+                  <span className="font-mono text-amber-300 font-bold">2026.4 v2</span>
+                </div>
+                <div className="flex items-center justify-between text-gray-400">
+                  <span>Target Assemblies</span>
+                  <span className="text-white font-bold">Telangana & AP</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* Main Layout: Desktop Sidebar Navigation + Dynamic Admin Views */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         
-        {/* Left Admin Navigation Sidebar */}
-        <aside className="w-56 sm:w-64 bg-[#0A0A0F] border-r border-[#1C1C28] p-3 flex flex-col justify-between shrink-0 overflow-y-auto">
+        {/* Left Admin Navigation Sidebar (Desktop Only) */}
+        <aside className="hidden lg:flex w-64 bg-[#0A0A0F] border-r border-[#1C1C28] p-3 flex-col justify-between shrink-0 overflow-y-auto">
           <div className="space-y-1">
             <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest px-2.5 py-1 block">
               Core Modules
@@ -926,8 +1061,8 @@ export default function NowNineAdminDashboard({
           </div>
         </aside>
 
-        {/* Right Main Content Panel */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-[#07070A]">
+        {/* Right Main Content Panel (100% width on mobile, full responsiveness) */}
+        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6 bg-[#07070A] w-full min-w-0">
 
           {/* VIEW 1: DASHBOARD OVERVIEW */}
           {activeTab === 'overview' && (

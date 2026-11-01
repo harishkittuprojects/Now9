@@ -89,7 +89,7 @@ export function BottomNavBar({ activeTab = 'home', onTabChange = () => {} }) {
   ];
 
   return (
-    <div className="h-12 border-t border-[#1C1C22] bg-[#0E0E12] px-2 flex items-center justify-around z-30 select-none">
+    <div className="h-14 pb-[max(0.25rem,env(safe-area-inset-bottom))] border-t border-[#1C1C22] bg-[#0E0E12] px-2 flex items-center justify-around z-30 select-none shrink-0">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
@@ -98,14 +98,14 @@ export function BottomNavBar({ activeTab = 'home', onTabChange = () => {} }) {
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
-            className="flex flex-col items-center justify-center py-1 px-2 relative transition-all"
+            className="flex flex-col items-center justify-center py-1 px-3 min-w-[48px] min-h-[44px] relative transition-all cursor-pointer active:scale-95"
           >
             <Icon 
               className={`w-4 h-4 transition-colors ${
                 isActive ? 'text-[#F5C754] stroke-[2.5]' : 'text-gray-400 hover:text-gray-200'
               }`} 
             />
-            <span className={`text-[9px] mt-0.5 tracking-tight ${
+            <span className={`text-[9px] mt-0.5 tracking-tight font-medium ${
               isActive ? 'text-[#F5C754] font-bold' : 'text-gray-400'
             }`}>
               {tab.label}
@@ -1025,6 +1025,24 @@ export function Screen2Home({
                   <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
                   <span className="text-[9px] leading-tight">100% Anonymous & Secure Voting</span>
                 </div>
+
+                {/* Admin Command Center Quick Switch on Mobile */}
+                <button 
+                  type="button"
+                  onClick={() => {
+                    onNavigate('admin');
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full p-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-[#FDE047] flex items-center justify-between transition-colors cursor-pointer text-xs font-bold"
+                >
+                  <span className="flex items-center gap-2">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Admin Command Center</span>
+                  </span>
+                  <span className="text-[9px] bg-[#F5C754] text-black px-1.5 py-0.5 rounded-full font-black">
+                    PORTAL
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -3972,10 +3990,10 @@ export function PhoneFrame({ children, title = null, stepBadge = null, isCard = 
   }
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col items-center justify-center">
-      {/* Responsive Phone Chassis */}
+    <div className="w-full h-full min-h-0 flex flex-col items-center justify-center p-0">
+      {/* Responsive Phone Chassis (Full edge-to-edge on mobile, sleek frame on desktop) */}
       <div 
-        className="relative w-full max-w-[430px] h-[100dvh] max-h-[100dvh] sm:h-[min(730px,calc(100vh-80px))] sm:w-[350px] sm:rounded-[42px] sm:p-[6px] sm:bg-gradient-to-b sm:from-[#3E382A] sm:via-[#1E1E22] sm:to-[#322B1C] sm:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] sm:border sm:border-[#52482E]/80 transition-all duration-300 flex flex-col min-h-0"
+        className="relative w-full max-w-full sm:max-w-[390px] md:max-w-[420px] h-[100dvh] max-h-[100dvh] sm:h-[min(780px,calc(100vh-60px))] sm:rounded-[42px] sm:p-[6px] sm:bg-gradient-to-b sm:from-[#3E382A] sm:via-[#1E1E22] sm:to-[#322B1C] sm:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] sm:border sm:border-[#52482E]/80 transition-all duration-300 flex flex-col min-h-0 overflow-hidden"
       >
         {/* Dynamic Island / Notch (Desktop only) */}
         <div className="hidden sm:flex absolute top-2.5 left-1/2 transform -translate-x-1/2 w-20 h-3.5 bg-black rounded-full z-40 items-center justify-center pointer-events-none">
