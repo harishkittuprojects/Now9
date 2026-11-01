@@ -103,6 +103,12 @@ export default function NowNineUnifiedApp() {
 
   // Live GPS Location Detection and Reverse Geocoding with guaranteed visibility
   const detectLiveGpsLocation = () => {
+    // NEVER run live GPS detection on the admin
+    if (activeScreenId === 'admin' || (typeof window !== 'undefined' && window.location.hash.toLowerCase().includes('admin'))) {
+      setIsLocating(false);
+      return;
+    }
+
     setIsLocating(true);
     const startTime = Date.now();
 
@@ -179,10 +185,14 @@ export default function NowNineUnifiedApp() {
     }
   };
 
-  // Run auto-locate on initial app load
+  // Run auto-locate on initial app load ONLY for citizen voter screens (never for admin)
   useEffect(() => {
+    if (activeScreenId === 'admin' || (typeof window !== 'undefined' && window.location.hash.toLowerCase().includes('admin'))) {
+      setIsLocating(false);
+      return;
+    }
     detectLiveGpsLocation();
-  }, []);
+  }, [activeScreenId]);
 
   // Render active screen
   const renderScreen = (id) => {

@@ -936,9 +936,6 @@ export default function NowNineAdminDashboard({
 
   // Filtered constituencies list based on region and search query
   const filteredConstituenciesList = Object.values(ALL_CONSTITUENCIES).filter(c => {
-    // If this constituency is where the citizen is currently logged in, NEVER filter it out
-    const isCitizenActive = activeCitizenSession?.constituencyKey === c.id;
-    if (isCitizenActive) return true;
     if (regionFilter !== 'All' && c.state !== regionFilter) return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
@@ -946,12 +943,6 @@ export default function NowNineAdminDashboard({
            c.locality.toLowerCase().includes(q) || 
            c.district.toLowerCase().includes(q) ||
            c.code.toLowerCase().includes(q);
-  }).sort((a, b) => {
-    const aActive = activeCitizenSession?.constituencyKey === a.id;
-    const bActive = activeCitizenSession?.constituencyKey === b.id;
-    if (aActive && !bActive) return -1;
-    if (!aActive && bActive) return 1;
-    return 0;
   });
 
   return (
@@ -1005,11 +996,6 @@ export default function NowNineAdminDashboard({
             </span>
             <span className="text-[10px] text-gray-400 font-mono">
               Total Ballots: <strong className="text-white">{totalVotesCount.toLocaleString()}</strong>
-            </span>
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-extrabold ml-1 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
-              <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
-              <span>Active Citizen: <strong className="text-white font-black">{activeCitizenSession?.assembly?.replace(' Assembly Constituency', '').replace(' Assembly', '') || baseConstituency.name.replace(' Assembly Constituency', '')}</strong> ({activeCitizenSession?.locality || baseConstituency.locality})</span>
             </span>
           </div>
         </div>
@@ -1141,40 +1127,6 @@ export default function NowNineAdminDashboard({
         </div>
       </div>
 
-      {/* Live Citizen Active Constituency Sync Bar (Shown on secondary tabs for quick context) */}
-      {activeCitizenSession && activeTab !== 'overview' && (
-        <div className="w-full bg-gradient-to-r from-amber-500/20 via-[#13121F] to-emerald-500/15 border-b border-amber-400/30 px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 shadow-md">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
-            <span className="text-xs font-bold text-amber-300">
-              ⚡ Live Citizen Login Auto-Synced:
-            </span>
-            <span className="text-xs font-black text-white px-2.5 py-0.5 rounded-lg bg-black/50 border border-amber-400/40">
-              📍 {activeCitizenSession.assembly || activeCitizenSession.locality} ({activeCitizenSession.locality}, {activeCitizenSession.state})
-            </span>
-            <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-gray-300">
-              via <span className="font-mono text-emerald-400 font-bold">{activeCitizenSession.method || 'Mobile App'}</span>
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedConstituencyKey(activeCitizenSession.constituencyKey);
-              setActiveTab('constituencies');
-              showToast(`Viewing live standings for ${activeCitizenSession.assembly}`);
-            }}
-            className="px-3 py-1 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs transition-all shadow-md cursor-pointer flex items-center gap-1.5 active:scale-95"
-          >
-            <Vote className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>View {activeCitizenSession.assembly?.replace(' Assembly Constituency', '').replace(' Assembly', '')} Standings & Parties →</span>
-          </button>
-        </div>
-      )}
-
       {/* Main Layout: Dynamic Admin Views (100% Full-Width) */}
       <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full">
         {/* Right Main Content Panel (100% width on mobile, full responsiveness) */}
@@ -1199,11 +1151,6 @@ export default function NowNineAdminDashboard({
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         Live Ingestion Active
                       </span>
-                      {activeCitizenSession && (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-400/30 flex items-center gap-1">
-                          📍 Citizen Synced: {activeCitizenSession.locality}
-                        </span>
-                      )}
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5">
                       Focus: <strong className="text-white">{activeConstituency.name} ({activeConstituency.code})</strong> • {activeConstituency.locality}, {activeConstituency.state}
@@ -1685,28 +1632,11 @@ export default function NowNineAdminDashboard({
 
               {/* Grid of All Target Assemblies */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredConstituenciesList.map(c => {
-                  const isCitizenActive = activeCitizenSession?.constituencyKey === c.id;
-                  return (
-                    <div 
-                      key={c.id}
-                      className={`p-4 rounded-2xl transition-all shadow-md relative space-y-3 ${
-                        isCitizenActive 
-                          ? 'bg-[#12111A] border-2 border-amber-400 ring-2 ring-amber-400/40 shadow-[0_0_30px_rgba(245,199,84,0.25)]' 
-                          : 'bg-[#0E0E14] border border-[#222232] hover:border-amber-400/40'
-                      }`}
-                    >
-                      {isCitizenActive && (
-                        <div className="flex items-center justify-between px-3 py-1.5 -mt-1 -mx-1 mb-2 bg-gradient-to-r from-amber-500/25 via-emerald-500/20 to-amber-500/25 rounded-xl border border-amber-400/50 text-[11px] font-black text-amber-300 animate-pulse">
-                          <span className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-                            <span>🔴 LIVE CITIZEN LOGGED IN HERE</span>
-                          </span>
-                          <span className="text-gray-200 font-mono text-[10px] bg-black/40 px-2 py-0.5 rounded border border-amber-400/30">
-                            {activeCitizenSession?.locality || c.locality} • Auto-Synced
-                          </span>
-                        </div>
-                      )}
+                {filteredConstituenciesList.map(c => (
+                  <div 
+                    key={c.id}
+                    className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] hover:border-amber-400/40 transition-all shadow-md relative space-y-3"
+                  >
                     <div className="flex items-center justify-between pb-2 border-b border-[#1E1E28]">
                       <div>
                         <div className="flex items-center gap-2">
@@ -1755,8 +1685,7 @@ export default function NowNineAdminDashboard({
                       ))}
                     </div>
                   </div>
-                );
-              })}
+                ))}
               </div>
             </div>
           )}
