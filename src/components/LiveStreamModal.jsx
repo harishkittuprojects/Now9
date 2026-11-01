@@ -266,7 +266,8 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
             ) : (
               /* Active High-Def Studio Live Video Feed */
               <video
-                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                src="https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4"
+                poster="/assets/news_debate_studio.jpg"
                 autoPlay
                 playsInline
                 loop

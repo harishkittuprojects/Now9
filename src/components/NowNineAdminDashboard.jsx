@@ -2196,7 +2196,8 @@ export default function NowNineAdminDashboard({
 
                     <div className="aspect-video w-full bg-black relative">
                       <video
-                        src={previewRecordedModal.videoUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
+                        src={previewRecordedModal.videoUrl || "https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4"}
+                        poster="/assets/news_debate_studio.jpg"
                         controls
                         autoPlay
                         className="w-full h-full object-cover"

@@ -2,9 +2,25 @@
 // Connects Admin Studio <-> Citizen Website in real-time
 import { publishCloudEvent, subscribeCloudEvents } from './cloudSyncService';
 
-export const NOW9_ACTIVE_BROADCAST_KEY = 'now9_active_broadcast_v1';
-export const NOW9_RECORDED_BROADCASTS_KEY = 'now9_recorded_broadcasts_v1';
+export const NOW9_ACTIVE_BROADCAST_KEY = 'now9_active_broadcast_v2';
+export const NOW9_RECORDED_BROADCASTS_KEY = 'now9_recorded_broadcasts_v2';
 export const BROADCAST_EVENT = 'now9_broadcast_changed';
+
+export const DEFAULT_ACTIVE_BROADCAST = {
+  isLive: true,
+  id: 'live-now9-prime-2026',
+  title: '2026 ఎన్నికలు: ప్రజా తీర్పు & లైవ్ చర్చ',
+  subtitle: 'Now9 ప్రత్యక్ష ప్రసారం • AP & తెలంగాణ నియోజకవర్గాల లైవ్ ప్రజాభిప్రాయం',
+  host: 'Now9 Prime Editor & Senior Analysts',
+  constituency: 'Global (All Constituencies)',
+  scope: 'All Users (AP & Telangana)',
+  isGlobal: true,
+  startedAt: Date.now() - 32 * 60 * 1000,
+  viewers: 14820,
+  views: '14.8K watching',
+  thumbnail: '/assets/news_debate_studio.jpg',
+  videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'
+};
 
 export const DEFAULT_RECORDED_SESSIONS = [
   {
@@ -16,7 +32,7 @@ export const DEFAULT_RECORDED_SESSIONS = [
     duration: '28:40',
     views: '14.8K views',
     thumbnail: '/assets/news_debate_studio.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'
   },
   {
     id: 'rec-2',
@@ -27,7 +43,7 @@ export const DEFAULT_RECORDED_SESSIONS = [
     duration: '21:15',
     views: '19.2K views',
     thumbnail: '/assets/farmer_portrait.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'
   },
   {
     id: 'rec-3',
@@ -38,20 +54,28 @@ export const DEFAULT_RECORDED_SESSIONS = [
     duration: '35:10',
     views: '26.5K views',
     thumbnail: '/assets/youth_speaker_mic.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'
   }
 ];
 
 export function getActiveBroadcast() {
   if (typeof window === 'undefined') {
-    return { isLive: false };
+    return DEFAULT_ACTIVE_BROADCAST;
   }
   try {
     const raw = localStorage.getItem(NOW9_ACTIVE_BROADCAST_KEY);
-    if (!raw) return { isLive: false };
-    return JSON.parse(raw);
+    if (!raw) {
+      localStorage.setItem(NOW9_ACTIVE_BROADCAST_KEY, JSON.stringify(DEFAULT_ACTIVE_BROADCAST));
+      return DEFAULT_ACTIVE_BROADCAST;
+    }
+    const parsed = JSON.parse(raw);
+    if (!parsed || parsed.id === undefined) {
+      localStorage.setItem(NOW9_ACTIVE_BROADCAST_KEY, JSON.stringify(DEFAULT_ACTIVE_BROADCAST));
+      return DEFAULT_ACTIVE_BROADCAST;
+    }
+    return parsed;
   } catch (e) {
-    return { isLive: false };
+    return DEFAULT_ACTIVE_BROADCAST;
   }
 }
 
@@ -86,7 +110,7 @@ export function startLiveBroadcast({ title, host = 'Now9 Prime Editor', constitu
     startedAt: Date.now(),
     viewers: 14280,
     thumbnail: '/assets/news_debate_studio.jpg',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'
   };
 
   try {
@@ -124,7 +148,7 @@ export function endLiveBroadcast() {
       duration: durationStr,
       views: `${(current.viewers ? (current.viewers / 1000).toFixed(1) : '14.2')}K views`,
       thumbnail: current.thumbnail || '/assets/news_debate_studio.jpg',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'
     };
 
     const existing = getRecordedSessions();

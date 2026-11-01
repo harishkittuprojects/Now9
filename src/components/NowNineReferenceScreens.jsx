@@ -1257,14 +1257,30 @@ export function Screen2Home({
               {/* Tile 1: Live On */}
               <button 
                 type="button"
-                onClick={() => onNavigate('live-debates')}
+                onClick={() => {
+                  if (activeBroadcast?.isLive) {
+                    setSelectedDebate({ ...activeBroadcast, isLive: true });
+                    onNavigate('debate-detail');
+                  } else {
+                    onNavigate('live-debates');
+                  }
+                }}
                 className="p-3.5 sm:p-4 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
               >
-                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner relative">
                   <Play className="w-5 h-5 fill-[#F5C754] stroke-[#F5C754] ml-0.5" />
+                  {activeBroadcast?.isLive && (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+                    </span>
+                  )}
                 </div>
-                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
-                  Live On
+                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight flex items-center justify-center gap-1">
+                  <span>Live On</span>
+                  {activeBroadcast?.isLive && (
+                    <span className="px-1.5 py-0.2 rounded bg-red-600 text-white text-[7.5px] font-black uppercase tracking-wider">LIVE</span>
+                  )}
                 </h3>
                 <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
                   Watch • Listen • Discuss
@@ -2097,11 +2113,13 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
   }
 
   const heroItem = activeBroadcast?.isLive ? {
+    id: activeBroadcast.id || 'admin-live',
     title: activeBroadcast.title,
-    subtitle: `🔴 Live Broadcast • ${activeBroadcast.host} • 🌐 All Users (Global Broadcast)`,
+    subtitle: `🔴 Live Broadcast • ${activeBroadcast.host || 'Now9 Prime Desk'} • 🌐 All Users (Global Broadcast)`,
     views: `${(activeBroadcast.viewers / 1000).toFixed(1)}K Watching`,
     isLive: true,
-    img: activeBroadcast.thumbnail || '/assets/news_debate_studio.jpg'
+    img: activeBroadcast.thumbnail || '/assets/news_debate_studio.jpg',
+    videoUrl: activeBroadcast.videoUrl
   } : (recordedSessions[0] ? {
     title: recordedSessions[0].title,
     subtitle: `Recorded Debate • ${recordedSessions[0].host} • ${recordedSessions[0].duration}`,
@@ -3214,7 +3232,9 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState(LIVE_CHAT_MESSAGES);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [hasVideoError, setHasVideoError] = useState(false);
+  const [activeFeed, setActiveFeed] = useState('studio');
   const [selectedPanelist, setSelectedPanelist] = useState(null);
   const [isEmojiBarOpen, setIsEmojiBarOpen] = useState(false);
   const [isQueueJoined, setIsQueueJoined] = useState(false);
@@ -3230,15 +3250,15 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
     return unsub;
   }, []);
 
-  const debate = (liveState?.isLive ? liveState : selectedDebate) || {
-    title: '2026 ఎన్నికలు : ఎవరికి అవకాశాలు?',
-    host: 'Senior Political Editor',
+  const debate = (liveState?.isLive ? liveState : (selectedDebate?.isLive ? selectedDebate : (liveState || selectedDebate))) || {
+    title: '2026 ఎన్నికలు: ప్రజా తీర్పు & లైవ్ చర్చ',
+    host: 'Now9 Prime Editor & Senior Analysts',
     time: 'Today, 07:30 PM',
-    isLive: false,
-    isRecorded: true,
-    duration: '28:40',
+    isLive: true,
+    isRecorded: false,
+    duration: 'Live Broadcast',
     views: '14.8K views',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'
   };
 
   const isLive = !!(liveState?.isLive || debate.isLive);
@@ -3360,41 +3380,141 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
 
       {/* Content Area */}
       <div className="flex-1 min-h-0 overflow-y-auto phone-scroll touch-pan-y pb-2">
-        {/* Video Player */}
-        <div className="relative w-full h-40 bg-black overflow-hidden shrink-0 group">
-          <video
-            src={debate.videoUrl || liveState?.videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}
-            controls={!isLive}
-            autoPlay
-            playsInline
-            loop={isLive}
-            muted={isMuted}
-            className="w-full h-full object-cover"
-          />
+        {/* Video & Studio Live Broadcast Player */}
+        <div className="relative w-full h-48 bg-black overflow-hidden shrink-0 group border-b border-[#232330]">
+          {/* 1. Underlying HD Studio Visualizer (Always active as backdrop & fallback) */}
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <img 
+              src="/assets/news_debate_studio.jpg" 
+              alt="Now9 Live News Studio" 
+              className="w-full h-full object-cover scale-105 transition-transform duration-1000"
+            />
+            {/* Dark gradient for cinematic news studio look */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/35 pointer-events-none" />
+            
+            {/* Center Dynamic Audio Spectrum Visualizer */}
+            <div className="absolute inset-x-0 bottom-7 top-10 flex flex-col items-center justify-center pointer-events-none">
+              <div className="flex items-end justify-center gap-1.5 h-14 mb-2 px-6">
+                {[35, 75, 55, 95, 65, 100, 80, 90, 50, 85, 70, 95, 60, 80, 45].map((h, idx) => (
+                  <div
+                    key={idx}
+                    className="w-1.5 rounded-full bg-gradient-to-t from-amber-500 via-yellow-400 to-white shadow-xs shadow-amber-500/50"
+                    style={{
+                      height: `${h}%`,
+                      animation: isLive ? `pulse ${0.7 + (idx % 4) * 0.2}s ease-in-out infinite alternate` : 'none',
+                      animationDelay: `${idx * 0.06}s`
+                    }}
+                  />
+                ))}
+              </div>
 
-          {/* Real-time Live Broadcast Overlay */}
-          {isLive && (
-            <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none">
-              <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[8.5px] font-black uppercase flex items-center gap-1.5 shadow-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                <span>LIVE NOW ON AIR</span>
-              </span>
-              <div className="flex items-center gap-1 pointer-events-auto">
-                <button
-                  type="button"
-                  onClick={() => setIsMuted(!isMuted)}
-                  className="p-1 rounded bg-black/70 backdrop-blur-xs text-white hover:text-amber-400 cursor-pointer shadow-sm"
-                  title="Mute/Unmute"
-                >
-                  {isMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3 text-emerald-400" />}
-                </button>
-                <span className="px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-xs text-white text-[8px] font-semibold flex items-center gap-0.5">
-                  <Eye className="w-2.5 h-2.5 text-red-400" />
-                  <span>{debate.views || '14.8K'}</span>
+              <div className="text-center px-4 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
+                <span className="text-[9px] font-extrabold text-[#F5C754] tracking-wider uppercase flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                  <span>NOW9 NEWS 24/7 • STUDIO 1 LIVE FEED</span>
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* 2. Optional Video Element (if feed is set to 'stream' and no video error) */}
+          {activeFeed === 'stream' && !hasVideoError && (
+            <video
+              src={debate.videoUrl || 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4'}
+              autoPlay
+              playsInline
+              loop
+              muted={isMuted}
+              onError={() => {
+                setHasVideoError(true);
+                setActiveFeed('studio');
+                showToast('Switched to Now9 Studio HD Live Feed');
+              }}
+              className="absolute inset-0 w-full h-full object-cover z-10"
+            />
           )}
+
+          {/* 3. Top Floating Overlays */}
+          <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-20 pointer-events-none">
+            <div className="flex items-center gap-1.5 pointer-events-auto">
+              {isLive ? (
+                <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[8.5px] font-black uppercase flex items-center gap-1.5 shadow-md shadow-red-600/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                  <span>LIVE NOW ON AIR</span>
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[8px] font-bold uppercase">
+                  RECORDED SESSION
+                </span>
+              )}
+              <span className="px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-md text-amber-300 border border-amber-400/20 text-[7.5px] font-semibold">
+                1080p 60fps
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 pointer-events-auto">
+              {/* Toggle Studio / Video Stream feed */}
+              <button
+                type="button"
+                onClick={() => {
+                  const next = activeFeed === 'studio' ? 'stream' : 'studio';
+                  setActiveFeed(next);
+                  showToast(next === 'stream' ? 'Switched to Video Stream' : 'Switched to Studio HD Feed');
+                }}
+                className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-white hover:text-amber-300 text-[8px] font-bold border border-white/10 cursor-pointer shadow-sm transition-colors"
+                title="Switch Camera Feed"
+              >
+                {activeFeed === 'studio' ? '📹 Stream' : '🎙️ Studio'}
+              </button>
+
+              {/* Mute / Unmute Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  const nextMuted = !isMuted;
+                  setIsMuted(nextMuted);
+                  showToast(nextMuted ? 'Audio Muted 🔇' : 'Live Audio Active 🔊');
+                }}
+                className="p-1 rounded bg-black/70 backdrop-blur-md text-white hover:text-amber-400 cursor-pointer shadow-sm border border-white/10"
+                title="Mute / Unmute Audio"
+              >
+                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+              </button>
+
+              {/* Viewers Badge */}
+              <span className="px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-md text-white text-[8px] font-semibold flex items-center gap-0.5 border border-white/10">
+                <Eye className="w-2.5 h-2.5 text-red-400" />
+                <span>{debate.views || '14.8K'}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* 4. Tap to Unmute Overlay if muted */}
+          {isMuted && (
+            <div className="absolute inset-x-0 bottom-9 flex justify-center z-20 pointer-events-none">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMuted(false);
+                  showToast('Live Studio Sound Unmuted 🔊');
+                }}
+                className="pointer-events-auto px-3 py-1 rounded-full bg-amber-500/90 text-black font-extrabold text-[9px] shadow-lg flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              >
+                <Volume2 className="w-3 h-3" />
+                <span>Tap for Live Sound 🔊</span>
+              </button>
+            </div>
+          )}
+
+          {/* 5. Live Breaking News Ticker running at bottom of video */}
+          <div className="absolute inset-x-0 bottom-0 bg-red-950/90 border-t border-red-500/40 px-2 py-0.5 z-20 flex items-center gap-1.5 overflow-hidden">
+            <span className="shrink-0 px-1 py-0.2 rounded bg-red-600 text-white text-[7px] font-black uppercase tracking-wider">
+              FLASH
+            </span>
+            <div className="text-[8px] text-white font-telugu whitespace-nowrap overflow-hidden text-ellipsis flex-1">
+              🔴 లైవ్ డిబేట్: 2026 అసెంబ్లీ ఎన్నికల ప్రత్యక్ష విశ్లేషణ • పౌరుల ప్రశ్నలు & గ్రౌండ్ రిపోర్ట్
+            </div>
+          </div>
         </div>
 
         {/* Debate Title & Meta */}
