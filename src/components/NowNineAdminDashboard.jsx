@@ -1017,6 +1017,7 @@ export default function NowNineAdminDashboard({
           <nav className="space-y-1.5 my-5">
             {[
               { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+              { id: 'live-broadcast', label: 'Live Broadcast', icon: Radio },
               { id: 'news', label: 'Manage News', icon: Newspaper },
               { id: 'live-debates', label: 'Manage Videos', icon: Play },
               { id: 'surveys', label: 'Manage Polls', icon: BarChart3 },
@@ -1034,14 +1035,33 @@ export default function NowNineAdminDashboard({
                     setActiveTab(tab.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`w-full py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center gap-3 cursor-pointer ${
+                  className={`w-full py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                     isActive
                       ? 'bg-[#F9C942] text-black font-extrabold shadow-sm'
                       : 'text-gray-400 hover:text-white hover:bg-[#1C1E24]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-black stroke-[2.5]' : 'text-gray-400'}`} />
-                  <span>{tab.label}</span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icon className={`w-4 h-4 shrink-0 ${
+                      isActive 
+                        ? 'text-black stroke-[2.5]' 
+                        : tab.id === 'live-broadcast' 
+                          ? (activeBroadcast?.isLive ? 'text-red-500 animate-pulse' : 'text-red-400') 
+                          : 'text-gray-400'
+                    }`} />
+                    <span className="truncate">{tab.label}</span>
+                  </div>
+
+                  {tab.id === 'live-broadcast' && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 ${
+                      activeBroadcast?.isLive 
+                        ? (isActive ? 'bg-black text-red-500' : 'bg-red-600 text-white animate-pulse shadow-sm shadow-red-500/50') 
+                        : (isActive ? 'bg-black/20 text-black' : 'bg-[#252732] text-gray-400')
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${activeBroadcast?.isLive ? 'bg-red-500 animate-ping' : 'bg-gray-400'}`} />
+                      <span>{activeBroadcast?.isLive ? 'LIVE' : 'OFF'}</span>
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -1849,8 +1869,8 @@ export default function NowNineAdminDashboard({
             </div>
           )}
 
-          {/* VIEW 4: LIVE ON & DEBATES MANAGEMENT (SIMPLIFIED) */}
-          {activeTab === 'live-debates' && (
+          {/* VIEW 4A: LIVE BROADCAST STUDIO (DEDICATED LIVE CONDUCTING) */}
+          {activeTab === 'live-broadcast' && (
             <div className="space-y-6 animate-fadeIn">
               
               {/* Header */}
@@ -1858,10 +1878,10 @@ export default function NowNineAdminDashboard({
                 <div>
                   <h2 className="text-xl font-black text-white flex items-center gap-2">
                     <Radio className="w-5 h-5 text-red-500 animate-pulse" />
-                    <span>Live On & Debates Management</span>
+                    <span>Live Broadcast Studio (ప్రత్యక్ష ప్రసారం)</span>
                   </h2>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    Conduct live broadcasts to the citizen website, and manage recorded sessions for on-demand playback.
+                    Conduct real-time global live broadcasts appearing instantly on all citizens' mobile devices across AP & Telangana.
                   </p>
                 </div>
                 
@@ -1880,7 +1900,7 @@ export default function NowNineAdminDashboard({
                 </div>
               </div>
 
-              {/* MODULE 1: CONDUCT LIVE (లైవ్ నిర్వహించండి) */}
+              {/* MODULE: CONDUCT LIVE (లైవ్ నిర్వహించండి) */}
               <div className="p-5 rounded-2xl bg-[#0E0E14] border-2 border-[#20202E] space-y-4 shadow-xl">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1E1E28]">
                   <div className="flex items-center gap-2">
@@ -1888,7 +1908,7 @@ export default function NowNineAdminDashboard({
                       🔴
                     </div>
                     <div>
-                      <h3 className="text-sm font-extrabold text-white">1. Conduct Live Broadcast</h3>
+                      <h3 className="text-sm font-extrabold text-white">Conduct Live Broadcast</h3>
                       <p className="text-[11px] text-gray-400">When you start live, it appears instantly on the citizen website</p>
                     </div>
                   </div>
@@ -2085,8 +2105,33 @@ export default function NowNineAdminDashboard({
                   </div>
                 )}
               </div>
+            </div>
+          )}
 
-              {/* MODULE 2: RECORDED SESSIONS (వెబ్‌సైట్‌లో రికార్డెడ్ సెషన్స్) */}
+          {/* VIEW 4B: MANAGE VIDEOS & RECORDED SESSIONS (NO LIVE CONDUCTING) */}
+          {activeTab === 'live-debates' && (
+            <div className="space-y-6 animate-fadeIn">
+              
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-3">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <Play className="w-5 h-5 text-amber-400" />
+                    <span>Manage Videos & Recorded Sessions</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Past debate recordings and video catalog watchable by citizens on the website & mobile app.
+                  </p>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1.5 rounded-full bg-[#181824] text-gray-300 border border-white/10 text-xs font-bold">
+                    {recordedSessions.length} Videos Available
+                  </span>
+                </div>
+              </div>
+
+              {/* RECORDED SESSIONS GRID */}
               <div className="p-5 rounded-2xl bg-[#0E0E14] border-2 border-[#20202E] space-y-4 shadow-xl">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1E1E28]">
                   <div className="flex items-center gap-2">
@@ -2094,19 +2139,19 @@ export default function NowNineAdminDashboard({
                       🎬
                     </div>
                     <div>
-                      <h3 className="text-sm font-extrabold text-white">2. Recorded Sessions (Watchable on Website)</h3>
+                      <h3 className="text-sm font-extrabold text-white">Recorded Sessions Catalog</h3>
                       <p className="text-[11px] text-gray-400">Past debates archived for citizens to watch and replay anytime</p>
                     </div>
                   </div>
 
                   <span className="text-[10px] text-gray-400 font-mono">
-                    {recordedSessions.length} Sessions Available
+                    {recordedSessions.length} Videos
                   </span>
                 </div>
 
                 {recordedSessions.length === 0 ? (
                   <div className="p-8 text-center rounded-xl bg-[#12121A] border border-[#222232] text-gray-400 text-xs">
-                    No recorded sessions yet. Start a live broadcast above and click "End Broadcast & Save" to create one.
+                    No recorded sessions yet. Use the <strong>Live Broadcast</strong> tab in the sidebar to conduct and save sessions.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
