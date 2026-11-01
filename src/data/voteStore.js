@@ -1,4 +1,6 @@
 // Central Real-Time Voting & Ballot Ledger for NowNine
+import { recordCustomerActivity } from './customerActivityStore';
+
 export const BALLOT_COUNT_KEY = 'now9_total_ballots_live_v4';
 export const BALLOT_LOGS_KEY = 'now9_ballot_logs_live_v4';
 export const CONSTITUENCY_VOTES_KEY = 'now9_constituency_votes_live_v4';
@@ -118,6 +120,18 @@ export function recordLiveBallot({ party, location, answers = {} }) {
     window.dispatchEvent(new CustomEvent(VOTE_CAST_EVENT, { 
       detail: { count: nextCount, log: newLog, constituencyVotes, questionVotes } 
     }));
+
+    // Record as omni-channel customer activity
+    recordCustomerActivity({
+      type: 'vote',
+      title: 'Electoral Ballot Submitted',
+      detail: `Citizen cast ballot for ${partyName} (${candidateName}) in ${localityName}`,
+      location: `${localityName}, ${constituencyName}`,
+      icon: '🗳️',
+      badgeColor: 'emerald',
+      badgeText: 'Official Ballot',
+      metadata: { ballotId, party: partyName, candidate: candidateName }
+    });
   } catch (e) {}
 
   return { count: nextCount, log: newLog, constituencyVotes, questionVotes };

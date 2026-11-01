@@ -72,6 +72,7 @@ import {
   voteForHousemate, 
   subscribeHousemates 
 } from '../data/bossStore';
+import { recordCustomerActivity } from '../data/customerActivityStore';
 
 // Phone Status Bar (Cellular, Wifi, Battery icons removed as requested)
 export function PhoneStatusBar() {
@@ -1480,6 +1481,15 @@ export function Screen3Survey({
     if (onSelectSurveyParty) {
       onSelectSurveyParty(party);
     }
+    recordCustomerActivity({
+      type: 'survey',
+      title: 'Survey Party Selected',
+      detail: `Citizen picked "${party.name}" (${party.candidate}) for governance survey in ${constituencyLabel}`,
+      location: constituencyLabel,
+      icon: '🗳️',
+      badgeColor: 'emerald',
+      badgeText: 'Party Choice'
+    });
     showToast(`🎉 ${party.name} (${party.candidate}) ఎంపిక చేయబడింది!`);
     setTimeout(() => {
       setActiveTab('questions');
@@ -1492,6 +1502,17 @@ export function Screen3Survey({
 
   const handleSelectOption = (idx) => {
     setAnswers(prev => ({ ...prev, [currentStep]: idx }));
+    const optObj = activeQuestion?.options?.[idx];
+    const optText = optObj?.text || `Option ${idx + 1}`;
+    recordCustomerActivity({
+      type: 'survey',
+      title: `Governance Priority #${currentStep + 1} Answered`,
+      detail: `Citizen selected "${optText}" on "${activeQuestion?.questionTelugu || activeQuestion?.question || 'Survey Question'}"`,
+      location: constituencyLabel,
+      icon: '📊',
+      badgeColor: 'amber',
+      badgeText: `Priority #${currentStep + 1}`
+    });
   };
 
   const handleNext = () => {
@@ -1989,6 +2010,15 @@ export function Screen4LiveDebates({ onBack, onSelectDebate, onNavigate }) {
 
   const handleWatchItem = (item) => {
     setSelectedDebate(item);
+    recordCustomerActivity({
+      type: 'live',
+      title: item.isLive ? 'Tuned into Live Debate' : 'Watching Recorded Debate',
+      detail: `Citizen opened stream: "${item.title}" (${item.host || 'Political Studio'})`,
+      location: 'Live Debate Studio',
+      icon: item.isLive ? '🔴' : '🎬',
+      badgeColor: item.isLive ? 'red' : 'amber',
+      badgeText: item.isLive ? 'Live On Air' : 'Recorded Debate'
+    });
     if (onSelectDebate) onSelectDebate();
   };
 
@@ -2390,7 +2420,18 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
         {videosList.map((item) => (
           <div
             key={item.id}
-            onClick={onSelectShort}
+            onClick={() => {
+              recordCustomerActivity({
+                type: 'video',
+                title: 'Citizen Watching Short Video',
+                detail: `Citizen playing video: "${item.title}" (${item.views} views)`,
+                location: 'Shorts Feed',
+                icon: '▶️',
+                badgeColor: 'purple',
+                badgeText: item.badge || 'Short Video'
+              });
+              if (onSelectShort) onSelectShort();
+            }}
             className="rounded-2xl overflow-hidden bg-[#141419] border border-[#23232C] hover:border-amber-500/50 cursor-pointer group relative transition-all active:scale-[0.99]"
           >
             <div className="relative h-28 w-full overflow-hidden">
@@ -2540,7 +2581,19 @@ export function Screen6CommonPeople({ onBack, onNavigate, onSelectStory = null }
         {filteredStories.map((story) => (
           <div
             key={story.id}
-            onClick={() => onSelectStory ? onSelectStory(story) : onNavigate('video-player')}
+            onClick={() => {
+              recordCustomerActivity({
+                type: 'community',
+                title: 'Common People Story Opened',
+                detail: `Citizen opened voice story: "${story.title}" (${story.name} • ${story.location})`,
+                location: story.location || 'Community Voice',
+                icon: '👥',
+                badgeColor: 'cyan',
+                badgeText: story.role || 'Citizen Voice'
+              });
+              if (onSelectStory) onSelectStory(story);
+              else onNavigate('video-player');
+            }}
             className="p-2.5 rounded-xl bg-[#121217] border border-[#22222C] hover:border-amber-400/40 cursor-pointer transition-all space-y-2 group"
           >
             <div className="flex items-center justify-between">
@@ -3536,7 +3589,18 @@ export function ScreenNews({ onBack, onNavigate }) {
         {filteredNews.map((news) => (
           <div
             key={news.id}
-            onClick={() => showToast(`📰 Opening: ${news.title.slice(0, 30)}...`)}
+            onClick={() => {
+              showToast(`📰 Opening: ${news.title.slice(0, 30)}...`);
+              recordCustomerActivity({
+                type: 'news',
+                title: 'News Article Read',
+                detail: `Citizen opened news: "${news.title}"`,
+                location: `${news.category || 'Regional'} News`,
+                icon: '📰',
+                badgeColor: 'blue',
+                badgeText: news.tag || 'News Read'
+              });
+            }}
             className="p-2.5 rounded-2xl bg-[#11141E] border border-[#1E293B] hover:border-[#F5C754]/50 cursor-pointer transition-all space-y-2 group shadow-sm active:scale-[0.99]"
           >
             <div className="flex items-center justify-between">
@@ -3774,7 +3838,18 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
                   <button
                     key={opt.id}
                     type="button"
-                    onClick={() => setPollVotes(prev => ({ ...prev, 1: opt.id }))}
+                    onClick={() => {
+                      setPollVotes(prev => ({ ...prev, 1: opt.id }));
+                      recordCustomerActivity({
+                        type: 'boss-house',
+                        title: 'Daily House Poll Voted',
+                        detail: `Citizen picked "${opt.name}" in "ఈ వారం బెస్ట్ ఎంటర్‌టైనర్ ఎవరు?"`,
+                        location: 'Boss of House Poll',
+                        icon: '📊',
+                        badgeColor: 'amber',
+                        badgeText: 'Daily Poll'
+                      });
+                    }}
                     className={`w-full p-2 rounded-xl border text-left text-[9px] font-bold transition-all cursor-pointer flex items-center justify-between ${
                       pollVotes[1] === opt.id
                         ? 'bg-amber-500/20 border-amber-400 text-[#FDE047]'

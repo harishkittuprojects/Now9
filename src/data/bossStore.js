@@ -1,5 +1,6 @@
 // Central Store for Boss of House / Bigg Boss Telugu Housemates
 // Connects Admin Housemates Manager <-> Citizen Mobile Voting & Contestant Roster
+import { recordCustomerActivity } from './customerActivityStore';
 
 export const BOSS_STORAGE_KEY = 'now9_boss_housemates_v1';
 export const BOSS_EVENT = 'now9_boss_housemates_updated';
@@ -106,8 +107,10 @@ export function resetHousemateVotes() {
 export function voteForHousemate(id) {
   if (typeof window === 'undefined') return;
   const current = getPublishedHousemates();
+  let votedPerson = null;
   const updatedRaw = current.map(h => {
     if (h.id === id) {
+      votedPerson = h;
       return { ...h, votes: (h.votes || 0) + 1 };
     }
     return h;
@@ -116,6 +119,18 @@ export function voteForHousemate(id) {
   try {
     localStorage.setItem(BOSS_STORAGE_KEY, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent(BOSS_EVENT, { detail: { type: 'voted', id, list: updated } }));
+    
+    if (votedPerson) {
+      recordCustomerActivity({
+        type: 'boss-house',
+        title: 'Boss of House Elimination Vote',
+        detail: `Citizen voted to save "${votedPerson.name} (${votedPerson.teluguName || votedPerson.name})" from elimination`,
+        location: 'Citizen App (Boss of House)',
+        icon: votedPerson.avatar || '👑',
+        badgeColor: 'rose',
+        badgeText: 'Boss of House'
+      });
+    }
   } catch (e) {}
   return updated;
 }

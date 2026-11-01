@@ -74,6 +74,12 @@ import {
   resetHousemateVotes, 
   subscribeHousemates 
 } from '../data/bossStore';
+import { 
+  getCustomerActivities, 
+  recordCustomerActivity, 
+  clearCustomerActivities, 
+  subscribeCustomerActivities 
+} from '../data/customerActivityStore';
 
 export default function NowNineAdminDashboard({ 
   onClose, 
@@ -200,6 +206,86 @@ export default function NowNineAdminDashboard({
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  // Live Citizen Activity Stream State (Captures everything customers do on website)
+  const [customerActivities, setCustomerActivities] = useState(() => getCustomerActivities());
+  const [activityFilter, setActivityFilter] = useState('all'); // 'all' | 'vote' | 'survey' | 'boss-house' | 'live' | 'news' | 'location'
+  const [activitySearch, setActivitySearch] = useState('');
+
+  useEffect(() => {
+    const unsub = subscribeCustomerActivities((updated) => {
+      setCustomerActivities(updated);
+    });
+    return unsub;
+  }, []);
+
+  const handleSimulateCustomerTask = () => {
+    const sampleTasks = [
+      {
+        type: 'vote',
+        title: 'Constituency Ballot Cast',
+        detail: 'Citizen voted for BRS - V. Srinivas Goud in Yenugonda',
+        location: 'Yenugonda, Mahabubnagar',
+        icon: '🗳️',
+        badgeColor: 'emerald',
+        badgeText: 'Electoral Vote'
+      },
+      {
+        type: 'survey',
+        title: '5-Question Pulse Response',
+        detail: 'Citizen answered Priority #3: "ఉద్యోగాలు, ఉపాధి (Employment & Jobs)"',
+        location: 'Mahabubnagar Constituency',
+        icon: '📊',
+        badgeColor: 'amber',
+        badgeText: '5-Question Pulse'
+      },
+      {
+        type: 'boss-house',
+        title: 'Boss of House Elimination Vote',
+        detail: 'Citizen voted to save "Vishnupriya (విష్ణుప్రియ)" from elimination',
+        location: 'Jubilee Hills, Hyderabad',
+        icon: '👑',
+        badgeColor: 'rose',
+        badgeText: 'Boss Elimination'
+      },
+      {
+        type: 'live',
+        title: 'Tuned into Live Stream',
+        detail: 'Citizen joined live stream: "2026 ఎన్నికలు: ఎవరికి అవకాశాలు?"',
+        location: 'LB Nagar, Hyderabad',
+        icon: '🔴',
+        badgeColor: 'red',
+        badgeText: 'Live Stream'
+      },
+      {
+        type: 'news',
+        title: 'News Headline Read',
+        detail: 'Citizen opened breaking report: "తెలంగాణ అసెంబ్లీ నియోజకవర్గాల్లో ముమ్మర ప్రచారం"',
+        location: 'Khairatabad, Hyderabad',
+        icon: '📰',
+        badgeColor: 'blue',
+        badgeText: 'News Reader'
+      },
+      {
+        type: 'location',
+        title: 'GPS Geofence Verified',
+        detail: 'Citizen verified location in Serilingampally (Gachibowli)',
+        location: 'Serilingampally, Hyderabad',
+        icon: '📍',
+        badgeColor: 'sky',
+        badgeText: 'GPS Verified'
+      }
+    ];
+    const picked = sampleTasks[Math.floor(Math.random() * sampleTasks.length)];
+    recordCustomerActivity(picked);
+    showToast(`⚡ Live Citizen Task Logged: ${picked.title}`);
+  };
+
+  const handleClearActivities = () => {
+    clearCustomerActivities();
+    setCustomerActivities([]);
+    showToast('🗑️ Citizen activity log cleared.');
+  };
 
   // Detailed Assembly Standings Data
   const ALL_CONSTITUENCIES = {
@@ -781,6 +867,7 @@ export default function NowNineAdminDashboard({
 
             {[
               { id: 'overview', label: 'Dashboard Overview', icon: BarChart3, badge: 'Live' },
+              { id: 'customer-tasks', label: 'Live Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
               { id: 'constituencies', label: 'Constituency Standings', icon: Vote, count: '8 Hot' },
               { id: 'surveys', label: '5-Question Pulse', icon: FileText, count: '124K' },
               { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
@@ -1311,6 +1398,300 @@ export default function NowNineAdminDashboard({
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* LIVE CUSTOMER / CITIZEN ACTIVITY STREAM (Real-time monitor of every task run on the website) */}
+              <div className="p-4 sm:p-5 rounded-3xl bg-[#0D0D15] border-2 border-emerald-500/40 shadow-2xl space-y-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-[#20202E]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-400 text-lg shadow-inner">
+                      <Activity className="w-5 h-5 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-base sm:text-lg font-black text-white">
+                          Live Customer Activity Stream
+                        </h2>
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-mono font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                          LIVE CITIZEN MONITOR
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Every task citizen users execute on the website appears here live: votes, surveys, live debates, Boss of House, news reads, and GPS geofences
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSimulateCustomerTask}
+                      className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-400/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                      title="Simulate a live citizen action"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>+ Simulate Citizen Task</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleClearActivities}
+                      className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 text-xs font-bold transition-all cursor-pointer"
+                      title="Clear activity log"
+                    >
+                      <span>Clear</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Filter Pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                  {[
+                    { id: 'all', label: 'All Tasks', icon: '⚡', count: customerActivities.length },
+                    { id: 'vote', label: 'Electoral Ballots', icon: '🗳️', count: customerActivities.filter(a => a.type === 'vote').length },
+                    { id: 'survey', label: '5-Question Surveys', icon: '📊', count: customerActivities.filter(a => a.type === 'survey').length },
+                    { id: 'boss-house', label: 'Boss of House', icon: '👑', count: customerActivities.filter(a => a.type === 'boss-house').length },
+                    { id: 'live', label: 'Live Debates', icon: '🔴', count: customerActivities.filter(a => a.type === 'live').length },
+                    { id: 'news', label: 'News Reads', icon: '📰', count: customerActivities.filter(a => a.type === 'news').length },
+                    { id: 'location', label: 'GPS Geofences', icon: '📍', count: customerActivities.filter(a => a.type === 'location').length },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setActivityFilter(f.id)}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
+                        activityFilter === f.id
+                          ? 'bg-emerald-500 text-black font-black shadow-md'
+                          : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#232332]'
+                      }`}
+                    >
+                      <span>{f.icon}</span>
+                      <span>{f.label}</span>
+                      <span className="font-mono text-[10px] px-1 rounded bg-black/30 text-white font-bold">{f.count}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Activity cards stream */}
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                  {customerActivities.filter(a => activityFilter === 'all' || a.type === activityFilter).length === 0 ? (
+                    <div className="p-8 text-center text-xs text-gray-500 bg-[#0E0E14] rounded-2xl border border-dashed border-[#222232]">
+                      <Activity className="w-8 h-8 text-gray-600 mx-auto mb-2 animate-pulse" />
+                      <p className="font-bold text-gray-400 text-sm">No tasks in this category yet</p>
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        Interact on the website / mobile app or click "+ Simulate Citizen Task" above to see real-time updates!
+                      </p>
+                    </div>
+                  ) : (
+                    customerActivities
+                      .filter(a => activityFilter === 'all' || a.type === activityFilter)
+                      .slice(0, 30)
+                      .map((act) => (
+                        <div
+                          key={act.id}
+                          className="p-3 rounded-2xl bg-[#11111A] border border-[#222232] hover:border-emerald-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 animate-fadeIn"
+                        >
+                          <div className="flex items-start sm:items-center gap-3">
+                            <span className="text-2xl p-2 rounded-xl bg-[#171724] border border-[#262638] shrink-0">
+                              {act.icon}
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase ${
+                                  act.badgeColor === 'emerald' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
+                                  act.badgeColor === 'amber' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
+                                  act.badgeColor === 'rose' ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' :
+                                  act.badgeColor === 'red' ? 'bg-red-500/20 text-red-300 border border-red-400/30' :
+                                  act.badgeColor === 'blue' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
+                                  'bg-sky-500/20 text-sky-300 border border-sky-400/30'
+                                }`}>
+                                  {act.badgeText || act.type}
+                                </span>
+                                <h4 className="font-extrabold text-sm text-white">{act.title}</h4>
+                                <span className="font-mono text-[10px] text-gray-500">{act.id}</span>
+                              </div>
+                              <p className="text-xs text-gray-300 mt-1 font-medium">{act.detail}</p>
+                              <div className="flex items-center gap-2 text-[10.5px] text-gray-400 mt-1">
+                                <span className="flex items-center gap-1 text-sky-400">
+                                  <MapPin className="w-3 h-3" />
+                                  {act.location}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
+                            <span className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-gray-500" />
+                              {act.time}
+                            </span>
+                            <span className="text-[9.5px] text-gray-500 font-mono">
+                              {new Date(act.timestamp || Date.now()).toLocaleTimeString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW: STANDALONE LIVE CITIZEN TASKS MONITOR */}
+          {activeTab === 'customer-tasks' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#20202E] gap-3">
+                <div>
+                  <h2 className="text-xl font-black text-white flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-emerald-400" />
+                    <span>Live Citizen Tasks & Omnichannel Activity</span>
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Real-time monitor tracking every single action citizen users execute on the Now9 platform
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSimulateCustomerTask}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-400/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>+ Simulate Citizen Task</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleClearActivities}
+                    className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    <span>Clear Feed</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI Metrics on Customer Tasks */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-3.5 rounded-2xl bg-[#0F0F18] border border-[#222232]">
+                  <span className="text-[10px] text-gray-400 font-bold block">Total Citizen Tasks</span>
+                  <span className="text-2xl font-black text-white font-mono">{customerActivities.length}</span>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-[#0F0F18] border border-emerald-500/30">
+                  <span className="text-[10px] text-emerald-400 font-bold block">Electoral Ballots</span>
+                  <span className="text-2xl font-black text-emerald-300 font-mono">
+                    {customerActivities.filter(a => a.type === 'vote').length}
+                  </span>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-[#0F0F18] border border-amber-500/30">
+                  <span className="text-[10px] text-amber-400 font-bold block">Governance Surveys</span>
+                  <span className="text-2xl font-black text-amber-300 font-mono">
+                    {customerActivities.filter(a => a.type === 'survey').length}
+                  </span>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-[#0F0F18] border border-rose-500/30">
+                  <span className="text-[10px] text-rose-400 font-bold block">Boss of House Votes</span>
+                  <span className="text-2xl font-black text-rose-300 font-mono">
+                    {customerActivities.filter(a => a.type === 'boss-house').length}
+                  </span>
+                </div>
+              </div>
+
+              {/* Search & Category Filter */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                  {[
+                    { id: 'all', label: 'All Tasks', icon: '⚡' },
+                    { id: 'vote', label: 'Electoral Ballots', icon: '🗳️' },
+                    { id: 'survey', label: 'Surveys', icon: '📊' },
+                    { id: 'boss-house', label: 'Boss House', icon: '👑' },
+                    { id: 'live', label: 'Live Debates', icon: '🔴' },
+                    { id: 'news', label: 'News', icon: '📰' },
+                    { id: 'location', label: 'GPS', icon: '📍' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setActivityFilter(f.id)}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
+                        activityFilter === f.id
+                          ? 'bg-emerald-500 text-black font-black shadow-md'
+                          : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#232332]'
+                      }`}
+                    >
+                      <span>{f.icon}</span>
+                      <span>{f.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={activitySearch}
+                    onChange={(e) => setActivitySearch(e.target.value)}
+                    placeholder="Search tasks or locality..."
+                    className="pl-8 pr-3 py-1.5 rounded-xl bg-[#12121A] border border-[#222232] text-xs text-white placeholder-gray-500 outline-none focus:border-emerald-400 w-full sm:w-60"
+                  />
+                </div>
+              </div>
+
+              {/* Tasks List */}
+              <div className="space-y-2.5">
+                {customerActivities
+                  .filter(a => activityFilter === 'all' || a.type === activityFilter)
+                  .filter(a => {
+                    if (!activitySearch.trim()) return true;
+                    const q = activitySearch.toLowerCase();
+                    return a.title?.toLowerCase().includes(q) || a.detail?.toLowerCase().includes(q) || a.location?.toLowerCase().includes(q);
+                  })
+                  .map((act) => (
+                    <div
+                      key={act.id}
+                      className="p-3.5 rounded-2xl bg-[#0E0E14] border border-[#222232] hover:border-emerald-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm"
+                    >
+                      <div className="flex items-start sm:items-center gap-3">
+                        <span className="text-2xl p-2.5 rounded-xl bg-[#141420] border border-[#252538] shrink-0">
+                          {act.icon}
+                        </span>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase ${
+                              act.badgeColor === 'emerald' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' :
+                              act.badgeColor === 'amber' ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30' :
+                              act.badgeColor === 'rose' ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' :
+                              act.badgeColor === 'red' ? 'bg-red-500/20 text-red-300 border border-red-400/30' :
+                              act.badgeColor === 'blue' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
+                              'bg-sky-500/20 text-sky-300 border border-sky-400/30'
+                            }`}>
+                              {act.badgeText || act.type}
+                            </span>
+                            <h4 className="font-extrabold text-sm text-white">{act.title}</h4>
+                            <span className="font-mono text-[10px] text-gray-500">{act.id}</span>
+                          </div>
+                          <p className="text-xs text-gray-300 mt-1 font-medium">{act.detail}</p>
+                          <div className="flex items-center gap-2 text-[10.5px] text-gray-400 mt-1">
+                            <span className="flex items-center gap-1 text-sky-400">
+                              <MapPin className="w-3 h-3" />
+                              {act.location}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
+                        <span className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-gray-500" />
+                          {act.time}
+                        </span>
+                        <span className="text-[9.5px] text-gray-500 font-mono">
+                          {new Date(act.timestamp || Date.now()).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           )}

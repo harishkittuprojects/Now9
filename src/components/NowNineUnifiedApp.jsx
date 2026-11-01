@@ -23,6 +23,7 @@ import {
 } from './NowNineReferenceScreens';
 import ScreenAdminPanel from './ScreenAdminPanel';
 import NowNineAdminDashboard from './NowNineAdminDashboard';
+import { recordCustomerActivity } from '../data/customerActivityStore';
 import { 
   DEFAULT_DETECTED_LOCATION, 
   CONSTITUENCY_DATABASE,
@@ -112,6 +113,15 @@ export default function NowNineUnifiedApp() {
       setTimeout(() => {
         if (resolvedLocation) {
           setCurrentLocation(resolvedLocation);
+          recordCustomerActivity({
+            type: 'location',
+            title: 'GPS Geofence Verified',
+            detail: `Citizen geofenced to ${resolvedLocation.locality || resolvedLocation.city} (${resolvedLocation.assembly})`,
+            location: `${resolvedLocation.locality || resolvedLocation.city}, ${resolvedLocation.assembly}`,
+            icon: '📍',
+            badgeColor: 'sky',
+            badgeText: 'GPS Verified'
+          });
         }
         setIsLocating(false);
       }, remaining);
@@ -146,6 +156,21 @@ export default function NowNineUnifiedApp() {
     }
   };
 
+  const handleLocationChange = (newLoc) => {
+    setCurrentLocation(newLoc);
+    if (newLoc) {
+      recordCustomerActivity({
+        type: 'location',
+        title: 'Constituency Changed',
+        detail: `Citizen selected ${newLoc.locality || newLoc.assembly} (${newLoc.district || newLoc.state || ''})`,
+        location: `${newLoc.locality || newLoc.city || ''}, ${newLoc.assembly || ''}`,
+        icon: '📍',
+        badgeColor: 'sky',
+        badgeText: 'Constituency Selection'
+      });
+    }
+  };
+
   // Run auto-locate on initial app load
   useEffect(() => {
     detectLiveGpsLocation();
@@ -165,7 +190,7 @@ export default function NowNineUnifiedApp() {
             onSkipToHome={() => handleNav('home')} 
             onNavigate={handleNav}
             currentLocation={currentLocation}
-            onLocationChange={setCurrentLocation}
+            onLocationChange={handleLocationChange}
             isLocating={isLocating}
             onDetectLiveGps={detectLiveGpsLocation}
           />
@@ -177,7 +202,7 @@ export default function NowNineUnifiedApp() {
           <Screen2Home 
             onNavigate={handleNav}
             currentLocation={currentLocation}
-            onLocationChange={setCurrentLocation}
+            onLocationChange={handleLocationChange}
             isLocating={isLocating}
             onDetectLiveGps={detectLiveGpsLocation}
             selectedParty={selectedSurveyParty}
@@ -192,7 +217,7 @@ export default function NowNineUnifiedApp() {
             onNavigate={handleNav}
             selectedParty={selectedSurveyParty}
             currentLocation={currentLocation}
-            onLocationChange={setCurrentLocation}
+            onLocationChange={handleLocationChange}
             isLocating={isLocating}
             onDetectLiveGps={detectLiveGpsLocation}
             onSelectSurveyParty={setSelectedSurveyParty}
@@ -237,7 +262,7 @@ export default function NowNineUnifiedApp() {
             onSkipToHome={() => handleNav('home')} 
             onNavigate={handleNav}
             currentLocation={currentLocation}
-            onLocationChange={setCurrentLocation}
+            onLocationChange={handleLocationChange}
             isLocating={isLocating}
             onDetectLiveGps={detectLiveGpsLocation}
           />
