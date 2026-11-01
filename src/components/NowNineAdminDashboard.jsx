@@ -1081,199 +1081,91 @@ export default function NowNineAdminDashboard({
         </div>
       </header>
 
-      {/* Mobile Horizontal Module Switcher (Quick 1-tap switching on phones) */}
-      <div className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-[#0A0A0F] border-b border-[#1C1C28] overflow-x-auto phone-scroll shrink-0 z-30">
-        {[
-          { id: 'overview', label: 'Overview', icon: '📊' },
-          { id: 'customer-tasks', label: 'Citizen Tasks', icon: '⚡', count: customerActivities.length },
-          { id: 'constituencies', label: 'Standings', icon: '🗳️' },
-          { id: 'surveys', label: 'Surveys', icon: '📝' },
-          { id: 'live-debates', label: 'Live Debates', icon: '🔴' },
-          { id: 'news', label: 'News', icon: '📰' },
-          { id: 'boss-house', label: 'Boss House', icon: '👑' },
-          { id: 'settings', label: 'Settings', icon: '⚙️' },
-        ].map((m) => (
-          <button
-            key={m.id}
-            type="button"
-            onClick={() => {
-              setActiveTab(m.id);
-              setIsMobileMenuOpen(false);
-            }}
-            className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === m.id
-                ? 'bg-amber-500 text-black font-black shadow-md shadow-amber-500/20'
-                : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#232332]'
-            }`}
-          >
-            <span>{m.icon}</span>
-            <span>{m.label}</span>
-            {m.count !== undefined && (
-              <span className="font-mono text-[9.5px] px-1 rounded bg-black/40 text-amber-300 font-bold">{m.count}</span>
-            )}
-          </button>
-        ))}
+      {/* Universal Top Horizontal Module Switcher Bar (Placed Horizontally Across Desktop, Laptops & Mobile) */}
+      <div className="w-full bg-[#0A0A0F] border-b border-[#1C1C28] px-2 sm:px-6 py-2.5 overflow-x-auto phone-scroll shrink-0 z-30 shadow-md">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-max">
+          {[
+            { id: 'overview', label: 'Dashboard Overview', shortLabel: 'Overview', icon: BarChart3, badge: 'Live' },
+            { id: 'customer-tasks', label: 'Live Citizen Tasks', shortLabel: 'Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
+            { id: 'constituencies', label: 'Constituency Standings', shortLabel: 'Standings', icon: Vote, count: '8 Hot' },
+            { id: 'surveys', label: '5-Question Pulse', shortLabel: 'Surveys', icon: FileText, count: '124K' },
+            { id: 'live-debates', label: 'Live On & Debates', shortLabel: 'Live Debates', icon: Radio, badge: 'Active' },
+            { id: 'news', label: 'News & Flash Ticker', shortLabel: 'News', icon: Newspaper, count: '4' },
+            { id: 'boss-house', label: 'Boss of House Voting', shortLabel: 'Boss House', icon: Eye, count: '300K+' },
+            { id: 'settings', label: 'Embargo & Settings', shortLabel: 'Settings', icon: Settings },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-2 ${
+                  isActive
+                    ? 'bg-amber-500 text-black font-black shadow-lg shadow-amber-500/25 ring-1 ring-amber-300 scale-[1.02]'
+                    : 'bg-[#14141E] text-gray-400 hover:text-white hover:bg-[#1C1C28] border border-[#232332]'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-black stroke-[2.5]' : 'text-amber-400'}`} />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.shortLabel}</span>
+                {tab.badge && (
+                  <span className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider ${
+                    isActive ? 'bg-black text-amber-300' : 'bg-red-600 text-white animate-pulse'
+                  }`}>
+                    {tab.badge}
+                  </span>
+                )}
+                {tab.count !== undefined && (
+                  <span className={`px-1.5 py-0.2 rounded text-[8.5px] font-mono font-bold ${
+                    isActive ? 'bg-black/30 text-black font-black' : 'bg-white/10 text-gray-300'
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Mobile Off-Canvas Drawer (When Menu button is tapped) */}
-      {isMobileMenuOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex animate-fadeIn"
-          onClick={() => setIsMobileMenuOpen(false)}
-        >
-          <aside 
-            className="w-72 max-w-[85vw] h-full bg-[#0A0A0F] border-r border-[#20202E] p-4 flex flex-col justify-between overflow-y-auto animate-slideInLeft"
-            onClick={(e) => e.stopPropagation()}
+      {/* Live Citizen Active Constituency Sync Bar */}
+      {activeCitizenSession && (
+        <div className="w-full bg-gradient-to-r from-amber-500/20 via-[#13121F] to-emerald-500/15 border-b border-amber-400/30 px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 shadow-md">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-bold text-amber-300">
+              ⚡ Live Citizen Login Auto-Synced:
+            </span>
+            <span className="text-xs font-black text-white px-2.5 py-0.5 rounded-lg bg-black/50 border border-amber-400/40">
+              📍 {activeCitizenSession.assembly || activeCitizenSession.locality} ({activeCitizenSession.locality}, {activeCitizenSession.state})
+            </span>
+            <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-gray-300">
+              via <span className="font-mono text-emerald-400 font-bold">{activeCitizenSession.method || 'Mobile App'}</span>
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedConstituencyKey(activeCitizenSession.constituencyKey);
+              setActiveTab('constituencies');
+              showToast(`Viewing live standings for ${activeCitizenSession.assembly}`);
+            }}
+            className="px-3 py-1 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs transition-all shadow-md cursor-pointer flex items-center gap-1.5 active:scale-95"
           >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-[#1C1C28]">
-                <div className="flex items-center gap-2">
-                  <img src="/now9_icon.png" alt="now9 logo" className="w-6 h-6 object-contain rounded-lg" />
-                  <span className="font-black text-sm text-white">now<span className="text-[#F5C754]">nine</span> Modules</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-1">
-                {[
-                  { id: 'overview', label: 'Dashboard Overview', icon: BarChart3, badge: 'Live' },
-                  { id: 'customer-tasks', label: 'Live Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
-                  { id: 'constituencies', label: 'Constituency Standings', icon: Vote, count: '8 Hot' },
-                  { id: 'surveys', label: '5-Question Pulse', icon: FileText, count: '124K' },
-                  { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
-                  { id: 'news', label: 'News & Flash Ticker', icon: Newspaper, count: '4' },
-                  { id: 'boss-house', label: 'Boss of House Voting', icon: Eye, count: '300K+' },
-                  { id: 'settings', label: 'Embargo & Settings', icon: Settings },
-                ].map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveTab(tab.id);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className={`w-full px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
-                        isActive
-                          ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-sm'
-                          : 'text-gray-400 hover:text-white hover:bg-[#14141E]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-[#F5C754]' : 'text-gray-400'}`} />
-                        <span>{tab.label}</span>
-                      </div>
-                      {tab.badge && (
-                        <span className="px-1.5 py-0.2 rounded-full bg-red-600/80 text-white text-[7.5px] font-black uppercase animate-pulse">
-                          {tab.badge}
-                        </span>
-                      )}
-                      {tab.count && (
-                        <span className="px-1.5 py-0.2 rounded bg-white/10 text-gray-300 text-[8px] font-mono">
-                          {tab.count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[#1C1C28]">
-              <div className="p-2.5 rounded-xl bg-[#12121A] border border-[#20202E] text-[8.5px] space-y-1">
-                <div className="flex items-center justify-between text-gray-400">
-                  <span>Electoral Version</span>
-                  <span className="font-mono text-amber-300 font-bold">2026.4 v2</span>
-                </div>
-                <div className="flex items-center justify-between text-gray-400">
-                  <span>Target Assemblies</span>
-                  <span className="text-white font-bold">Telangana & AP</span>
-                </div>
-              </div>
-            </div>
-          </aside>
+            <Vote className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>View {activeCitizenSession.assembly?.replace(' Assembly Constituency', '').replace(' Assembly', '')} Standings & Parties →</span>
+          </button>
         </div>
       )}
 
-      {/* Main Layout: Desktop Sidebar Navigation + Dynamic Admin Views */}
-      <div className="flex-1 flex overflow-hidden min-h-0">
-        
-        {/* Left Admin Navigation Sidebar (Desktop Only) */}
-        <aside className="hidden lg:flex w-64 bg-[#0A0A0F] border-r border-[#1C1C28] p-3 flex-col justify-between shrink-0 overflow-y-auto">
-          <div className="space-y-1">
-            <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest px-2.5 py-1 block">
-              Core Modules
-            </span>
-
-            {[
-              { id: 'overview', label: 'Dashboard Overview', icon: BarChart3, badge: 'Live' },
-              { id: 'customer-tasks', label: 'Live Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
-              { id: 'constituencies', label: 'Constituency Standings', icon: Vote, count: '8 Hot' },
-              { id: 'surveys', label: '5-Question Pulse', icon: FileText, count: '124K' },
-              { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
-              { id: 'news', label: 'News & Flash Ticker', icon: Newspaper, count: '4' },
-              { id: 'boss-house', label: 'Boss of House Voting', icon: Eye, count: '300K+' },
-              { id: 'settings', label: 'Embargo & Settings', icon: Settings },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full px-3 py-2.5 rounded-xl text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
-                    isActive
-                      ? 'bg-amber-500/20 text-[#FDE047] border border-amber-400/40 shadow-sm'
-                      : 'text-gray-400 hover:text-white hover:bg-[#14141E]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#F5C754]' : 'text-gray-400'}`} />
-                    <span>{tab.label}</span>
-                  </div>
-                  {tab.badge && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-red-600/80 text-white text-[7.5px] font-black uppercase animate-pulse">
-                      {tab.badge}
-                    </span>
-                  )}
-                  {tab.count && (
-                    <span className="px-1.5 py-0.2 rounded bg-white/10 text-gray-300 text-[8px] font-mono">
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Quick Info Card at Sidebar Bottom */}
-          <div className="pt-3 border-t border-[#1C1C28]">
-            <div className="p-2.5 rounded-xl bg-[#12121A] border border-[#20202E] text-[8.5px] space-y-1">
-              <div className="flex items-center justify-between text-gray-400">
-                <span>Electoral Version</span>
-                <span className="font-mono text-amber-300 font-bold">2026.4 v2</span>
-              </div>
-              <div className="flex items-center justify-between text-gray-400">
-                <span>Target Assemblies</span>
-                <span className="text-white font-bold">Telangana & AP</span>
-              </div>
-              <div className="flex items-center justify-between text-gray-400">
-                <span>Encrypted Hash</span>
-                <span className="font-mono text-emerald-400">SHA-256 ✓</span>
-              </div>
-            </div>
-          </div>
-        </aside>
-
+      {/* Main Layout: Dynamic Admin Views (100% Full-Width) */}
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full">
         {/* Right Main Content Panel (100% width on mobile, full responsiveness) */}
         <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6 bg-[#07070A] w-full min-w-0">
 
@@ -1281,161 +1173,6 @@ export default function NowNineAdminDashboard({
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-fadeIn">
               
-              {/* SECTION-WISE VISUAL FLOW INSPECTOR (Shows crystal-clearly what happens on every vote) */}
-              <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#1A1828] via-[#141422] to-[#0D0D14] border-2 border-amber-500/50 shadow-2xl space-y-4">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-[#252538]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-400 font-black text-xl shadow-inner">
-                      ⚡
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-base sm:text-lg font-black text-white">
-                          Live Voting Inspector • Section-by-Section Flow
-                        </h2>
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[9.5px] font-mono font-bold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                          <span>LIVE SYNC ACTIVE</span>
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-300 mt-0.5">
-                        Whenever someone presses vote on the mobile website, watch how each section below reacts in real-time:
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* One-Click Real Test Voter Actions */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] font-bold text-gray-400">Quick Test Vote:</span>
-                    <button
-                      type="button"
-                      onClick={() => handleCastVoterChoice('Congress (INC)', 'Yennam Srinivas Reddy', 'inc', 0)}
-                      className="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                    >
-                      <span>✋ Vote Congress</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleCastVoterChoice('BRS', 'V. Srinivas Goud', 'brs', 1)}
-                      className="px-3 py-1.5 rounded-xl bg-pink-600/20 hover:bg-pink-600/30 text-pink-300 border border-pink-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                    >
-                      <span>🚗 Vote BRS</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleCastVoterChoice('BJP', 'A.P. Mithun Kumar Reddy', 'bjp', 2)}
-                      className="px-3 py-1.5 rounded-xl bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                    >
-                      <span>🪷 Vote BJP</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        resetAllBallotsToZero();
-                        showToast('🗑️ Cleared everything! All sections reset back to 0.');
-                      }}
-                      className="px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                      title="Reset everything to 0"
-                    >
-                      <RotateCcw className="w-3 h-3 text-red-400" />
-                      <span>Reset 0</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* 4 Interactive Visual Cards Explaining Exactly What Happens Section-by-Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  
-                  {/* Section 1 Card */}
-                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-amber-500/30 space-y-1.5 shadow-md">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px]">
-                        SECTION 1
-                      </span>
-                      <span className="text-[10px] text-gray-400">Total Ballots</span>
-                    </div>
-                    <h3 className="text-sm font-black text-white">Electoral Counters</h3>
-                    <p className="text-[11px] text-gray-300 leading-snug">
-                      Immediately ticks up by <strong className="text-emerald-400 font-mono">+1</strong> across all cluster nodes.
-                    </p>
-                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
-                      <span className="text-gray-400">Count:</span>
-                      <span className="font-black text-amber-400 text-xs">{totalVotesCount} Ballots</span>
-                    </div>
-                  </div>
-
-                  {/* Section 2 Card */}
-                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-sky-500/30 space-y-1.5 shadow-md">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 font-mono text-[10px]">
-                        SECTION 2
-                      </span>
-                      <span className="text-[10px] text-gray-400">Standings</span>
-                    </div>
-                    <h3 className="text-sm font-black text-white">Candidate Vote Share</h3>
-                    <p className="text-[11px] text-gray-300 leading-snug">
-                      Increments selected candidate's tally and animates percentage bar.
-                    </p>
-                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
-                      <span className="text-gray-400">Leading:</span>
-                      <span className="font-black text-sky-400 text-xs truncate max-w-[130px]">{activeConstituency.leadingParty}</span>
-                    </div>
-                  </div>
-
-                  {/* Section 3 Card */}
-                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-emerald-500/30 space-y-1.5 shadow-md">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">
-                        SECTION 3
-                      </span>
-                      <span className="text-[10px] text-gray-400">Governance</span>
-                    </div>
-                    <h3 className="text-sm font-black text-white">5-Question Sentiment</h3>
-                    <p className="text-[11px] text-gray-300 leading-snug">
-                      Logs answers to Road & Drainage, Water, and MLA Accessibility in live bars.
-                    </p>
-                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
-                      <span className="text-gray-400">Sample:</span>
-                      <span className="font-black text-emerald-400 text-xs">{totalVotesCount} Voters</span>
-                    </div>
-                  </div>
-
-                  {/* Section 4 Card */}
-                  <div className="p-3.5 rounded-2xl bg-[#0F0F1A] border border-rose-500/30 space-y-1.5 shadow-md">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-mono text-[10px]">
-                        SECTION 4
-                      </span>
-                      <span className="text-[10px] text-gray-400">Audit Trail</span>
-                    </div>
-                    <h3 className="text-sm font-black text-white">Tamper-Proof Ledger</h3>
-                    <p className="text-[11px] text-gray-300 leading-snug">
-                      Logs SHA-256 integrity block, timestamp, and geofence verification tag.
-                    </p>
-                    <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10.5px] font-mono">
-                      <span className="text-gray-400">Last Hash:</span>
-                      <span className="font-black text-rose-400 text-[10px] truncate max-w-[120px]">{auditStream[0]?.id || 'None'}</span>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* If a ballot was received, show glowing confirmation banner */}
-                {auditStream.length > 0 && (
-                  <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                      <span className="font-bold text-emerald-300">
-                        ⚡ Most Recent Citizen Vote: <strong>{auditStream[0].party}</strong> ({auditStream[0].candidate}) in <strong>{auditStream[0].locality}</strong>
-                      </span>
-                    </div>
-                    <span className="text-[10.5px] font-mono text-emerald-400 font-bold">
-                      {auditStream[0].id} • {auditStream[0].time}
-                    </span>
-                  </div>
-                )}
-              </div>
-
               {/* LIVE CITIZEN CONSTITUENCY INGESTION BANNER */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#101F1B] to-[#0E1522] border-2 border-emerald-500/50 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
