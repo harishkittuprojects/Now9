@@ -1078,58 +1078,115 @@ export default function NowNineAdminDashboard({
         </div>
       </header>
 
-      {/* Universal Top Horizontal Module Switcher Bar (Placed Horizontally Across Desktop, Laptops & Mobile) */}
-      <div className="w-full bg-[#0A0A0F] border-b border-[#1C1C28] px-2 sm:px-6 py-2.5 overflow-x-auto phone-scroll shrink-0 z-30 shadow-md">
-        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-max">
-          {[
-            { id: 'overview', label: 'Dashboard Overview', shortLabel: 'Overview', icon: BarChart3, badge: 'Live' },
-            { id: 'customer-tasks', label: 'Live Citizen Tasks', shortLabel: 'Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
-            { id: 'constituencies', label: 'Constituency Standings', shortLabel: 'Standings', icon: Vote, count: '8 Hot' },
-            { id: 'surveys', label: '5-Question Pulse', shortLabel: 'Surveys', icon: FileText, count: '124K' },
-            { id: 'live-debates', label: 'Live On & Debates', shortLabel: 'Live Debates', icon: Radio, badge: 'Active' },
-            { id: 'news', label: 'News & Flash Ticker', shortLabel: 'News', icon: Newspaper, count: '4' },
-            { id: 'boss-house', label: 'Boss of House Voting', shortLabel: 'Boss House', icon: Eye, count: '300K+' },
-            { id: 'settings', label: 'Embargo & Settings', shortLabel: 'Settings', icon: Settings },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-2 ${
-                  isActive
-                    ? 'bg-amber-500 text-black font-black shadow-lg shadow-amber-500/25 ring-1 ring-amber-300 scale-[1.02]'
-                    : 'bg-[#14141E] text-gray-400 hover:text-white hover:bg-[#1C1C28] border border-[#232332]'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-black stroke-[2.5]' : 'text-amber-400'}`} />
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">{tab.shortLabel}</span>
-                {tab.badge && (
-                  <span className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider ${
-                    isActive ? 'bg-black text-amber-300' : 'bg-red-600 text-white animate-pulse'
-                  }`}>
-                    {tab.badge}
-                  </span>
-                )}
-                {tab.count !== undefined && (
-                  <span className={`px-1.5 py-0.2 rounded text-[8.5px] font-mono font-bold ${
-                    isActive ? 'bg-black/30 text-black font-black' : 'bg-white/10 text-gray-300'
-                  }`}>
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+      {/* Mobile Horizontal Module Switcher (Quick 1-tap switching on phones) */}
+      <div className="lg:hidden flex items-center gap-1.5 px-3 py-2 bg-[#0A0A0F] border-b border-[#1C1C28] overflow-x-auto phone-scroll shrink-0 z-30">
+        {[
+          { id: 'overview', label: 'Overview', icon: BarChart3 },
+          { id: 'customer-tasks', label: 'Citizen Tasks', icon: Activity, count: customerActivities.length },
+          { id: 'constituencies', label: 'Standings', icon: Vote },
+          { id: 'surveys', label: 'Surveys', icon: FileText },
+          { id: 'live-debates', label: 'Debates', icon: Radio },
+          { id: 'news', label: 'News', icon: Newspaper },
+          { id: 'boss-house', label: 'Boss House', icon: Eye },
+          { id: 'settings', label: 'Settings', icon: Settings },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all flex items-center gap-1.5 cursor-pointer ${
+                isActive
+                  ? 'bg-amber-500 text-black font-extrabold shadow-sm'
+                  : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#232332]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+              {tab.count !== undefined && (
+                <span className="text-[9px] px-1 rounded bg-black/30 font-mono font-bold">
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Main Layout: Dynamic Admin Views (100% Full-Width) */}
-      <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full">
-        {/* Right Main Content Panel (100% width on mobile, full responsiveness) */}
+      {/* Main Layout: Dynamic Admin Views (Left Sidebar on Desktop + Content Area) */}
+      <div className="flex-1 flex overflow-hidden min-h-0 w-full">
+        {/* Left Desktop Sidebar Navigation */}
+        <aside className="hidden lg:flex w-64 bg-[#0A0A0F] border-r border-[#1C1C28] p-3 flex-col justify-between shrink-0 overflow-y-auto">
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-gray-500 px-3 pb-1 block font-bold">
+              Electoral Modules
+            </span>
+            {[
+              { id: 'overview', label: 'Dashboard Overview', icon: BarChart3, badge: 'Live' },
+              { id: 'customer-tasks', label: 'Live Citizen Tasks', icon: Activity, count: `${customerActivities.length}` },
+              { id: 'constituencies', label: 'Constituency Standings', icon: Vote, count: '8 Hot' },
+              { id: 'surveys', label: '5-Question Pulse', icon: FileText, count: '124K' },
+              { id: 'live-debates', label: 'Live On & Debates', icon: Radio, badge: 'Active' },
+              { id: 'news', label: 'News & Flash Ticker', icon: Newspaper, count: '4' },
+              { id: 'boss-house', label: 'Boss of House Voting', icon: Eye, count: '300K+' },
+              { id: 'settings', label: 'Embargo & Settings', icon: Settings },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-between group ${
+                    isActive
+                      ? 'bg-gradient-to-r from-amber-500/25 via-amber-500/15 to-transparent text-amber-300 font-black border-l-4 border-amber-400 shadow-sm'
+                      : 'text-gray-400 hover:text-white hover:bg-[#14141E]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Icon className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-amber-400 stroke-[2.5]' : 'text-gray-400'}`} />
+                    <span className="truncate">{tab.label}</span>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {tab.badge && (
+                      <span className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider ${
+                        isActive ? 'bg-amber-400 text-black' : 'bg-red-600 text-white animate-pulse'
+                      }`}>
+                        {tab.badge}
+                      </span>
+                    )}
+                    {tab.count !== undefined && (
+                      <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
+                        isActive ? 'bg-amber-400/20 text-amber-300' : 'bg-white/10 text-gray-400'
+                      }`}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Bottom System Status in Sidebar */}
+          <div className="p-3 rounded-2xl bg-[#12121C] border border-[#20202E] space-y-1 mt-4">
+            <div className="flex items-center justify-between text-[10px] font-mono">
+              <span className="text-gray-400">System Status</span>
+              <span className="text-emerald-400 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Live Node 24/7
+              </span>
+            </div>
+            <div className="text-[9.5px] text-gray-500 font-mono">
+              Vercel Edge Global Cluster
+            </div>
+          </div>
+        </aside>
+
+        {/* Right Main Content Panel */}
         <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6 bg-[#07070A] w-full min-w-0">
 
           {/* VIEW 1: DASHBOARD OVERVIEW (Executive, Clean & Crystal Clear) */}
