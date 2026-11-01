@@ -1150,6 +1150,12 @@ export function Screen2Home({
                       </span>
                     </div>
 
+                    {(party.isKutami || party.name?.includes('కూటమి') || party.name?.includes('Kutami') || party.teluguName?.includes('కూటమి')) && (
+                      <span className="mb-1.5 px-2 py-0.5 rounded-full text-[8.5px] font-black bg-gradient-to-r from-amber-500/25 to-yellow-500/25 text-amber-300 border border-amber-400/50 shadow-xs flex items-center gap-1">
+                        <span>🤝</span>
+                        <span>కూటమి (Kutami)</span>
+                      </span>
+                    )}
                     <h3 className="font-black text-[13.5px] sm:text-[14px] text-white leading-snug tracking-tight">
                       {party.name}
                     </h3>
@@ -1749,6 +1755,12 @@ export function Screen3Survey({
                         </span>
                       </div>
 
+                      {(party.isKutami || party.name?.includes('కూటమి') || party.name?.includes('Kutami') || party.teluguName?.includes('కూటమి')) && (
+                        <span className="mb-1.5 px-2 py-0.5 rounded-full text-[8.5px] font-black bg-gradient-to-r from-amber-500/25 to-yellow-500/25 text-amber-300 border border-amber-400/50 shadow-xs flex items-center gap-1">
+                          <span>🤝</span>
+                          <span>కూటమి (Kutami)</span>
+                        </span>
+                      )}
                       {/* Party Name */}
                       <h3 className="font-black text-[13.5px] sm:text-[14px] text-white leading-snug tracking-tight">
                         {party.name}

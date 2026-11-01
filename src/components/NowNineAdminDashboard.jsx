@@ -350,15 +350,15 @@ export default function NowNineAdminDashboard({
       totalVotes: 37400,
       turnoutRate: '76.8%',
       verifiedRate: '99.8%',
-      leadingParty: 'TDP / NDA Alliance',
+      leadingParty: 'TDP (కూటమి / Kutami)',
       leadingCandidate: 'T.G. Bharath',
       margin: '+9.3% (3,478 Votes)',
       parliament: 'Kurnool Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'T.G. Bharath (Sitting MLA / Minister)', symbol: '🚲', voteShare: 48.4, votes: 18101, color: '#EAB308', trend: '+4.1%' },
+        { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'T.G. Bharath (Sitting MLA / Minister)', symbol: '🚲', voteShare: 48.4, votes: 18101, color: '#EAB308', trend: '+4.1%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'A. Md. Imtiaz (Ex-Collector)', symbol: '🪭', voteShare: 42.1, votes: 15745, color: '#0EA5E9', trend: '-2.8%' },
-        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'District Alliance Contender', symbol: '🍵', voteShare: 4.6, votes: 1720, color: '#DC2626', trend: '+1.4%' },
-        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Kurnool City President', symbol: '🪷', voteShare: 2.2, votes: 822, color: '#FF6F00', trend: '+0.5%' },
+        { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'District Alliance Contender', symbol: '🍵', voteShare: 4.6, votes: 1720, color: '#DC2626', trend: '+1.4%' },
+        { id: 'bjp', name: 'BJP (కూటమి / Kutami)', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', isKutami: true, candidate: 'Kurnool City President', symbol: '🪷', voteShare: 2.2, votes: 822, color: '#FF6F00', trend: '+0.5%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Shaik Jailani Basha', symbol: '✋', voteShare: 1.5, votes: 561, color: '#10B981', trend: '-0.8%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Workers Union Nominee', symbol: '🌾', voteShare: 0.5, votes: 187, color: '#BE123C', trend: '+0.1%' },
         { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 150, color: '#1D4ED8', trend: '0.0%' },
@@ -376,15 +376,15 @@ export default function NowNineAdminDashboard({
       totalVotes: 31200,
       turnoutRate: '84.2%',
       verifiedRate: '99.5%',
-      leadingParty: 'TDP / NDA Alliance',
+      leadingParty: 'TDP (కూటమి / Kutami)',
       leadingCandidate: 'Pulivarthi Nani',
       margin: '+8.4% (2,620 Votes)',
       parliament: 'Chittoor Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Pulivarthi Nani (Sitting MLA)', symbol: '🚲', voteShare: 48.2, votes: 15038, color: '#EAB308', trend: '+2.8%' },
+        { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Pulivarthi Nani (Sitting MLA)', symbol: '🚲', voteShare: 48.2, votes: 15038, color: '#EAB308', trend: '+2.8%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Chevireddy Mohith Reddy', symbol: '🪭', voteShare: 42.1, votes: 13135, color: '#0EA5E9', trend: '-2.2%' },
-        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Tirupati Rural Incharge', symbol: '🍵', voteShare: 4.8, votes: 1497, color: '#DC2626', trend: '+1.5%' },
-        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Alliance Nominee', symbol: '🪷', voteShare: 2.3, votes: 717, color: '#FF6F00', trend: '+0.4%' },
+        { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Tirupati Rural Incharge', symbol: '🍵', voteShare: 4.8, votes: 1497, color: '#DC2626', trend: '+1.5%' },
+        { id: 'bjp', name: 'BJP (కూటమి / Kutami)', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', isKutami: true, candidate: 'Alliance Nominee', symbol: '🪷', voteShare: 2.3, votes: 717, color: '#FF6F00', trend: '+0.4%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'K. Balaram', symbol: '✋', voteShare: 1.4, votes: 437, color: '#10B981', trend: '-0.3%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Left Contender', symbol: '🌾', voteShare: 0.5, votes: 156, color: '#BE123C', trend: '+0.1%' },
         { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 125, color: '#1D4ED8', trend: '0.0%' },
@@ -402,15 +402,15 @@ export default function NowNineAdminDashboard({
       totalVotes: 39500,
       turnoutRate: '75.6%',
       verifiedRate: '99.7%',
-      leadingParty: 'TDP / NDA Alliance',
+      leadingParty: 'TDP (కూటమి / Kutami)',
       leadingCandidate: 'Bonda Umamaheswara Rao',
       margin: '+9.4% (3,713 Votes)',
       parliament: 'Vijayawada Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Bonda Umamaheswara Rao', symbol: '🚲', voteShare: 47.2, votes: 18644, color: '#EAB308', trend: '+3.2%' },
+        { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Bonda Umamaheswara Rao', symbol: '🚲', voteShare: 47.2, votes: 18644, color: '#EAB308', trend: '+3.2%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Velampalli Srinivasa Rao', symbol: '🪭', voteShare: 41.5, votes: 16392, color: '#0EA5E9', trend: '-2.5%' },
-        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Pothina Mahesh / Youth Alliance', symbol: '🍵', voteShare: 5.8, votes: 2291, color: '#DC2626', trend: '+1.6%' },
-        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'City Leader', symbol: '🪷', voteShare: 2.6, votes: 1027, color: '#FF6F00', trend: '+0.5%' },
+        { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Pothina Mahesh / Youth Alliance', symbol: '🍵', voteShare: 5.8, votes: 2291, color: '#DC2626', trend: '+1.6%' },
+        { id: 'bjp', name: 'BJP (కూటమి / Kutami)', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', isKutami: true, candidate: 'City Leader', symbol: '🪷', voteShare: 2.6, votes: 1027, color: '#FF6F00', trend: '+0.5%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City President Nominee', symbol: '✋', voteShare: 1.8, votes: 711, color: '#10B981', trend: '-0.4%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Labor Union Nominee', symbol: '🌾', voteShare: 0.5, votes: 198, color: '#BE123C', trend: '-0.1%' },
         { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.3, votes: 118, color: '#1D4ED8', trend: '0.0%' },
@@ -428,15 +428,15 @@ export default function NowNineAdminDashboard({
       totalVotes: 35500,
       turnoutRate: '78.2%',
       verifiedRate: '99.6%',
-      leadingParty: 'TDP / NDA Alliance',
+      leadingParty: 'TDP (కూటమి / Kutami)',
       leadingCandidate: 'Galla Madhavi',
       margin: '+8.2% (2,911 Votes)',
       parliament: 'Guntur Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Galla Madhavi (Sitting MLA)', symbol: '🚲', voteShare: 48.5, votes: 17217, color: '#EAB308', trend: '+3.1%' },
+        { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Galla Madhavi (Sitting MLA)', symbol: '🚲', voteShare: 48.5, votes: 17217, color: '#EAB308', trend: '+3.1%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Vidadala Rajini (Ex-Minister)', symbol: '🪭', voteShare: 41.8, votes: 14839, color: '#0EA5E9', trend: '-2.1%' },
-        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Alliance Incharge', symbol: '🍵', voteShare: 4.8, votes: 1704, color: '#DC2626', trend: '+1.4%' },
-        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'City Incharge', symbol: '🪷', voteShare: 2.3, votes: 816, color: '#FF6F00', trend: '+0.4%' },
+        { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Alliance Incharge', symbol: '🍵', voteShare: 4.8, votes: 1704, color: '#DC2626', trend: '+1.4%' },
+        { id: 'bjp', name: 'BJP (కూటమి / Kutami)', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', isKutami: true, candidate: 'City Incharge', symbol: '🪷', voteShare: 2.3, votes: 816, color: '#FF6F00', trend: '+0.4%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Guntur INC President', symbol: '✋', voteShare: 1.6, votes: 568, color: '#10B981', trend: '-0.3%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Labor Union Nominee', symbol: '🌾', voteShare: 0.5, votes: 178, color: '#BE123C', trend: '+0.1%' },
         { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Guntur Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 142, color: '#1D4ED8', trend: '0.0%' },
@@ -454,15 +454,15 @@ export default function NowNineAdminDashboard({
       totalVotes: 47600,
       turnoutRate: '71.5%',
       verifiedRate: '99.9%',
-      leadingParty: 'TDP / NDA Alliance',
+      leadingParty: 'TDP (కూటమి / Kutami)',
       leadingCandidate: 'Velagapudi Ramakrishna Babu',
       margin: '+12.8% (6,092 Votes)',
       parliament: 'Visakhapatnam Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Velagapudi Ramakrishna Babu (Sitting MLA)', symbol: '🚲', voteShare: 51.4, votes: 24466, color: '#EAB308', trend: '+4.2%' },
+        { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Velagapudi Ramakrishna Babu (Sitting MLA)', symbol: '🚲', voteShare: 51.4, votes: 24466, color: '#EAB308', trend: '+4.2%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'MVV Satyanarayana', symbol: '🪭', voteShare: 38.6, votes: 18374, color: '#0EA5E9', trend: '-2.8%' },
-        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Vizag North Alliance Team', symbol: '🍵', voteShare: 5.2, votes: 2475, color: '#DC2626', trend: '+1.8%' },
-        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Vizag City President', symbol: '🪷', voteShare: 2.4, votes: 1142, color: '#FF6F00', trend: '+0.6%' },
+        { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Vizag North Alliance Team', symbol: '🍵', voteShare: 5.2, votes: 2475, color: '#DC2626', trend: '+1.8%' },
+        { id: 'bjp', name: 'BJP (కూటమి / Kutami)', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', isKutami: true, candidate: 'Vizag City President', symbol: '🪷', voteShare: 2.4, votes: 1142, color: '#FF6F00', trend: '+0.6%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'Steel Plant Forum / INC', symbol: '✋', voteShare: 1.4, votes: 666, color: '#10B981', trend: '-0.4%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Save Vizag Steel Forum', symbol: '🌾', voteShare: 0.6, votes: 286, color: '#BE123C', trend: '+0.2%' },
         { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Vizag Bahujan Nominee', symbol: '🐘', voteShare: 0.4, votes: 190, color: '#1D4ED8', trend: '0.0%' },
@@ -480,15 +480,15 @@ export default function NowNineAdminDashboard({
       totalVotes: 38900,
       turnoutRate: '81.4%',
       verifiedRate: '99.7%',
-      leadingParty: 'TDP / NDA Alliance',
+      leadingParty: 'TDP (కూటమి / Kutami)',
       leadingCandidate: 'Arani Srinivasulu',
       margin: '+8.6% (3,345 Votes)',
       parliament: 'Tirupati Lok Sabha',
       parties: [
-        { id: 'tdp', name: 'TDP (NDA Alliance)', telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Arani Srinivasulu (Sitting MLA)', symbol: '🚲', voteShare: 50.8, votes: 19761, color: '#EAB308', trend: '+3.5%' },
+        { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Arani Srinivasulu (Sitting MLA)', symbol: '🚲', voteShare: 50.8, votes: 19761, color: '#EAB308', trend: '+3.5%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Bhumana Abhinay Reddy', symbol: '🪭', voteShare: 42.2, votes: 16416, color: '#0EA5E9', trend: '-2.4%' },
-        { id: 'jsp', name: 'JanaSena (JSP)', telugu: 'జనసేన పార్టీ (కూటమి)', candidate: 'Tirupati Urban Incharge', symbol: '🍵', voteShare: 4.2, votes: 1634, color: '#DC2626', trend: '+1.2%' },
-        { id: 'bjp', name: 'BJP', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', candidate: 'Temple City Leader', symbol: '🪷', voteShare: 1.6, votes: 622, color: '#FF6F00', trend: '+0.3%' },
+        { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Tirupati Urban Incharge', symbol: '🍵', voteShare: 4.2, votes: 1634, color: '#DC2626', trend: '+1.2%' },
+        { id: 'bjp', name: 'BJP (కూటమి / Kutami)', telugu: 'భారతీయ జనతా పార్టీ (కూటమి)', isKutami: true, candidate: 'Temple City Leader', symbol: '🪷', voteShare: 1.6, votes: 622, color: '#FF6F00', trend: '+0.3%' },
         { id: 'inc', name: 'Congress (INC)', telugu: 'కాంగ్రెస్', candidate: 'City Incharge', symbol: '✋', voteShare: 0.6, votes: 233, color: '#10B981', trend: '-0.2%' },
         { id: 'cpi', name: 'CPI / Left Front', telugu: 'సీపీఐ / వామపక్షాలు', candidate: 'Pilgrim Workers Union', symbol: '🌾', voteShare: 0.6, votes: 233, color: '#BE123C', trend: '+0.1%' },
         { id: 'bsp', name: 'BSP', telugu: 'బహుజన్ సమాజ్ పార్టీ', candidate: 'Bahujan Nominee', symbol: '🐘', voteShare: 0.5, votes: 194, color: '#1D4ED8', trend: '0.0%' },
@@ -1357,9 +1357,16 @@ export default function NowNineAdminDashboard({
                             </span>
                             <span className="text-xl shrink-0">{party.symbol}</span>
                             <div className="min-w-0 truncate">
-                              <span className="font-extrabold text-white text-xs sm:text-sm block truncate">
-                                {party.name}
-                              </span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-extrabold text-white text-xs sm:text-sm block truncate">
+                                  {party.name}
+                                </span>
+                                {(party.isKutami || party.name?.includes('కూటమి') || party.telugu?.includes('కూటమి')) && (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                                    కూటమి (Kutami)
+                                  </span>
+                                )}
+                              </div>
                               <span className="text-[10px] text-gray-400 truncate block">
                                 {party.candidate}
                               </span>
@@ -1724,9 +1731,14 @@ export default function NowNineAdminDashboard({
                       {c.parties.map(p => (
                         <div key={p.id} className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-white flex items-center gap-1.5">
+                            <span className="font-bold text-white flex items-center gap-1.5 flex-wrap">
                               <span>{p.symbol}</span>
                               <span>{p.name}</span>
+                              {(p.isKutami || p.name?.includes('కూటమి') || p.telugu?.includes('కూటమి')) && (
+                                <span className="px-1.5 py-0.2 rounded-full text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                                  కూటమి (Kutami)
+                                </span>
+                              )}
                               <span className="text-[9.5px] text-gray-400 font-normal">({p.candidate})</span>
                             </span>
                             <span className="font-mono font-black" style={{ color: p.color }}>
