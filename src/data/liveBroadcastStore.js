@@ -1,5 +1,6 @@
 // Central Store for Now9 Live Broadcast & Recorded Sessions
 // Connects Admin Studio <-> Citizen Website in real-time
+import { publishCloudEvent, subscribeCloudEvents } from './cloudSyncService';
 
 export const NOW9_ACTIVE_BROADCAST_KEY = 'now9_active_broadcast_v1';
 export const NOW9_RECORDED_BROADCASTS_KEY = 'now9_recorded_broadcasts_v1';
@@ -84,7 +85,8 @@ export function startLiveBroadcast({ title, host = 'Now9 Prime Editor', constitu
     isGlobal: true,
     startedAt: Date.now(),
     viewers: 14280,
-    thumbnail: '/assets/news_debate_studio.jpg'
+    thumbnail: '/assets/news_debate_studio.jpg',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
   };
 
   try {
@@ -92,6 +94,8 @@ export function startLiveBroadcast({ title, host = 'Now9 Prime Editor', constitu
     window.dispatchEvent(new CustomEvent(BROADCAST_EVENT, { 
       detail: { type: 'started', activeBroadcast: activeData } 
     }));
+    // Broadcast instantly to all mobile devices and citizen browsers worldwide
+    publishCloudEvent('LIVE_BROADCAST_CHANGED', { activeBroadcast: activeData });
   } catch (e) {}
 
   return activeData;
@@ -137,6 +141,8 @@ export function endLiveBroadcast() {
     window.dispatchEvent(new CustomEvent(BROADCAST_EVENT, { 
       detail: { type: 'ended', activeBroadcast: inactive, newRecorded } 
     }));
+    // Notify all phones that live ended
+    publishCloudEvent('LIVE_BROADCAST_CHANGED', { activeBroadcast: inactive, newRecorded });
   } catch (e) {}
 
   return newRecorded;
@@ -188,8 +194,30 @@ export function subscribeBroadcast(callback) {
   window.addEventListener(BROADCAST_EVENT, handler);
   window.addEventListener('storage', handler);
 
+  // Cross-device cloud sync: update automatically when admin goes live on another device
+  const unsubCloud = subscribeCloudEvents((data) => {
+    if (data.type === 'LIVE_BROADCAST_CHANGED' && data.payload) {
+      if (data.payload.activeBroadcast) {
+        try {
+          localStorage.setItem(NOW9_ACTIVE_BROADCAST_KEY, JSON.stringify(data.payload.activeBroadcast));
+        } catch (e) {}
+      }
+      if (data.payload.newRecorded) {
+        try {
+          const existing = getRecordedSessions();
+          localStorage.setItem(NOW9_RECORDED_BROADCASTS_KEY, JSON.stringify([data.payload.newRecorded, ...existing]));
+        } catch (e) {}
+      }
+      callback({
+        activeBroadcast: data.payload.activeBroadcast || getActiveBroadcast(),
+        recordedSessions: getRecordedSessions()
+      });
+    }
+  });
+
   return () => {
     window.removeEventListener(BROADCAST_EVENT, handler);
     window.removeEventListener('storage', handler);
+    if (unsubCloud) unsubCloud();
   };
 }

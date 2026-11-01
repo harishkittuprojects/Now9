@@ -2599,8 +2599,8 @@ export default function NowNineAdminDashboard({
         isOpen={isLiveStreamModalOpen}
         onClose={() => setIsLiveStreamModalOpen(false)}
         presentDistrict={{
-          districtName: activeConstituency?.name || 'Mahabubnagar',
-          stateName: activeConstituency?.state || 'Telangana'
+          districtName: 'Global Live (All Constituencies)',
+          stateName: 'All AP & Telangana'
         }}
         initialMode={liveStreamModalMode}
       />

@@ -24,7 +24,8 @@ import {
   Square,
   ShieldCheck,
   TrendingUp,
-  Sliders
+  Sliders,
+  Globe
 } from 'lucide-react';
 import { startLiveBroadcast, endLiveBroadcast, getActiveBroadcast } from '../data/liveBroadcastStore';
 
@@ -40,10 +41,10 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
   const [cameraError, setCameraError] = useState(null);
 
   // Live Stream Details
-  const districtName = presentDistrict?.districtName || 'Nagarkurnool';
-  const stateName = presentDistrict?.stateName || 'Telangana';
-  const [streamTitle, setStreamTitle] = useState(`${districtName} Live Townhall & Civic Discussion`);
-  const [streamCategory, setStreamCategory] = useState('Common Talks');
+  const districtName = presentDistrict?.districtName || 'Global Live (All Constituencies)';
+  const stateName = presentDistrict?.stateName || 'All AP & Telangana';
+  const [streamTitle, setStreamTitle] = useState('Now 9 Live: 2026 ఎన్నికలు - ప్రజా తీర్పు & లైవ్ చర్చ');
+  const [streamCategory, setStreamCategory] = useState('Global Live Broadcast');
   
   // Stats
   const [viewerCount, setViewerCount] = useState(1480);
@@ -51,9 +52,9 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
 
   // Interactive Live Chat
   const [chatMessages, setChatMessages] = useState([
-    { id: 1, user: 'Suresh V.', district: districtName, text: 'Hello everyone! Glad Now 9 started live streaming for our district.', time: '1 min ago', isHost: false },
-    { id: 2, user: 'Now 9 Moderator', district: 'Platform', text: 'Welcome to Now 9 Live Stream. Keep comments respectful and civic-minded.', time: 'Just now', isHost: true },
-    { id: 3, user: 'Priya K.', district: 'Hyderabad', text: 'Watching live! What are the key priorities discussed today?', time: 'Just now', isHost: false },
+    { id: 1, user: 'Suresh V.', district: 'Visakhapatnam', text: 'Watching live! Glad Now 9 started global live streaming across AP & Telangana.', time: '1 min ago', isHost: false },
+    { id: 2, user: 'Now 9 Moderator', district: 'Platform', text: 'Welcome to Now 9 Live Stream. Visible to all citizens across Andhra Pradesh & Telangana.', time: 'Just now', isHost: true },
+    { id: 3, user: 'Priya K.', district: 'Hyderabad', text: 'High quality debate! What are the key priorities discussed today?', time: 'Just now', isHost: false },
   ]);
   const [chatInput, setChatInput] = useState('');
 
@@ -197,9 +198,9 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
             </div>
 
             <div className="hidden sm:flex items-center gap-2 text-xs text-slate-300">
-              <span className="bg-slate-800 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-400" />
-                {districtName} ({stateName})
+              <span className="bg-slate-800 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1.5 text-emerald-400">
+                <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                <span>🌐 All Users (Global Live Broadcast - AP & TS)</span>
               </span>
               <span className="bg-slate-800 px-2.5 py-1 rounded-lg font-medium text-brand-400">
                 {streamCategory}
@@ -253,8 +254,8 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
             {/* Live Stream Viewport */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60 pointer-events-none z-10"></div>
 
-            {/* Video element or simulated feed */}
-            {streamMode === 'conduct' && isCameraOn ? (
+            {/* Video element or active studio feed */}
+            {streamMode === 'conduct' && isCameraOn && mediaStreamRef.current ? (
               <video
                 ref={videoRef}
                 autoPlay
@@ -263,32 +264,15 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
                 className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (
-              /* Simulated Studio Visualizer Feed */
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-brand-950/40 flex flex-col items-center justify-start pt-16 sm:pt-20 px-6 text-center z-0">
-                <div className="relative mb-3 sm:mb-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-brand-500/20 border-2 border-brand-500/40 flex items-center justify-center animate-pulse shadow-lg shadow-brand-500/20">
-                    <Radio className="w-8 h-8 sm:w-10 sm:h-10 text-brand-400" />
-                  </div>
-                  <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center text-[9px] font-bold">
-                    ✓
-                  </span>
-                </div>
-
-                <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight mb-1 drop-shadow-md">
-                  Now 9 Live Civic Broadcast
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-400 max-w-sm sm:max-w-md leading-relaxed">
-                  {streamMode === 'conduct'
-                    ? 'Previewing virtual broadcast studio. Click "Start Live Stream" below to go on-air.'
-                    : `Streaming real-time citizen debate and civic townhall from ${districtName}.`}
-                </p>
-
-                {cameraError && (
-                  <span className="mt-2 text-[11px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-0.5 rounded-full">
-                    {cameraError}
-                  </span>
-                )}
-              </div>
+              /* Active High-Def Studio Live Video Feed */
+              <video
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                autoPlay
+                playsInline
+                loop
+                muted={!isMicOn}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             )}
 
             {/* Top Video Overlay: Title & Live Badges */}

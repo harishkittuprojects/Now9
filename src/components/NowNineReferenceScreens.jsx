@@ -3220,9 +3220,17 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
   const [isQueueJoined, setIsQueueJoined] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
+  const [liveState, setLiveState] = useState(() => getActiveBroadcast());
   const selectedDebate = getSelectedDebate();
-  const activeBroadcast = getActiveBroadcast();
-  const debate = selectedDebate || (activeBroadcast?.isLive ? activeBroadcast : {
+
+  useEffect(() => {
+    const unsub = subscribeBroadcast(({ activeBroadcast: ab }) => {
+      if (ab) setLiveState(ab);
+    });
+    return unsub;
+  }, []);
+
+  const debate = (liveState?.isLive ? liveState : selectedDebate) || {
     title: '2026 ఎన్నికలు : ఎవరికి అవకాశాలు?',
     host: 'Senior Political Editor',
     time: 'Today, 07:30 PM',
@@ -3231,10 +3239,10 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
     duration: '28:40',
     views: '14.8K views',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-  });
+  };
 
-  const isLive = debate.isLive;
-  const isRecorded = debate.isRecorded || !isLive;
+  const isLive = !!(liveState?.isLive || debate.isLive);
+  const isRecorded = !isLive;
 
   const emojis = ['👍', '❤️', '👏', '🔥', '🇮🇳', '🗳️', '📢'];
 
@@ -3353,55 +3361,39 @@ export function Screen9LiveDebateDetail({ onBack, onNavigate = null }) {
       {/* Content Area */}
       <div className="flex-1 min-h-0 overflow-y-auto phone-scroll touch-pan-y pb-2">
         {/* Video Player */}
-        <div className="relative w-full h-36 bg-black overflow-hidden shrink-0 group">
-          {isRecorded && debate.videoUrl ? (
-            <video
-              src={debate.videoUrl}
-              controls
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <>
-              <img 
-                src={debate.thumbnail || debate.img || "/assets/news_debate_studio.jpg"} 
-                alt="Live Debate Broadcast" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
-                <span className="px-1.5 py-0.5 rounded bg-red-600 text-white text-[8px] font-extrabold flex items-center gap-1 shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                  LIVE NOW
-                </span>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setIsMuted(!isMuted)}
-                    className="p-1 rounded bg-black/60 text-white hover:text-amber-400 cursor-pointer"
-                    title="Mute/Unmute"
-                  >
-                    {isMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3" />}
-                  </button>
-                  <span className="px-1.5 py-0.5 rounded bg-black/60 text-white text-[8px] font-semibold flex items-center gap-0.5">
-                    <Eye className="w-2.5 h-2.5 text-red-400" />
-                    {debate.views || '14.2K'}
-                  </span>
-                </div>
-              </div>
+        <div className="relative w-full h-40 bg-black overflow-hidden shrink-0 group">
+          <video
+            src={debate.videoUrl || liveState?.videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}
+            controls={!isLive}
+            autoPlay
+            playsInline
+            loop={isLive}
+            muted={isMuted}
+            className="w-full h-full object-cover"
+          />
 
-              {/* Play/Pause Control Overlay */}
-              <div 
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/20 hover:bg-black/40 transition-colors"
-              >
-                {!isPlaying && (
-                  <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg">
-                    <Play className="w-5 h-5 fill-current ml-0.5" />
-                  </div>
-                )}
+          {/* Real-time Live Broadcast Overlay */}
+          {isLive && (
+            <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+              <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[8.5px] font-black uppercase flex items-center gap-1.5 shadow-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                <span>LIVE NOW ON AIR</span>
+              </span>
+              <div className="flex items-center gap-1 pointer-events-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsMuted(!isMuted)}
+                  className="p-1 rounded bg-black/70 backdrop-blur-xs text-white hover:text-amber-400 cursor-pointer shadow-sm"
+                  title="Mute/Unmute"
+                >
+                  {isMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3 text-emerald-400" />}
+                </button>
+                <span className="px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-xs text-white text-[8px] font-semibold flex items-center gap-0.5">
+                  <Eye className="w-2.5 h-2.5 text-red-400" />
+                  <span>{debate.views || '14.8K'}</span>
+                </span>
               </div>
-            </>
+            </div>
           )}
         </div>
 
