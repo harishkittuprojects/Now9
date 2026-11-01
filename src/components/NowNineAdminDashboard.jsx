@@ -1331,29 +1331,6 @@ export default function NowNineAdminDashboard({
                       <Newspaper className="w-4 h-4" />
                       <span>Add News</span>
                     </button>
-
-                    {/* Add Video (Bright Yellow Button) */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setLiveStreamModalMode('conduct');
-                        setIsLiveStreamModalOpen(true);
-                      }}
-                      className="w-full py-3.5 px-4 rounded-xl bg-[#F9C942] hover:bg-[#F5C754] text-black font-extrabold text-sm flex items-center justify-center gap-2.5 transition shadow-sm cursor-pointer active:scale-98"
-                    >
-                      <Play className="w-4 h-4 fill-current" />
-                      <span>Add Video</span>
-                    </button>
-
-                    {/* Create Poll */}
-                    <button
-                      type="button"
-                      onClick={() => setIsAddQuestionModalOpen(true)}
-                      className="w-full py-3.5 px-4 rounded-xl bg-[#18191E] text-white hover:bg-black font-bold text-sm flex items-center justify-center gap-2.5 transition shadow-xs cursor-pointer active:scale-98"
-                    >
-                      <BarChart3 className="w-4 h-4" />
-                      <span>Create Poll</span>
-                    </button>
                   </div>
                 </div>
 
