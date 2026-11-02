@@ -971,7 +971,7 @@ export default function NowNineAdminDashboard({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('📥 Official CSV Report downloaded successfully (8 Assemblies, 32 Candidates)');
+    showToast('📥 Official CSV Report downloaded successfully (8 Assemblies, All Parties)');
   };
 
   // Filtered constituencies list based on region and search query
@@ -1306,7 +1306,7 @@ export default function NowNineAdminDashboard({
                             Public Meeting Highlights
                           </h3>
                           <span className="text-[11px] text-gray-400 block mt-0.5">
-                            Candidate Debate & Election Public Forum
+                            Live Debate & Election Public Forum
                           </span>
                         </div>
                       </div>
@@ -1477,9 +1477,6 @@ export default function NowNineAdminDashboard({
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-gray-500 truncate block">
-                              {party.candidate}
-                            </span>
                           </div>
                         </div>
 
@@ -1675,7 +1672,7 @@ export default function NowNineAdminDashboard({
                     <span>Live Constituency Standings & Vote Shares</span>
                   </h2>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    Select any constituency to inspect candidate-level vote counts, percentage shares, and trends
+                    Select any constituency to inspect party-level vote counts, percentage shares, and trends
                   </p>
                 </div>
 
@@ -1750,7 +1747,6 @@ export default function NowNineAdminDashboard({
                                   కూటమి (Kutami)
                                 </span>
                               )}
-                              <span className="text-[9.5px] text-gray-400 font-normal">({p.candidate})</span>
                             </span>
                             <span className="font-mono font-black" style={{ color: p.color }}>
                               {p.voteShare}%

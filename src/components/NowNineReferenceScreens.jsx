@@ -1171,9 +1171,11 @@ export function Screen2Home({
                       {party.name}
                     </h3>
 
-                    <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1">
-                      {party.candidate || `${party.name} Candidate`}
-                    </p>
+                    {party.telugu && (
+                      <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1 font-telugu">
+                        {party.telugu}
+                      </p>
+                    )}
 
                     <div className="mt-2 flex items-center justify-center gap-1 max-w-full">
                       <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 flex items-center gap-1 max-w-full truncate">
@@ -1237,7 +1239,7 @@ export function Screen2Home({
                   </h3>
                 </div>
                 <span className="text-[9px] text-gray-300 block mb-2 mt-0.5 leading-tight">
-                  Vote for your local candidate & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
+                  Vote for your preferred political party & rate governance in <strong className="text-amber-300">{currentLocation?.locality || 'Your Area'}</strong>.
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
@@ -1546,13 +1548,13 @@ export function Screen3Survey({
     recordCustomerActivity({
       type: 'survey',
       title: 'Survey Party Selected',
-      detail: `Citizen picked "${party.name}" (${party.candidate}) for governance survey in ${constituencyLabel}`,
+      detail: `Citizen picked "${party.name}" for governance survey in ${constituencyLabel}`,
       location: constituencyLabel,
       icon: '🗳️',
       badgeColor: 'emerald',
       badgeText: 'Party Choice'
     });
-    showToast(`🎉 ${party.name} (${party.candidate}) ఎంపిక చేయబడింది!`);
+    showToast(`🎉 ${party.name} ఎంపిక చేయబడింది!`);
     setTimeout(() => {
       setActiveTab('questions');
     }, 450);
@@ -1635,7 +1637,7 @@ export function Screen3Survey({
               {isSubmitted || activeTab === 'submitted'
                 ? 'ఓటు నమోదైంది (Vote Submitted)' 
                 : activeTab === 'parties'
-                  ? 'Local Parties & Candidates'
+                  ? 'Local Political Parties'
                   : chosenParty 
                     ? `Vote Survey • ${chosenParty.name}` 
                     : 'Political Survey'}
@@ -1646,7 +1648,7 @@ export function Screen3Survey({
                 : activeTab === 'parties'
                   ? `${loc?.locality || 'Your Area'} • ${loc?.assembly || 'Assembly'}`
                   : chosenParty 
-                    ? `${chosenParty.candidate || loc?.locality} • Question ${currentStep + 1} of 5` 
+                    ? `${chosenParty.name} • Question ${currentStep + 1} of 5` 
                     : `Question ${currentStep + 1} of 5 • Your Opinion Matters`}
             </p>
           </div>
@@ -1689,7 +1691,7 @@ export function Screen3Survey({
               if (chosenParty) {
                 setActiveTab('questions');
               } else {
-                showToast('⚠️ Pick a party or candidate first');
+                showToast('⚠️ Pick a party first');
               }
             }}
             className={`flex-1 py-1.5 px-2 rounded-lg text-[9px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
@@ -1705,7 +1707,7 @@ export function Screen3Survey({
       )}
 
       {/* Main Body */}
-      {/* VIEW 1: POLITICAL PARTIES & LOCAL CANDIDATES */}
+      {/* VIEW 1: POLITICAL PARTIES */}
       {activeTab === 'parties' && (
         <div className="flex-1 min-h-0 px-3 py-2.5 overflow-y-auto phone-scroll touch-pan-y space-y-3 pb-6">
           <div className="rounded-2xl p-3 bg-gradient-to-b from-[#181822] via-[#14141A] to-[#0D0D12] border border-amber-500/35 shadow-xl space-y-2 relative overflow-hidden">
@@ -1720,7 +1722,7 @@ export function Screen3Survey({
                   <span className="text-amber-400 font-bold text-[9px]">({loc?.locality || 'Your Area'})</span>
                 </h3>
                 <p className="text-[8px] text-gray-400">
-                  MLA Candidates & citizen approval in {loc?.assembly || 'Constituency'}
+                  Political parties & citizen approval in {loc?.assembly || 'Constituency'}
                 </p>
               </div>
               <button
@@ -1745,7 +1747,7 @@ export function Screen3Survey({
                     </span>
                   </h3>
                   <p className="text-[8px] text-gray-400">
-                    Contesting MLA candidates • Tap one party to vote & evaluate
+                    Contesting political parties • Tap one party to vote & evaluate
                   </p>
                 </div>
                 <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-mono">
@@ -1796,10 +1798,11 @@ export function Screen3Survey({
                         {party.name}
                       </h3>
 
-                      {/* Candidate Name */}
-                      <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1">
-                        {party.candidate || `${party.name} Candidate`}
-                      </p>
+                      {party.telugu && (
+                        <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal line-clamp-1 font-telugu">
+                          {party.telugu}
+                        </p>
+                      )}
 
                       <div className="mt-2 flex items-center justify-center gap-1 max-w-full">
                         <span className="text-[8.5px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 flex items-center gap-1 max-w-full truncate">
@@ -1839,17 +1842,17 @@ export function Screen3Survey({
       {activeTab === 'questions' && !isSubmitted && (
         <div className="flex-1 min-h-0 px-3 py-3 overflow-y-auto phone-scroll touch-pan-y flex flex-col justify-between pb-4">
           <div>
-            {/* If a candidate is chosen, show candidate badge with option to change */}
+            {/* If a party is chosen, show party badge with option to change */}
             {chosenParty ? (
               <div className="mb-2.5 p-2 rounded-xl bg-amber-500/10 border border-amber-400/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-base">{chosenParty.symbol || '🗳️'}</span>
                   <div>
                     <span className="text-[9.5px] font-bold text-white block leading-tight">
-                      Evaluating: {chosenParty.name}
+                      Selected: {chosenParty.name}
                     </span>
-                    <span className="text-[7.5px] text-amber-300 block">
-                      Candidate: {chosenParty.candidate || loc?.locality}
+                    <span className="text-[7.5px] text-amber-300 block font-telugu">
+                      {chosenParty.telugu || loc?.locality}
                     </span>
                   </div>
                 </div>
@@ -1864,14 +1867,14 @@ export function Screen3Survey({
             ) : (
               <div className="mb-2.5 p-2 rounded-xl bg-[#14141A] border border-[#23232C] flex items-center justify-between">
                 <span className="text-[8.5px] text-gray-300">
-                  🏛️ Haven't picked a candidate yet?
+                  🏛️ Haven't picked a party yet?
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveTab('parties')}
                   className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[8px] font-bold hover:bg-amber-400/30 transition-colors cursor-pointer"
                 >
-                  Pick Candidate
+                  Pick Party
                 </button>
               </div>
             )}
@@ -1979,7 +1982,7 @@ export function Screen3Survey({
             </p>
             <p className="text-[9px] text-gray-400 mt-1 leading-relaxed">
               {chosenParty 
-                ? `Your anonymous vote for ${chosenParty.name} (${chosenParty.candidate || loc?.locality}) has been recorded.` 
+                ? `Your anonymous vote for ${chosenParty.name} has been recorded.` 
                 : "Your anonymous opinion has been securely added to the 2026 People's Pulse."}
             </p>
 
@@ -1990,7 +1993,7 @@ export function Screen3Survey({
                   <span className="text-xl">{chosenParty.symbol || '🗳️'}</span>
                   <div>
                     <h4 className="text-[11px] font-black text-white leading-tight">{chosenParty.name}</h4>
-                    <p className="text-[8px] text-gray-400">{chosenParty.candidate} • {loc?.locality || 'Local'}</p>
+                    <p className="text-[8px] text-gray-400 font-telugu">{chosenParty.telugu || loc?.locality || 'Local'}</p>
                   </div>
                 </div>
                 <span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
