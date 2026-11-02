@@ -40,8 +40,19 @@ import {
   RotateCcw,
   Mic,
   MicOff,
-  Newspaper
+  Newspaper,
+  Camera,
+  Upload,
+  MoreHorizontal
 } from 'lucide-react';
+import InstagramVideoUploadModal from './InstagramVideoUploadModal';
+import { 
+  getCommonTalksVideos, 
+  uploadCommonTalksVideo, 
+  likeCommonTalksVideo, 
+  addCommentToCommonTalksVideo, 
+  subscribeCommonTalksVideos 
+} from '../data/commonTalksStore';
 import { 
   SURVEY_DATA, 
   TRENDING_NOW, 
@@ -1304,20 +1315,23 @@ export function Screen2Home({
                 </p>
               </button>
 
-              {/* Tile 3: Common People */}
+              {/* Tile 3: Common Talks & People */}
               <button 
                 type="button"
                 onClick={() => onNavigate('common-people')}
-                className="p-3.5 sm:p-4 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40"
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#0C1421] border border-[#1B2A41] hover:border-[#F5C754]/60 cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center group active:scale-[0.98] shadow-md shadow-black/40 relative"
               >
-                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner">
+                <div className="w-12 h-12 rounded-full border-2 border-[#F5C754] flex items-center justify-center text-[#F5C754] mb-2 bg-[#F5C754]/10 group-hover:scale-105 transition-transform shadow-inner relative">
                   <Users className="w-5 h-5 text-[#F5C754]" />
+                  <span className="absolute -top-1 -right-1 px-1 py-0.2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white text-[7px] font-black uppercase tracking-wider">
+                    REELS
+                  </span>
                 </div>
-                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight">
-                  Common People
+                <h3 className="font-black text-[14px] sm:text-[15px] text-white leading-snug tracking-tight flex items-center justify-center gap-1">
+                  <span>Common Talks</span>
                 </h3>
                 <p className="text-[10px] text-slate-300 mt-1 font-medium tracking-normal">
-                  Real Voices • Real Stories
+                  Upload Videos • Real Stories
                 </p>
               </button>
 
@@ -2387,47 +2401,14 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
         </div>
       )}
 
-      {/* Upload Modal */}
-      {isUploadOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
-          <div className="w-full bg-[#14141A] border border-[#2B2B38] rounded-2xl p-4 shadow-2xl space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-[#22222E]">
-              <div className="flex items-center gap-1.5">
-                <Video className="w-4 h-4 text-amber-400" />
-                <h3 className="text-xs font-bold text-white">Upload Citizen Short Video</h3>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setIsUploadOpen(false)}
-                className="p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <p className="text-[10px] text-gray-300">
-              Share 60-second video of your local issues, opinions, or village events.
-            </p>
-
-            <div className="p-4 rounded-xl border border-dashed border-amber-400/40 bg-[#181822] text-center flex flex-col items-center justify-center gap-2">
-              <span className="text-2xl">📹</span>
-              <span className="text-[10px] font-bold text-white">Select Video from Phone</span>
-              <span className="text-[8px] text-gray-400">MP4, MOV (Max 60s, up to 50MB)</span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setIsUploadOpen(false);
-                showToast('🚀 Video uploaded! Under editorial review.');
-              }}
-              className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs shadow-md cursor-pointer hover:brightness-110"
-            >
-              Publish to NowNine Feed
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Instagram-style Video Upload Modal */}
+      <InstagramVideoUploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        onVideoUploaded={() => {
+          showToast('🎉 Video published to Common Talks & Shorts feed!');
+        }}
+      />
 
       {/* Header */}
       <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
@@ -2554,25 +2535,103 @@ export function Screen5ShortVideos({ onBack, onSelectShort, onNavigate }) {
   );
 }
 
-// 6. SCREEN 6: COMMON PEOPLE SCREEN (Real Voices • Real Stories)
-export function Screen6CommonPeople({ onBack, onNavigate, onSelectStory = null }) {
+// 6. SCREEN 6: COMMON PEOPLE SCREEN (Common Talks • Instagram-Style Citizen Video Feed & Reels)
+export function Screen6CommonPeople({ onBack, onNavigate, onSelectStory = null, currentLocation = null }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [toastMessage, setToastMessage] = useState(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [videos, setVideos] = useState(() => getCommonTalksVideos());
+  const [playingVideoId, setPlayingVideoId] = useState(null);
+  const [mutedVideos, setMutedVideos] = useState({});
+  const [activeCommentVideo, setActiveCommentVideo] = useState(null);
+  const [commentInput, setCommentInput] = useState('');
+  const [savedVideoIds, setSavedVideoIds] = useState(new Set());
+
+  useEffect(() => {
+    const unsub = subscribeCommonTalksVideos((updated) => {
+      setVideos(updated);
+    });
+    return unsub;
+  }, []);
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
   };
 
-  const categories = ['All', 'Farmers', 'Students', 'Women', 'Workers'];
+  const categories = [
+    { id: 'All', label: 'All Talks' },
+    { id: 'Farmers', label: '🌾 Farmers' },
+    { id: 'Students', label: '🎓 Students' },
+    { id: 'Women', label: '👩 Women' },
+    { id: 'Civic', label: '🏙️ Civic' },
+    { id: 'Workers', label: '💼 Work & Life' }
+  ];
 
-  const filteredStories = COMMON_PEOPLE_STORIES.filter(s => {
+  const storiesRings = [
+    { id: 'upload', name: 'Your Reel', icon: '+', isUpload: true },
+    { id: 'Farmers', name: 'Farmers', icon: '🌾', category: 'Farmers' },
+    { id: 'Students', name: 'Students', icon: '🎓', category: 'Students' },
+    { id: 'Women', name: 'Women', icon: '👩', category: 'Women' },
+    { id: 'Civic', name: 'Civic', icon: '🏙️', category: 'Civic' },
+    { id: 'Workers', name: 'Life', icon: '💼', category: 'Workers' }
+  ];
+
+  const filteredVideos = videos.filter(v => {
     if (activeFilter === 'All') return true;
-    if (activeFilter === 'Farmers') return s.role.toLowerCase().includes('farmer');
-    if (activeFilter === 'Students') return s.role.toLowerCase().includes('student');
-    if (activeFilter === 'Women') return s.role.toLowerCase().includes('housewife') || s.role.toLowerCase().includes('women');
+    if (activeFilter === 'Farmers') return v.category === 'Farmers' || v.role?.toLowerCase().includes('farmer');
+    if (activeFilter === 'Students') return v.category === 'Students' || v.role?.toLowerCase().includes('student');
+    if (activeFilter === 'Women') return v.category === 'Women' || v.role?.toLowerCase().includes('women') || v.role?.toLowerCase().includes('housewife');
+    if (activeFilter === 'Civic') return v.category === 'Civic' || v.role?.toLowerCase().includes('civic');
+    if (activeFilter === 'Workers') return v.category === 'Workers' || v.role?.toLowerCase().includes('worker');
     return true;
   });
+
+  const handleLike = (e, videoId) => {
+    e.stopPropagation();
+    likeCommonTalksVideo(videoId);
+    showToast('❤️ Liked reel!');
+  };
+
+  const handleSave = (e, videoId) => {
+    e.stopPropagation();
+    setSavedVideoIds(prev => {
+      const next = new Set(prev);
+      if (next.has(videoId)) {
+        next.delete(videoId);
+        showToast('Removed from Saved Collection');
+      } else {
+        next.add(videoId);
+        showToast('Saved to Collection 🔖');
+      }
+      return next;
+    });
+  };
+
+  const handleShare = (e, video) => {
+    e.stopPropagation();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(`${window.location.origin}/#common-talks-${video.id}`).catch(() => {});
+    }
+    showToast('Reel link copied to clipboard! 📋');
+  };
+
+  const handleTogglePlay = (videoId) => {
+    setPlayingVideoId(prev => prev === videoId ? null : videoId);
+  };
+
+  const handleToggleMute = (e, videoId) => {
+    e.stopPropagation();
+    setMutedVideos(prev => ({ ...prev, [videoId]: !prev[videoId] }));
+  };
+
+  const handleAddComment = (e) => {
+    e.preventDefault();
+    if (!commentInput.trim() || !activeCommentVideo) return;
+    addCommentToCommonTalksVideo(activeCommentVideo.id, commentInput, 'You');
+    setCommentInput('');
+    showToast('Comment posted! 💬');
+  };
 
   return (
     <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#0A0A0D] text-white min-h-0">
@@ -2585,8 +2644,8 @@ export function Screen6CommonPeople({ onBack, onNavigate, onSelectStory = null }
         </div>
       )}
 
-      {/* Header */}
-      <div className="px-3 py-2 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
+      {/* Instagram-style Top Header */}
+      <div className="px-3 py-2.5 flex items-center justify-between border-b border-[#1C1C22] bg-[#0E0E12] shrink-0">
         <div className="flex items-center gap-2">
           <button 
             type="button" 
@@ -2597,99 +2656,331 @@ export function Screen6CommonPeople({ onBack, onNavigate, onSelectStory = null }
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div>
-            <h2 className="text-xs font-extrabold text-white leading-tight">Common People</h2>
-            <p className="text-[8px] text-gray-400 leading-none mt-0.5">Real Voices • Real Stories</p>
+            <h2 className="text-xs font-black text-white leading-tight flex items-center gap-1.5">
+              <span>Common Talks</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-[7px] font-black uppercase text-white">REELS</span>
+            </h2>
+            <p className="text-[8px] text-gray-400 leading-none mt-0.5">కామన్ టాక్స్ • Citizen Video Opinions</p>
           </div>
         </div>
 
+        {/* Instagram Upload Video Button */}
         <button
           type="button"
-          onClick={() => {
-            showToast('🎙️ Microphone ready: Share your local story!');
-          }}
-          className="px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black text-[8px] font-extrabold flex items-center gap-1 cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-xs"
+          onClick={() => setIsUploadModalOpen(true)}
+          className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white text-[9px] font-black flex items-center gap-1.5 cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-md shadow-rose-500/20"
         >
-          <Mic className="w-2.5 h-2.5" />
-          <span>Record Voice</span>
+          <Camera className="w-3 h-3 text-white" />
+          <span>Upload Video</span>
         </button>
       </div>
 
-      {/* Categories Filter Pills */}
-      <div className="px-3 py-2 border-b border-[#1A1A22] bg-[#0A0A0D] flex items-center gap-1.5 overflow-x-auto phone-scroll shrink-0">
-        {categories.map((cat) => (
+      {/* Instagram Stories Carousel at Top */}
+      <div className="px-3 py-2 bg-[#0C0C10] border-b border-[#181820] flex items-center gap-3 overflow-x-auto phone-scroll shrink-0">
+        {storiesRings.map((story) => (
           <button
-            key={cat}
+            key={story.id}
             type="button"
-            onClick={() => setActiveFilter(cat)}
-            className={`px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
-              activeFilter === cat
-                ? 'bg-[#F5C754] text-black font-extrabold shadow-xs'
-                : 'bg-[#16161D] text-gray-400 border border-[#23232C] hover:text-white'
-            }`}
+            onClick={() => {
+              if (story.isUpload) {
+                setIsUploadModalOpen(true);
+              } else {
+                setActiveFilter(story.category);
+              }
+            }}
+            className="flex flex-col items-center gap-1 shrink-0 cursor-pointer group active:scale-95 transition-transform"
           >
-            {cat}
+            <div className={`w-12 h-12 rounded-full p-0.5 ${
+              story.isUpload
+                ? 'bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 animate-pulse'
+                : activeFilter === story.category
+                  ? 'bg-gradient-to-tr from-amber-400 to-yellow-500'
+                  : 'bg-[#222230]'
+            }`}>
+              <div className="w-full h-full rounded-full bg-[#121218] flex items-center justify-center text-sm font-bold shadow-inner relative">
+                <span>{story.icon}</span>
+                {story.isUpload && (
+                  <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 border border-[#121218] flex items-center justify-center text-[10px] text-white font-black">
+                    +
+                  </span>
+                )}
+              </div>
+            </div>
+            <span className={`text-[8px] font-semibold truncate max-w-[50px] ${
+              story.isUpload ? 'text-amber-400 font-extrabold' : activeFilter === story.category ? 'text-white' : 'text-gray-400'
+            }`}>
+              {story.name}
+            </span>
           </button>
         ))}
       </div>
 
-      {/* Stories Feed */}
-      <div className="flex-1 min-h-0 px-3 py-2.5 overflow-y-auto phone-scroll touch-pan-y space-y-2.5 pb-6">
-        {filteredStories.map((story) => (
-          <div
-            key={story.id}
-            onClick={() => {
-              recordCustomerActivity({
-                type: 'community',
-                title: 'Common People Story Opened',
-                detail: `Citizen opened voice story: "${story.title}" (${story.name} • ${story.location})`,
-                location: story.location || 'Community Voice',
-                icon: '👥',
-                badgeColor: 'cyan',
-                badgeText: story.role || 'Citizen Voice'
-              });
-              if (onSelectStory) onSelectStory(story);
-              else onNavigate('video-player');
-            }}
-            className="p-2.5 rounded-xl bg-[#121217] border border-[#22222C] hover:border-amber-400/40 cursor-pointer transition-all space-y-2 group"
+      {/* Categories Filter Pills */}
+      <div className="px-3 py-1.5 border-b border-[#1A1A22] bg-[#0A0A0D] flex items-center gap-1.5 overflow-x-auto phone-scroll shrink-0">
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            type="button"
+            onClick={() => setActiveFilter(cat.id)}
+            className={`px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 transition-all cursor-pointer ${
+              activeFilter === cat.id
+                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-extrabold shadow-xs'
+                : 'bg-[#16161D] text-gray-400 border border-[#23232C] hover:text-white'
+            }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-lg p-1 rounded-lg bg-[#181822] border border-[#2A2A36]">
-                  {story.icon}
-                </span>
-                <div>
-                  <h4 className="text-[10px] font-extrabold text-white group-hover:text-amber-300 transition-colors">
-                    {story.role}
-                  </h4>
-                  <span className="text-[8px] text-gray-400 font-mono">
-                    {story.views} Citizen Listens
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Feed Area (Instagram Post / Reel Style) */}
+      <div className="flex-1 min-h-0 px-2 sm:px-3 py-2.5 overflow-y-auto phone-scroll touch-pan-y space-y-4 pb-14">
+        {filteredVideos.map((video) => {
+          const isPlaying = playingVideoId === video.id;
+          const isMuted = mutedVideos[video.id] ?? true;
+          const isSaved = savedVideoIds.has(video.id);
+
+          return (
+            <div
+              key={video.id}
+              className="rounded-2xl overflow-hidden bg-[#121218] border border-[#20202C] shadow-lg transition-all"
+            >
+              {/* Instagram Post Header */}
+              <div className="p-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-8 h-8 rounded-full p-0.5 bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600 shrink-0">
+                    <div className="w-full h-full rounded-full bg-[#121218] flex items-center justify-center font-bold text-xs text-white">
+                      {video.author.charAt(0)}
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1">
+                      <h4 className="text-[11px] font-black text-white truncate">
+                        {video.author}
+                      </h4>
+                      <span className="text-[7.5px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">
+                        {video.role || 'Citizen'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[8px] text-gray-400 truncate">
+                      <MapPin className="w-2.5 h-2.5 text-rose-400 shrink-0" />
+                      <span className="truncate">{video.location}</span>
+                      <span>•</span>
+                      <span>{video.time}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => handleShare(e, video)}
+                  className="p-1 text-gray-400 hover:text-white cursor-pointer"
+                  title="Share"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Instagram Reel Video Player Container */}
+              <div 
+                onClick={() => handleTogglePlay(video.id)}
+                className="relative aspect-[4/3] sm:aspect-video w-full bg-black overflow-hidden cursor-pointer group select-none"
+              >
+                <video
+                  src={video.videoUrl}
+                  autoPlay={isPlaying}
+                  playsInline
+                  loop
+                  muted={isMuted}
+                  poster={video.thumbnail || '/assets/news_debate_studio.jpg'}
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Center Play Indicator when paused */}
+                {!isPlaying && (
+                  <div className="absolute inset-0 bg-black/35 flex items-center justify-center pointer-events-none">
+                    <div className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg border border-white/20">
+                      <Play className="w-5 h-5 fill-current ml-0.5 text-amber-400" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Top Video Overlay: Verified Voice & Audio */}
+                <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+                  <span className="px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[8px] font-bold text-emerald-400 border border-emerald-500/30 flex items-center gap-1 shadow-sm">
+                    <CheckCircle2 className="w-2.5 h-2.5" />
+                    <span>Citizen Voice</span>
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggleMute(e, video.id)}
+                    className="pointer-events-auto p-1 rounded-full bg-black/70 backdrop-blur-md text-white hover:text-amber-400 cursor-pointer shadow-sm border border-white/10"
+                    title={isMuted ? "Unmute" : "Mute"}
+                  >
+                    {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+                  </button>
+                </div>
+
+                {/* Bottom Video Overlay: Duration */}
+                <div className="absolute bottom-2 right-2 pointer-events-none">
+                  <span className="px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-md text-white font-mono text-[8px]">
+                    ⏱ {video.duration || '0:45'}
                   </span>
                 </div>
               </div>
 
-              <span className="text-[8px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 font-bold flex items-center gap-1">
-                <Clock className="w-2.5 h-2.5" />
-                <span>{story.duration}</span>
-              </span>
-            </div>
+              {/* Instagram Action Buttons Bar */}
+              <div className="p-2.5 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {/* Like Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => handleLike(e, video.id)}
+                      className="flex items-center gap-1 cursor-pointer group active:scale-125 transition-transform"
+                    >
+                      <Heart className={`w-5 h-5 ${video.hasUserLiked ? 'text-rose-500 fill-rose-500' : 'text-gray-300 hover:text-rose-400'}`} />
+                    </button>
 
-            <p className="font-telugu text-[11px] font-bold text-gray-200 leading-snug">
-              "{story.title}"
-            </p>
+                    {/* Comment Button */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveCommentVideo(video)}
+                      className="flex items-center gap-1 text-gray-300 hover:text-white cursor-pointer active:scale-110 transition-transform"
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                    </button>
 
-            <div className="flex items-center justify-between pt-0.5">
-              <span className="text-[7.5px] text-emerald-400 flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="w-2.5 h-2.5" />
-                <span>Verified Local Citizen Voice</span>
-              </span>
-              <div className="flex items-center gap-1 text-[8.5px] text-amber-400 font-bold group-hover:translate-x-0.5 transition-transform">
-                <Play className="w-2.5 h-2.5 fill-current" />
-                <span>Listen Now</span>
+                    {/* Share Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => handleShare(e, video)}
+                      className="text-gray-300 hover:text-white cursor-pointer active:scale-110 transition-transform"
+                    >
+                      <Share2 className="w-4.5 h-4.5" />
+                    </button>
+                  </div>
+
+                  {/* Bookmark Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleSave(e, video.id)}
+                    className="cursor-pointer active:scale-110 transition-transform"
+                  >
+                    <Bookmark className={`w-5 h-5 ${isSaved ? 'text-amber-400 fill-amber-400' : 'text-gray-400 hover:text-white'}`} />
+                  </button>
+                </div>
+
+                {/* Likes Count */}
+                <p className="text-[10px] font-black text-white">
+                  ❤️ Liked by {video.likes} citizens
+                </p>
+
+                {/* Caption / Title */}
+                <div className="text-[10px] leading-relaxed">
+                  <span className="font-extrabold text-white mr-1.5">{video.author}</span>
+                  <span className="text-gray-200 font-telugu">{video.caption || video.title}</span>
+                </div>
+
+                {/* Comments Link */}
+                <button
+                  type="button"
+                  onClick={() => setActiveCommentVideo(video)}
+                  className="text-[9px] text-gray-400 hover:text-gray-200 font-medium block pt-0.5 cursor-pointer"
+                >
+                  View all {video.comments?.length || 0} comments • Add your opinion...
+                </button>
               </div>
+
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Floating Upload Action Button (Instagram Reel Style) */}
+      <button
+        type="button"
+        onClick={() => setIsUploadModalOpen(true)}
+        className="absolute bottom-14 right-3 z-30 py-2.5 px-4 rounded-full bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white font-black text-xs shadow-xl shadow-rose-500/30 flex items-center gap-1.5 hover:brightness-110 active:scale-95 transition-all cursor-pointer border border-white/20"
+      >
+        <Camera className="w-4 h-4 text-white" />
+        <span>+ Upload Reel</span>
+      </button>
+
+      {/* Slide-Up Instagram Comment Drawer */}
+      {activeCommentVideo && (
+        <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-xs flex flex-col justify-end animate-fadeIn">
+          <div className="bg-[#14141C] border-t border-[#262638] rounded-t-3xl max-h-[70vh] flex flex-col overflow-hidden text-white shadow-2xl">
+            <div className="p-3 border-b border-[#222230] flex items-center justify-between bg-[#181822]">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-amber-400" />
+                <h3 className="text-xs font-black text-white">
+                  Comments on {activeCommentVideo.author}'s Reel
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveCommentVideo(null)}
+                className="p-1 rounded-full text-gray-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto phone-scroll p-3 space-y-2.5">
+              {(!activeCommentVideo.comments || activeCommentVideo.comments.length === 0) ? (
+                <p className="text-[10px] text-gray-400 text-center py-6">
+                  No comments yet. Be the first citizen to comment!
+                </p>
+              ) : (
+                activeCommentVideo.comments.map((c) => (
+                  <div key={c.id} className="flex items-start gap-2 bg-[#181824] p-2 rounded-xl border border-white/5">
+                    <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-[9px] shrink-0">
+                      {c.user.charAt(0)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9.5px] font-bold text-amber-300">{c.user}</span>
+                        <span className="text-[7.5px] text-gray-500">{c.time}</span>
+                      </div>
+                      <p className="font-telugu text-[9.5px] text-gray-200 mt-0.5">{c.text}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <form onSubmit={handleAddComment} className="p-2.5 border-t border-[#222230] bg-[#161622] flex items-center gap-2">
+              <input
+                type="text"
+                value={commentInput}
+                onChange={(e) => setCommentInput(e.target.value)}
+                placeholder="Add a comment as citizen..."
+                className="flex-1 bg-[#101018] border border-[#2B2B3E] rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:border-amber-400"
+              />
+              <button
+                type="submit"
+                disabled={!commentInput.trim()}
+                className="py-1.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-extrabold text-xs disabled:opacity-40 cursor-pointer"
+              >
+                Post
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Instagram Video Upload Modal */}
+      <InstagramVideoUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        currentLocation={currentLocation}
+        onVideoUploaded={(newVideo) => {
+          setVideos(getCommonTalksVideos());
+          showToast('🎉 Your video was shared to Common Talks!');
+        }}
+      />
 
       <BottomNavBar activeTab="home" onTabChange={onNavigate} />
     </div>

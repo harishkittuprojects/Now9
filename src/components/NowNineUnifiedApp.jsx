@@ -256,6 +256,7 @@ export default function NowNineUnifiedApp() {
             onBack={() => handleNav('home')} 
             onNavigate={handleNav} 
             onSelectStory={() => handleNav('video-player')} 
+            currentLocation={currentLocation}
           />
         );
       case 'area-specials':

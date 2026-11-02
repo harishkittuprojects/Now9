@@ -92,6 +92,11 @@ import {
   recordCitizenLogin, 
   getConstituencyKeyFromLocation 
 } from '../data/citizenSessionStore';
+import {
+  getCommonTalksVideos,
+  subscribeCommonTalksVideos,
+  deleteCommonTalksVideo
+} from '../data/commonTalksStore';
 
 export default function NowNineAdminDashboard({ 
   onClose, 
@@ -118,6 +123,7 @@ export default function NowNineAdminDashboard({
   const [liveStreamModalMode, setLiveStreamModalMode] = useState('conduct');
   const [activeBroadcast, setActiveBroadcast] = useState(() => getActiveBroadcast());
   const [recordedSessions, setRecordedSessions] = useState(() => getRecordedSessions());
+  const [commonTalksVideos, setCommonTalksVideos] = useState(() => getCommonTalksVideos());
   const [customDebateTitle, setCustomDebateTitle] = useState('2026 ఎన్నికలు: ఎవరికి అవకాశాలు?');
   const [selectedDebateConstituency, setSelectedDebateConstituency] = useState('Mahabubnagar');
   const [debateHostName, setDebateHostName] = useState('Now9 Prime Editor');
@@ -131,6 +137,14 @@ export default function NowNineAdminDashboard({
     const unsub = subscribeBroadcast(({ activeBroadcast: ab, recordedSessions: rs }) => {
       if (ab) setActiveBroadcast(ab);
       if (rs) setRecordedSessions(rs);
+    });
+    return unsub;
+  }, []);
+
+  // Subscribe to common talks video store changes
+  useEffect(() => {
+    const unsub = subscribeCommonTalksVideos((vids) => {
+      setCommonTalksVideos(vids);
     });
     return unsub;
   }, []);
@@ -2206,6 +2220,138 @@ export default function NowNineAdminDashboard({
                               onClick={() => handleDeleteRecordedSession(rec.id)}
                               className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 cursor-pointer transition-colors"
                               title="Delete from website"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* CITIZEN COMMON TALKS VIDEOS (INSTAGRAM-STYLE REELS) */}
+              <div className="p-5 rounded-2xl bg-[#0E0E14] border-2 border-[#20202E] space-y-4 shadow-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-[#1E1E28] gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-rose-500/20">
+                      📸
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-extrabold text-white">Common Talks • Citizen Video Reels</h3>
+                        <span className="px-1.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white text-[8px] font-black uppercase tracking-wider">
+                          INSTAGRAM REELS
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-400">Citizen-uploaded video opinions, village stories, and ground reality reports</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-full bg-[#181824] text-rose-400 border border-rose-500/20 text-[10px] font-bold">
+                      {commonTalksVideos.length} Citizen Reels
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-[#181824] text-amber-400 border border-amber-500/20 text-[10px] font-bold">
+                      {commonTalksVideos.filter(v => v.isUserUpload).length} User Uploaded
+                    </span>
+                  </div>
+                </div>
+
+                {commonTalksVideos.length === 0 ? (
+                  <div className="p-8 text-center rounded-xl bg-[#12121A] border border-[#222232] text-gray-400 text-xs">
+                    No citizen video reels uploaded yet. Citizens can upload reels anytime from <strong>Common Talks</strong> on the mobile website.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {commonTalksVideos.map((vid) => (
+                      <div
+                        key={vid.id}
+                        className="rounded-xl overflow-hidden bg-[#12121A] border border-[#20202C] hover:border-rose-500/40 transition-all flex flex-col justify-between"
+                      >
+                        {/* Video Thumbnail / Aspect Banner */}
+                        <div className="relative aspect-video w-full overflow-hidden bg-black">
+                          <img
+                            src={vid.thumbnail || '/assets/news_debate_studio.jpg'}
+                            alt={vid.title}
+                            className="w-full h-full object-cover opacity-80"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30"></div>
+                          
+                          <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white text-[8px] font-black uppercase shadow-xs">
+                            {vid.category || 'REEL'}
+                          </span>
+
+                          <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-white font-mono text-[9px]">
+                            ⏱ {vid.duration || '0:45'}
+                          </span>
+
+                          <span className="absolute bottom-2 left-2 text-[9px] text-gray-300 flex items-center gap-1 bg-black/60 px-1.5 py-0.5 rounded">
+                            <MapPin className="w-2.5 h-2.5 text-amber-400" />
+                            <span className="truncate max-w-[140px]">{vid.location}</span>
+                          </span>
+                        </div>
+
+                        {/* Author info & caption */}
+                        <div className="p-3 space-y-2 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <div className="w-6 h-6 rounded-full p-[1.5px] bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 shrink-0">
+                                <div className="w-full h-full rounded-full bg-[#161620] flex items-center justify-center text-[9px] font-black text-white">
+                                  {vid.author ? vid.author.charAt(0) : 'C'}
+                                </div>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="text-[11px] font-bold text-white truncate">{vid.author}</h5>
+                                  <span className="text-[8px] text-gray-500">{vid.time}</span>
+                                </div>
+                                <span className="text-[8px] text-gray-400 font-mono block truncate">{vid.authorHandle}</span>
+                              </div>
+                            </div>
+
+                            <h4 className="font-telugu text-xs font-bold text-white line-clamp-2 leading-snug">
+                              {vid.title}
+                            </h4>
+                            <p className="font-telugu text-[10px] text-gray-400 mt-1 line-clamp-2">
+                              {vid.caption}
+                            </p>
+
+                            <div className="flex items-center gap-3 text-[10px] text-gray-400 mt-2 pt-1 border-t border-white/5">
+                              <span className="text-rose-400 font-bold">❤️ {vid.likes || 0} likes</span>
+                              <span className="text-blue-400">💬 {vid.comments?.length || 0} comments</span>
+                              <span className="text-amber-400/80">👁️ {vid.views || '1.2K'}</span>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center justify-between pt-2 border-t border-[#1C1C26] gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setPreviewRecordedModal({
+                                title: vid.title,
+                                host: vid.author,
+                                constituency: vid.location,
+                                duration: vid.duration,
+                                views: `${vid.views || '1.2K'} views • ${vid.likes || 0} likes`,
+                                videoUrl: vid.videoUrl
+                              })}
+                              className="flex-1 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 text-rose-300 font-bold text-[11px] transition-all cursor-pointer flex items-center justify-center gap-1 border border-rose-500/20"
+                            >
+                              <Play className="w-3 h-3 fill-current" />
+                              <span>Watch Reel</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (window.confirm(`Delete reel "${vid.title}"?`)) {
+                                  deleteCommonTalksVideo(vid.id);
+                                }
+                              }}
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 cursor-pointer transition-colors"
+                              title="Delete reel"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
