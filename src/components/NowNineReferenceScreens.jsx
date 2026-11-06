@@ -642,7 +642,7 @@ export function ScreenLogin({
   );
 }
 
-// 0. SCREEN 0: OPENING LOGO ASSEMBLING VIDEO INTRO - TOTAL SCREEN COVERAGE
+// 0. SCREEN 0: OPENING LOGO ASSEMBLING VIDEO INTRO - 9:16 SIZE RATIO & CRYSTAL CLEAR
 export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
   const [progress, setProgress] = useState(0);
   const onCompleteRef = useRef(onComplete);
@@ -654,7 +654,7 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
   });
 
   useEffect(() => {
-    const duration = 4200; // 4.2 seconds
+    const duration = 4000; // 4 seconds
     const intervalTime = 30;
     const increment = (intervalTime / duration) * 100;
 
@@ -677,81 +677,92 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
       onClick={() => {
         if (onCompleteRef.current) onCompleteRef.current();
       }}
-      className="fixed inset-0 w-screen h-screen z-[999999] bg-black text-white cursor-pointer select-none overflow-hidden flex flex-col justify-between"
+      className="fixed inset-0 w-screen h-screen z-[999999] bg-[#050508] text-white cursor-pointer select-none overflow-hidden flex items-center justify-center p-0 sm:p-4"
     >
-      {/* 1. Golden Logo Assembling Video Animation - TOTAL SCREEN COVERAGE */}
-      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden bg-black flex items-center justify-center pointer-events-none">
-        {/* Layer A: Ambient glow blurred background */}
-        <img
-          src="/assets/golden_logo_intro.gif"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover filter blur-3xl scale-125 opacity-50 pointer-events-none"
-        />
-
-        {/* Layer B: Main Video covering total screen */}
-        <img
-          src="/assets/golden_logo_intro.gif"
-          alt="Now9 Golden Logo Assembling Animation"
-          className="relative z-10 w-full h-full object-cover drop-shadow-[0_0_80px_rgba(245,199,84,0.7)] pointer-events-none"
-        />
-
-        {/* Layer C: Subtle vignette for cinematic depth */}
-        <div className="absolute inset-0 bg-radial from-transparent via-black/15 to-black/75 pointer-events-none z-20"></div>
+      {/* Ambient background glow for desktop / wider screens */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[140px]" />
+        <div className="absolute inset-0 bg-radial from-transparent via-[#050508]/60 to-[#050508]/95" />
       </div>
 
-      {/* 2. Top Minimal Bar with Skip Button */}
-      <div className="relative z-30 w-full px-5 sm:px-8 pt-5 sm:pt-6 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 border border-amber-400/40 backdrop-blur-md shadow-lg pointer-events-auto">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
-          <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300">NOW9 INTRO</span>
+      {/* 9:16 Size Ratio Video Frame */}
+      <div 
+        className="relative z-10 w-full h-full sm:h-[92vh] sm:max-h-[850px] aspect-[9/16] sm:max-w-[478px] bg-gradient-to-b from-[#0A0A10] via-[#050508] to-[#0A0A10] sm:rounded-[32px] sm:border sm:border-amber-500/35 sm:shadow-[0_0_60px_rgba(245,199,84,0.2)] overflow-hidden flex flex-col justify-between"
+      >
+        {/* Subtle radial inner glow inside the 9:16 frame */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-amber-400/15 rounded-full blur-[90px]" />
+          <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-amber-500/10 to-transparent" />
+          <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black via-black/80 to-transparent" />
         </div>
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onSkipRef.current) onSkipRef.current();
-            else if (onCompleteRef.current) onCompleteRef.current();
-          }}
-          className="pointer-events-auto px-4 py-1.5 rounded-full bg-black/70 hover:bg-amber-500/20 border border-amber-400/50 hover:border-amber-400 backdrop-blur-md text-xs sm:text-sm font-bold text-amber-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-xl active:scale-95"
-        >
-          <span>Skip Intro</span>
-          <span>→</span>
-        </button>
-      </div>
+        {/* Top Bar with 9:16 Intro Badge & Skip Button */}
+        <div className="relative z-30 px-4 sm:px-6 pt-4 sm:pt-5 flex items-center justify-between pointer-events-none">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 border border-amber-400/40 backdrop-blur-md shadow-md pointer-events-auto">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">NOW9 • 9:16 INTRO</span>
+          </div>
 
-      {/* 3. Bottom Controls: Slogan, Progress Bar & Enter Button */}
-      <div className="relative z-30 w-full max-w-xl mx-auto px-5 sm:px-8 pb-6 sm:pb-10 space-y-3 pointer-events-auto">
-        {/* Subtle Brand Slogan */}
-        <div className="text-center drop-shadow-lg mb-1 pointer-events-none">
-          <p className="text-xs sm:text-sm font-extrabold text-[#FDE047] tracking-wider uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-            Now9 • Political & Community Video Platform
-          </p>
-          <p className="text-[11px] sm:text-xs text-amber-200/90 font-telugu mt-0.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-            ప్రజాస్వామ్య వేదిక • మీ గళం • మీ ఓటు
-          </p>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onSkipRef.current) onSkipRef.current();
+              else if (onCompleteRef.current) onCompleteRef.current();
+            }}
+            className="pointer-events-auto px-3.5 py-1 rounded-full bg-black/70 hover:bg-amber-500/25 border border-amber-400/40 hover:border-amber-400 backdrop-blur-md text-[11px] font-bold text-amber-300 hover:text-white transition-all cursor-pointer flex items-center gap-1 shadow-lg active:scale-95"
+          >
+            <span>Skip Intro</span>
+            <span>→</span>
+          </button>
         </div>
 
-        {/* High-visibility Golden Progress Bar */}
-        <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden backdrop-blur-md border border-white/20 shadow-inner">
-          <div
-            className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-300 rounded-full transition-all duration-75 shadow-[0_0_15px_rgba(251,191,36,0.9)]"
-            style={{ width: `${Math.min(100, progress)}%` }}
-          ></div>
+        {/* Center: Crystal Clear Golden Logo Assembling Animation in 9:16 Format */}
+        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-3 sm:px-4 text-center my-auto">
+          {/* Uncropped, High-definition, Pixel-clear Video Animation */}
+          <div className="relative w-full flex items-center justify-center">
+            <img
+              src="/assets/golden_logo_intro.gif"
+              alt="Now9 Golden Logo Assembling Animation"
+              className="w-full max-w-[440px] h-auto object-contain filter contrast-110 brightness-105 drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] select-none"
+            />
+          </div>
+
+          {/* Official Now9 Brand Banner Logo */}
+          <div className="mt-3 flex flex-col items-center">
+            <img
+              src="/now9_banner.png"
+              alt="nownine - VOTE | WATCH | ENGAGE"
+              className="w-56 sm:w-64 max-w-[85%] object-contain drop-shadow-xl mb-1.5"
+            />
+            <p className="text-[11px] sm:text-xs font-bold text-amber-300/90 tracking-wide font-telugu">
+              భారతదేశ మొట్టమొదటి పొలిటికల్ + కమ్యూనిటీ వీడియో ప్లాట్‌ఫామ్
+            </p>
+          </div>
         </div>
 
-        {/* Enter Button */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onCompleteRef.current) onCompleteRef.current();
-          }}
-          className="w-full py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-2xl shadow-amber-500/40 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
-        >
-          <span>Enter Now 9</span>
-          <span className="text-base font-bold">→</span>
-        </button>
+        {/* Bottom Bar: Progress Bar & Enter Button */}
+        <div className="relative z-30 px-5 sm:px-6 pb-6 sm:pb-8 space-y-3 pointer-events-auto">
+          {/* Animated 9:16 Progress Bar */}
+          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden backdrop-blur-xs border border-white/10 shadow-inner">
+            <div
+              className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-full transition-all duration-75 shadow-[0_0_12px_rgba(251,191,36,0.9)]"
+              style={{ width: `${Math.min(100, progress)}%` }}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onCompleteRef.current) onCompleteRef.current();
+            }}
+            className="w-full py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+          >
+            <span>Enter Now 9</span>
+            <span className="text-sm font-bold">→</span>
+          </button>
+        </div>
       </div>
     </div>
   );
