@@ -644,7 +644,6 @@ export function ScreenLogin({
 
 // 0. SCREEN 0: FULLSCREEN OPENING VIDEO INTRO - COVERS TOTAL SCREEN (100vw x 100vh)
 export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
-  const [progress, setProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
@@ -686,7 +685,6 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
     if (videoRef.current && videoRef.current.duration) {
       const current = videoRef.current.currentTime;
       const total = videoRef.current.duration;
-      setProgress((current / total) * 100);
       if (total > 0 && current >= total - 0.1) {
         triggerOpen();
       }
@@ -764,14 +762,6 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
             <span>→</span>
           </button>
         </div>
-      </div>
-
-      {/* 3. Bottom Slim Progress Line (Edge-to-Edge across bottom) */}
-      <div className="absolute bottom-0 inset-x-0 z-30 h-1.5 bg-black/40 overflow-hidden pointer-events-none">
-        <div
-          className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 transition-all duration-75 shadow-[0_0_12px_rgba(251,191,36,0.9)]"
-          style={{ width: `${Math.min(100, progress)}%` }}
-        />
       </div>
     </div>
   );
