@@ -7,6 +7,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { 
+  ScreenOpeningVideoIntro,
   ScreenLogin,
   Screen1Splash, 
   Screen2Home, 
@@ -50,8 +51,15 @@ export default function NowNineUnifiedApp() {
       ) {
         return 'admin';
       }
+      if (params.get('screen') === 'login' || hash === '#login') {
+        return 'login';
+      }
+      if (params.get('screen') === 'home' || hash === '#home') {
+        return 'home';
+      }
     }
-    return 'login';
+    // Default initial screen is the golden logo assembling animation intro
+    return 'intro-video';
   };
 
   const [activeScreenId, setActiveScreenId] = useState(getInitialScreen);
@@ -201,6 +209,13 @@ export default function NowNineUnifiedApp() {
     };
 
     switch (id) {
+      case 'intro-video':
+        return (
+          <ScreenOpeningVideoIntro 
+            onComplete={() => handleNav('home')} 
+            onSkip={() => handleNav('home')} 
+          />
+        );
       case 'login':
         return (
           <ScreenLogin 
@@ -214,7 +229,7 @@ export default function NowNineUnifiedApp() {
           />
         );
       case 'splash':
-        return <Screen1Splash onGetStarted={() => handleNav('login')} onNavigate={handleNav} />;
+        return <Screen1Splash onGetStarted={() => handleNav('home')} onNavigate={handleNav} />;
       case 'home':
         return (
           <Screen2Home 
@@ -356,6 +371,20 @@ export default function NowNineUnifiedApp() {
 
           {/* Header Actions */}
           <div className="flex items-center gap-2">
+            {/* Play Intro Animation Button */}
+            <button
+              onClick={() => setActiveScreenId('intro-video')}
+              className={`p-1.5 px-2 rounded-lg border text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeScreenId === 'intro-video'
+                  ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                  : 'bg-[#181820] border-[#2A2A35] text-amber-300/90 hover:text-white hover:border-amber-400/50'
+              }`}
+              title="Play Golden Logo Opening Animation"
+            >
+              <span>🎬</span>
+              <span>Play Intro</span>
+            </button>
+
             {/* Admin Panel Toggle Button */}
             <button
               onClick={() => activeScreenId === 'admin' ? handleExitAdmin('home') : handleOpenAdmin()}

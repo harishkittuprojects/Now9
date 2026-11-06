@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -642,6 +642,117 @@ export function ScreenLogin({
   );
 }
 
+// 0. SCREEN 0: OPENING LOGO ASSEMBLING VIDEO INTRO
+export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
+  const [progress, setProgress] = useState(0);
+  const onCompleteRef = useRef(onComplete);
+  const onSkipRef = useRef(onSkip);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    onSkipRef.current = onSkip;
+  });
+
+  useEffect(() => {
+    const duration = 4000; // 4 seconds
+    const intervalTime = 40;
+    const increment = (intervalTime / duration) * 100;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          if (onCompleteRef.current) onCompleteRef.current();
+          return 100;
+        }
+        return prev + increment;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div 
+      onClick={onComplete}
+      className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#050508] text-white cursor-pointer select-none"
+    >
+      {/* Golden radial background glow */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px]"></div>
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-amber-500/20 via-transparent to-transparent"></div>
+      </div>
+
+      {/* Top Bar with Skip Button */}
+      <div className="relative z-20 px-4 pt-3 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 border border-amber-400/30 backdrop-blur-md">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span className="text-[9px] font-black uppercase tracking-wider text-amber-300">NOW9 INTRO</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onSkip) onSkip();
+            else onComplete();
+          }}
+          className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md text-[10px] font-bold text-white transition-all cursor-pointer flex items-center gap-1 shadow-md"
+        >
+          <span>Skip Intro</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      {/* Center Cinematic Animation Area */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 text-center">
+        {/* Golden Assembling Logo Animation GIF */}
+        <div className="relative flex items-center justify-center mb-1">
+          <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl animate-pulse"></div>
+          <img
+            src="/assets/golden_logo_intro.gif"
+            alt="Now9 Golden Logo Assembling Animation"
+            className="w-56 h-56 sm:w-64 sm:h-64 object-contain drop-shadow-[0_0_45px_rgba(245,199,84,0.65)] relative z-10"
+          />
+        </div>
+
+        {/* Brand Banner */}
+        <div className="mt-2">
+          <img
+            src="/now9_banner.png"
+            alt="nownine - VOTE | WATCH | ENGAGE"
+            className="w-60 sm:w-72 max-w-[90%] object-contain mx-auto drop-shadow-lg"
+          />
+        </div>
+
+        <p className="mt-2 text-[11px] font-semibold text-amber-300/90 tracking-wide font-telugu">
+          ప్రజాస్వామ్య వేదిక • మీ గళం • మీ ఓటు
+        </p>
+      </div>
+
+      {/* Bottom Progress Bar & Enter Button */}
+      <div className="relative z-20 p-4 pb-6 space-y-3">
+        {/* Progress Bar */}
+        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 rounded-full transition-all duration-75"
+            style={{ width: `${Math.min(100, progress)}%` }}
+          ></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onComplete}
+          className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+        >
+          <span>Enter Now 9</span>
+          <span>→</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // 1. SCREEN 1: SPLASH SCREEN
 export function Screen1Splash({ onGetStarted, onNavigate = null }) {
   const [touchStartY, setTouchStartY] = useState(null);
@@ -675,12 +786,15 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
 
       {/* Brand Identity */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 pt-1 z-10 text-center">
-        {/* Official Golden 9 Logo */}
-        <img 
-          src="/now9_icon.png" 
-          alt="now9 logo" 
-          className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-[0_0_35px_rgba(245,199,84,0.55)] mb-3 animate-pulse hover:scale-105 transition-transform"
-        />
+        {/* Official Golden Logo Assembling Animation */}
+        <div className="relative flex items-center justify-center mb-2">
+          <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-xl animate-pulse"></div>
+          <img 
+            src="/assets/golden_logo_intro.gif" 
+            alt="now9 golden logo assembling animation" 
+            className="w-32 h-32 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] hover:scale-105 transition-transform relative z-10"
+          />
+        </div>
 
         {/* Official nownine Brand Banner */}
         <div className="flex items-center justify-center px-4 mb-2">
