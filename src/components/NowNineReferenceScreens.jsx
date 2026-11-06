@@ -642,7 +642,7 @@ export function ScreenLogin({
   );
 }
 
-// 0. SCREEN 0: CINEMATIC OPENING VIDEO INTRO (HD MP4 - AUTO-OPENS DIRECTLY)
+// 0. SCREEN 0: FULLSCREEN OPENING VIDEO INTRO - COVERS TOTAL SCREEN (100vw x 100vh)
 export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
   const [progress, setProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
@@ -712,18 +712,24 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
   return (
     <div 
       onClick={triggerOpen}
-      className="fixed inset-0 w-screen h-screen z-[999999] bg-[#050508] text-white cursor-pointer select-none overflow-hidden flex flex-col justify-between"
+      className="fixed inset-0 w-screen h-screen z-[999999] bg-black text-white cursor-pointer select-none overflow-hidden"
     >
-      {/* 1. Ambient Background Radial Glows */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] bg-amber-500/10 rounded-full blur-[160px]" />
-        <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-amber-500/15 via-transparent to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 h-44 bg-gradient-to-t from-black via-black/80 to-transparent" />
-      </div>
+      {/* 1. Fullscreen Video Covering TOTAL SCREEN 100vw x 100vh Edge-to-Edge */}
+      <video
+        ref={videoRef}
+        src="/assets/opening_video.mp4"
+        autoPlay
+        playsInline
+        muted
+        defaultMuted
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
+        className="absolute inset-0 w-full h-full object-cover select-none z-0"
+      />
 
-      {/* 2. Top Header Bar: Status Badge, Sound Button & Skip Intro */}
-      <div className="relative z-30 w-full px-4 sm:px-8 pt-4 sm:pt-6 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 border border-amber-400/40 backdrop-blur-md shadow-lg pointer-events-auto">
+      {/* 2. Top Minimal Floating Controls (Sound & Skip) */}
+      <div className="absolute top-4 sm:top-6 inset-x-4 sm:inset-x-8 z-30 flex items-center justify-between pointer-events-none">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 border border-amber-400/40 backdrop-blur-md shadow-lg pointer-events-auto">
           <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
           <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300">NOW9 INTRO</span>
           <span className="text-[9px] text-amber-200/60 hidden sm:inline">• 1080p Full HD</span>
@@ -736,8 +742,8 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
             onClick={toggleSound}
             className={`px-3 py-1.5 rounded-full border backdrop-blur-md text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-lg active:scale-95 ${
               isMuted 
-                ? 'bg-amber-500/20 border-amber-400/60 text-amber-300 hover:bg-amber-500/30' 
-                : 'bg-emerald-500/20 border-emerald-400/60 text-emerald-300 hover:bg-emerald-500/30'
+                ? 'bg-black/70 border-amber-400/60 text-amber-300 hover:bg-black/90' 
+                : 'bg-emerald-500/30 border-emerald-400/80 text-emerald-300 hover:bg-emerald-500/40'
             }`}
             title={isMuted ? "Unmute Sound" : "Mute Sound"}
           >
@@ -752,7 +758,7 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
               e.stopPropagation();
               triggerOpen();
             }}
-            className="px-4 py-1.5 rounded-full bg-black/70 hover:bg-white/10 border border-white/20 hover:border-amber-400 backdrop-blur-md text-xs sm:text-sm font-bold text-gray-200 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-xl active:scale-95"
+            className="px-4 py-1.5 rounded-full bg-black/70 hover:bg-black/90 border border-white/30 hover:border-amber-400 backdrop-blur-md text-xs sm:text-sm font-bold text-gray-200 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-xl active:scale-95"
           >
             <span>Skip</span>
             <span>→</span>
@@ -760,47 +766,12 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
         </div>
       </div>
 
-      {/* 3. Center Stage: Adaptive HD Video for Mobile & Desktop */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center w-full px-3 sm:px-6 my-auto overflow-hidden">
-        {/* Adaptive Video Container */}
-        <div className="relative w-full max-w-5xl flex flex-col items-center justify-center">
-          {/* The High Definition MP4 Video */}
-          <div className="relative w-full flex items-center justify-center rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(245,199,84,0.25)] border border-amber-500/20 bg-black">
-            <video
-              ref={videoRef}
-              src="/assets/opening_video.mp4"
-              autoPlay
-              playsInline
-              muted
-              defaultMuted
-              onTimeUpdate={handleTimeUpdate}
-              onEnded={handleEnded}
-              className="w-full max-h-[55vh] sm:max-h-[72vh] object-contain select-none"
-            />
-          </div>
-
-          {/* Official Brand Identity directly beneath video */}
-          <div className="mt-4 flex flex-col items-center text-center">
-            <img
-              src="/now9_banner.png"
-              alt="nownine - VOTE | WATCH | ENGAGE"
-              className="w-56 sm:w-72 max-w-[85%] object-contain drop-shadow-xl mb-1"
-            />
-            <p className="text-[11px] sm:text-xs font-bold text-amber-300/90 tracking-wide font-telugu">
-              భారతదేశ మొట్టమొదటి పొలిటికల్ + కమ్యూనిటీ వీడియో ప్లాట్‌ఫామ్
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Bottom Slim Synchronized Progress Bar (Auto-opens directly on end - NO button needed) */}
-      <div className="relative z-30 w-full max-w-xl mx-auto px-6 pb-6 pointer-events-none">
-        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden backdrop-blur-xs">
-          <div
-            className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-full transition-all duration-75 shadow-[0_0_10px_rgba(251,191,36,0.9)]"
-            style={{ width: `${Math.min(100, progress)}%` }}
-          />
-        </div>
+      {/* 3. Bottom Slim Progress Line (Edge-to-Edge across bottom) */}
+      <div className="absolute bottom-0 inset-x-0 z-30 h-1.5 bg-black/40 overflow-hidden pointer-events-none">
+        <div
+          className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 transition-all duration-75 shadow-[0_0_12px_rgba(251,191,36,0.9)]"
+          style={{ width: `${Math.min(100, progress)}%` }}
+        />
       </div>
     </div>
   );
