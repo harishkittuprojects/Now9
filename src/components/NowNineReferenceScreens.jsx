@@ -642,34 +642,44 @@ export function ScreenLogin({
   );
 }
 
-// 0. SCREEN 0: CINEMATIC OPENING VIDEO INTRO (HD MP4 - DESKTOP & MOBILE ADAPTIVE)
+// 0. SCREEN 0: CINEMATIC OPENING VIDEO INTRO (HD MP4 - AUTO-OPENS DIRECTLY)
 export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
   const [progress, setProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
   const onSkipRef = useRef(onSkip);
+  const hasCompletedRef = useRef(false);
+
+  const triggerOpen = () => {
+    if (!hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      if (onCompleteRef.current) onCompleteRef.current();
+    }
+  };
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
     onSkipRef.current = onSkip;
   });
 
-  // Autoplay video on mount
+  // Autoplay video on mount & set safety fallback timer so it opens directly without fail
   useEffect(() => {
     if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.defaultMuted = true;
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // If browser requires muted autoplay
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            setIsMuted(true);
-            videoRef.current.play().catch(() => {});
-          }
-        });
+        playPromise.catch(() => {});
       }
     }
+
+    // Safety fallback: Video is ~3s, auto-open directly after video ends
+    const timer = setTimeout(() => {
+      triggerOpen();
+    }, 3400);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleTimeUpdate = () => {
@@ -677,11 +687,14 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
       const current = videoRef.current.currentTime;
       const total = videoRef.current.duration;
       setProgress((current / total) * 100);
+      if (total > 0 && current >= total - 0.1) {
+        triggerOpen();
+      }
     }
   };
 
   const handleEnded = () => {
-    if (onCompleteRef.current) onCompleteRef.current();
+    triggerOpen();
   };
 
   const toggleSound = (e) => {
@@ -696,18 +709,9 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
     }
   };
 
-  const handleContainerClick = () => {
-    if (isMuted && videoRef.current) {
-      videoRef.current.muted = false;
-      setIsMuted(false);
-    } else {
-      if (onCompleteRef.current) onCompleteRef.current();
-    }
-  };
-
   return (
     <div 
-      onClick={handleContainerClick}
+      onClick={triggerOpen}
       className="fixed inset-0 w-screen h-screen z-[999999] bg-[#050508] text-white cursor-pointer select-none overflow-hidden flex flex-col justify-between"
     >
       {/* 1. Ambient Background Radial Glows */}
@@ -738,7 +742,7 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
             title={isMuted ? "Unmute Sound" : "Mute Sound"}
           >
             {isMuted ? <VolumeX className="w-3.5 h-3.5 text-amber-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
-            <span>{isMuted ? 'Tap for Sound' : 'Sound On'}</span>
+            <span>{isMuted ? 'Sound Off' : 'Sound On'}</span>
           </button>
 
           {/* Skip Intro Button */}
@@ -746,12 +750,11 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (onSkipRef.current) onSkipRef.current();
-              else if (onCompleteRef.current) onCompleteRef.current();
+              triggerOpen();
             }}
             className="px-4 py-1.5 rounded-full bg-black/70 hover:bg-white/10 border border-white/20 hover:border-amber-400 backdrop-blur-md text-xs sm:text-sm font-bold text-gray-200 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-xl active:scale-95"
           >
-            <span>Skip Intro</span>
+            <span>Skip</span>
             <span>→</span>
           </button>
         </div>
@@ -768,23 +771,12 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
               src="/assets/opening_video.mp4"
               autoPlay
               playsInline
-              muted={isMuted}
+              muted
+              defaultMuted
               onTimeUpdate={handleTimeUpdate}
               onEnded={handleEnded}
-              className="w-full max-h-[50vh] sm:max-h-[68vh] object-contain select-none"
+              className="w-full max-h-[55vh] sm:max-h-[72vh] object-contain select-none"
             />
-
-            {/* Muted audio callout overlay on video */}
-            {isMuted && (
-              <button
-                type="button"
-                onClick={toggleSound}
-                className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 px-3 py-1.5 rounded-full bg-black/80 hover:bg-black border border-amber-400/80 text-amber-300 text-[11px] sm:text-xs font-bold flex items-center gap-1.5 backdrop-blur-md shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              >
-                <VolumeX className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                <span>Tap for Sound 🔊</span>
-              </button>
-            )}
           </div>
 
           {/* Official Brand Identity directly beneath video */}
@@ -801,28 +793,14 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
         </div>
       </div>
 
-      {/* 4. Bottom Controls: Progress Bar & Enter Now 9 */}
-      <div className="relative z-30 w-full max-w-xl mx-auto px-4 sm:px-8 pb-6 sm:pb-9 space-y-3 pointer-events-auto">
-        {/* Real-time Video Synchronized Progress Bar */}
-        <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden backdrop-blur-md border border-white/10 shadow-inner">
+      {/* 4. Bottom Slim Synchronized Progress Bar (Auto-opens directly on end - NO button needed) */}
+      <div className="relative z-30 w-full max-w-xl mx-auto px-6 pb-6 pointer-events-none">
+        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden backdrop-blur-xs">
           <div
-            className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-full transition-all duration-100 shadow-[0_0_12px_rgba(251,191,36,0.9)]"
+            className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-full transition-all duration-75 shadow-[0_0_10px_rgba(251,191,36,0.9)]"
             style={{ width: `${Math.min(100, progress)}%` }}
           />
         </div>
-
-        {/* Enter Now 9 Button */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onCompleteRef.current) onCompleteRef.current();
-          }}
-          className="w-full py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-2xl shadow-amber-500/40 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
-        >
-          <span>Enter Now 9</span>
-          <span className="text-base font-bold">→</span>
-        </button>
       </div>
     </div>
   );
