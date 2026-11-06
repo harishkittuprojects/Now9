@@ -654,7 +654,7 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
   });
 
   useEffect(() => {
-    const duration = 4000; // 4 seconds
+    const duration = 3200; // 3.2 seconds
     const intervalTime = 30;
     const increment = (intervalTime / duration) * 100;
 
@@ -722,8 +722,8 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
           {/* Uncropped, High-definition, Pixel-clear Video Animation */}
           <div className="relative w-full flex items-center justify-center">
             <img
-              src="/assets/golden_logo_intro.gif"
-              alt="Now9 Golden Logo Assembling Animation"
+              src="/assets/golden_logo_assembly.gif"
+              alt="Now9 Golden Logo Assembly Animation"
               className="w-full max-w-[440px] h-auto object-contain filter contrast-110 brightness-105 drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] select-none"
             />
           </div>
@@ -801,13 +801,13 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
 
       {/* Brand Identity */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 pt-1 z-10 text-center">
-        {/* Official Golden Logo Assembling Animation */}
+        {/* Official Golden Logo Assembly Animation */}
         <div className="relative flex items-center justify-center mb-2">
           <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-xl animate-pulse"></div>
           <img 
-            src="/assets/golden_logo_intro.gif" 
-            alt="now9 golden logo assembling animation" 
-            className="w-32 h-32 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] hover:scale-105 transition-transform relative z-10"
+            src="/assets/golden_logo_assembly.gif" 
+            alt="now9 golden logo assembly animation" 
+            className="w-36 h-36 sm:w-40 sm:h-40 object-contain drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] hover:scale-105 transition-transform relative z-10"
           />
         </div>
 
