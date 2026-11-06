@@ -304,6 +304,16 @@ export default function NowNineUnifiedApp() {
     }
   };
 
+  // Render Full-Screen Opening Video Intro (Covers Total Screen)
+  if (activeScreenId === 'intro-video') {
+    return (
+      <ScreenOpeningVideoIntro 
+        onComplete={() => setActiveScreenId('home')}
+        onSkip={() => setActiveScreenId('home')}
+      />
+    );
+  }
+
   // Render Full-Screen Command Center Admin Dashboard
   if (activeScreenId === 'admin') {
     return (
