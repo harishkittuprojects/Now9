@@ -642,9 +642,11 @@ export function ScreenLogin({
   );
 }
 
-// 0. SCREEN 0: OPENING LOGO ASSEMBLING VIDEO INTRO - 9:16 SIZE RATIO & CRYSTAL CLEAR
+// 0. SCREEN 0: CINEMATIC OPENING VIDEO INTRO (HD MP4 - DESKTOP & MOBILE ADAPTIVE)
 export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
   const [progress, setProgress] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
   const onSkipRef = useRef(onSkip);
 
@@ -653,56 +655,93 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
     onSkipRef.current = onSkip;
   });
 
+  // Autoplay video on mount
   useEffect(() => {
-    const duration = 3200; // 3.2 seconds
-    const intervalTime = 30;
-    const increment = (intervalTime / duration) * 100;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          if (onCompleteRef.current) onCompleteRef.current();
-          return 100;
-        }
-        return prev + increment;
-      });
-    }, intervalTime);
-
-    return () => clearInterval(timer);
+    if (videoRef.current) {
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // If browser requires muted autoplay
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            setIsMuted(true);
+            videoRef.current.play().catch(() => {});
+          }
+        });
+      }
+    }
   }, []);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current && videoRef.current.duration) {
+      const current = videoRef.current.currentTime;
+      const total = videoRef.current.duration;
+      setProgress((current / total) * 100);
+    }
+  };
+
+  const handleEnded = () => {
+    if (onCompleteRef.current) onCompleteRef.current();
+  };
+
+  const toggleSound = (e) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      const nextMuted = !videoRef.current.muted;
+      videoRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  };
+
+  const handleContainerClick = () => {
+    if (isMuted && videoRef.current) {
+      videoRef.current.muted = false;
+      setIsMuted(false);
+    } else {
+      if (onCompleteRef.current) onCompleteRef.current();
+    }
+  };
 
   return (
     <div 
-      onClick={() => {
-        if (onCompleteRef.current) onCompleteRef.current();
-      }}
-      className="fixed inset-0 w-screen h-screen z-[999999] bg-[#050508] text-white cursor-pointer select-none overflow-hidden flex items-center justify-center p-0 sm:p-4"
+      onClick={handleContainerClick}
+      className="fixed inset-0 w-screen h-screen z-[999999] bg-[#050508] text-white cursor-pointer select-none overflow-hidden flex flex-col justify-between"
     >
-      {/* Ambient background glow for desktop / wider screens */}
+      {/* 1. Ambient Background Radial Glows */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[140px]" />
-        <div className="absolute inset-0 bg-radial from-transparent via-[#050508]/60 to-[#050508]/95" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] bg-amber-500/10 rounded-full blur-[160px]" />
+        <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-amber-500/15 via-transparent to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-44 bg-gradient-to-t from-black via-black/80 to-transparent" />
       </div>
 
-      {/* 9:16 Size Ratio Video Frame */}
-      <div 
-        className="relative z-10 w-full h-full sm:h-[92vh] sm:max-h-[850px] aspect-[9/16] sm:max-w-[478px] bg-gradient-to-b from-[#0A0A10] via-[#050508] to-[#0A0A10] sm:rounded-[32px] sm:border sm:border-amber-500/35 sm:shadow-[0_0_60px_rgba(245,199,84,0.2)] overflow-hidden flex flex-col justify-between"
-      >
-        {/* Subtle radial inner glow inside the 9:16 frame */}
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-amber-400/15 rounded-full blur-[90px]" />
-          <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-amber-500/10 to-transparent" />
-          <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black via-black/80 to-transparent" />
+      {/* 2. Top Header Bar: Status Badge, Sound Button & Skip Intro */}
+      <div className="relative z-30 w-full px-4 sm:px-8 pt-4 sm:pt-6 flex items-center justify-between pointer-events-none">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 border border-amber-400/40 backdrop-blur-md shadow-lg pointer-events-auto">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+          <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300">NOW9 INTRO</span>
+          <span className="text-[9px] text-amber-200/60 hidden sm:inline">• 1080p Full HD</span>
         </div>
 
-        {/* Top Bar with 9:16 Intro Badge & Skip Button */}
-        <div className="relative z-30 px-4 sm:px-6 pt-4 sm:pt-5 flex items-center justify-between pointer-events-none">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/70 border border-amber-400/40 backdrop-blur-md shadow-md pointer-events-auto">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-            <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">NOW9 • 9:16 INTRO</span>
-          </div>
+        <div className="flex items-center gap-2 pointer-events-auto">
+          {/* Sound Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleSound}
+            className={`px-3 py-1.5 rounded-full border backdrop-blur-md text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-lg active:scale-95 ${
+              isMuted 
+                ? 'bg-amber-500/20 border-amber-400/60 text-amber-300 hover:bg-amber-500/30' 
+                : 'bg-emerald-500/20 border-emerald-400/60 text-emerald-300 hover:bg-emerald-500/30'
+            }`}
+            title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          >
+            {isMuted ? <VolumeX className="w-3.5 h-3.5 text-amber-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+            <span>{isMuted ? 'Tap for Sound' : 'Sound On'}</span>
+          </button>
 
+          {/* Skip Intro Button */}
           <button
             type="button"
             onClick={(e) => {
@@ -710,59 +749,80 @@ export function ScreenOpeningVideoIntro({ onComplete, onSkip = null }) {
               if (onSkipRef.current) onSkipRef.current();
               else if (onCompleteRef.current) onCompleteRef.current();
             }}
-            className="pointer-events-auto px-3.5 py-1 rounded-full bg-black/70 hover:bg-amber-500/25 border border-amber-400/40 hover:border-amber-400 backdrop-blur-md text-[11px] font-bold text-amber-300 hover:text-white transition-all cursor-pointer flex items-center gap-1 shadow-lg active:scale-95"
+            className="px-4 py-1.5 rounded-full bg-black/70 hover:bg-white/10 border border-white/20 hover:border-amber-400 backdrop-blur-md text-xs sm:text-sm font-bold text-gray-200 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-xl active:scale-95"
           >
             <span>Skip Intro</span>
             <span>→</span>
           </button>
         </div>
+      </div>
 
-        {/* Center: Crystal Clear Golden Logo Assembling Animation in 9:16 Format */}
-        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-3 sm:px-4 text-center my-auto">
-          {/* Uncropped, High-definition, Pixel-clear Video Animation */}
-          <div className="relative w-full flex items-center justify-center">
-            <img
-              src="/assets/golden_logo_assembly.gif"
-              alt="Now9 Golden Logo Assembly Animation"
-              className="w-full max-w-[440px] h-auto object-contain filter contrast-110 brightness-105 drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] select-none"
+      {/* 3. Center Stage: Adaptive HD Video for Mobile & Desktop */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center w-full px-3 sm:px-6 my-auto overflow-hidden">
+        {/* Adaptive Video Container */}
+        <div className="relative w-full max-w-5xl flex flex-col items-center justify-center">
+          {/* The High Definition MP4 Video */}
+          <div className="relative w-full flex items-center justify-center rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(245,199,84,0.25)] border border-amber-500/20 bg-black">
+            <video
+              ref={videoRef}
+              src="/assets/opening_video.mp4"
+              autoPlay
+              playsInline
+              muted={isMuted}
+              onTimeUpdate={handleTimeUpdate}
+              onEnded={handleEnded}
+              className="w-full max-h-[50vh] sm:max-h-[68vh] object-contain select-none"
             />
+
+            {/* Muted audio callout overlay on video */}
+            {isMuted && (
+              <button
+                type="button"
+                onClick={toggleSound}
+                className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 px-3 py-1.5 rounded-full bg-black/80 hover:bg-black border border-amber-400/80 text-amber-300 text-[11px] sm:text-xs font-bold flex items-center gap-1.5 backdrop-blur-md shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              >
+                <VolumeX className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                <span>Tap for Sound 🔊</span>
+              </button>
+            )}
           </div>
 
-          {/* Official Now9 Brand Banner Logo */}
-          <div className="mt-3 flex flex-col items-center">
+          {/* Official Brand Identity directly beneath video */}
+          <div className="mt-4 flex flex-col items-center text-center">
             <img
               src="/now9_banner.png"
               alt="nownine - VOTE | WATCH | ENGAGE"
-              className="w-56 sm:w-64 max-w-[85%] object-contain drop-shadow-xl mb-1.5"
+              className="w-56 sm:w-72 max-w-[85%] object-contain drop-shadow-xl mb-1"
             />
             <p className="text-[11px] sm:text-xs font-bold text-amber-300/90 tracking-wide font-telugu">
               భారతదేశ మొట్టమొదటి పొలిటికల్ + కమ్యూనిటీ వీడియో ప్లాట్‌ఫామ్
             </p>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar: Progress Bar & Enter Button */}
-        <div className="relative z-30 px-5 sm:px-6 pb-6 sm:pb-8 space-y-3 pointer-events-auto">
-          {/* Animated 9:16 Progress Bar */}
-          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden backdrop-blur-xs border border-white/10 shadow-inner">
-            <div
-              className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-full transition-all duration-75 shadow-[0_0_12px_rgba(251,191,36,0.9)]"
-              style={{ width: `${Math.min(100, progress)}%` }}
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onCompleteRef.current) onCompleteRef.current();
-            }}
-            className="w-full py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
-          >
-            <span>Enter Now 9</span>
-            <span className="text-sm font-bold">→</span>
-          </button>
+      {/* 4. Bottom Controls: Progress Bar & Enter Now 9 */}
+      <div className="relative z-30 w-full max-w-xl mx-auto px-4 sm:px-8 pb-6 sm:pb-9 space-y-3 pointer-events-auto">
+        {/* Real-time Video Synchronized Progress Bar */}
+        <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden backdrop-blur-md border border-white/10 shadow-inner">
+          <div
+            className="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-full transition-all duration-100 shadow-[0_0_12px_rgba(251,191,36,0.9)]"
+            style={{ width: `${Math.min(100, progress)}%` }}
+          />
         </div>
+
+        {/* Enter Now 9 Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onCompleteRef.current) onCompleteRef.current();
+          }}
+          className="w-full py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-2xl shadow-amber-500/40 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+        >
+          <span>Enter Now 9</span>
+          <span className="text-base font-bold">→</span>
+        </button>
       </div>
     </div>
   );
@@ -801,13 +861,16 @@ export function Screen1Splash({ onGetStarted, onNavigate = null }) {
 
       {/* Brand Identity */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 pt-1 z-10 text-center">
-        {/* Official Golden Logo Assembly Animation */}
+        {/* Official Golden Logo Assembly Video */}
         <div className="relative flex items-center justify-center mb-2">
           <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-xl animate-pulse"></div>
-          <img 
-            src="/assets/golden_logo_assembly.gif" 
-            alt="now9 golden logo assembly animation" 
-            className="w-36 h-36 sm:w-40 sm:h-40 object-contain drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] hover:scale-105 transition-transform relative z-10"
+          <video 
+            src="/assets/opening_video.mp4" 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-[0_0_35px_rgba(245,199,84,0.65)] hover:scale-105 transition-transform relative z-10 rounded-2xl"
           />
         </div>
 
