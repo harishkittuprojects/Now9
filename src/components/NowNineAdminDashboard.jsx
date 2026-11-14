@@ -390,6 +390,7 @@ export default function NowNineAdminDashboard({
       margin: '+9.3% (3,478 Votes)',
       parliament: 'Kurnool Lok Sabha',
       parties: [
+        { id: 'kutami', name: 'Kutami (కూటమి / TDP + JSP + BJP)', isKutami: true, isMixKutami: true, telugu: 'కూటమి (తెదేపా + జనసేన + భాజపా ఉమ్మడి కూటమి)', candidate: 'T.G. Bharath (Kutami Joint Nominee)', symbol: '🤝', voteShare: 55.2, votes: 20643, color: '#F59E0B', trend: '+5.0%' },
         { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'T.G. Bharath (Sitting MLA / Minister)', symbol: '🚲', voteShare: 48.4, votes: 18101, color: '#EAB308', trend: '+4.1%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'A. Md. Imtiaz (Ex-Collector)', symbol: '🪭', voteShare: 42.1, votes: 15745, color: '#0EA5E9', trend: '-2.8%' },
         { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'District Alliance Contender', symbol: '🍵', voteShare: 4.6, votes: 1720, color: '#DC2626', trend: '+1.4%' },
@@ -416,6 +417,7 @@ export default function NowNineAdminDashboard({
       margin: '+8.4% (2,620 Votes)',
       parliament: 'Chittoor Lok Sabha',
       parties: [
+        { id: 'kutami', name: 'Kutami (కూటమి / TDP + JSP + BJP)', isKutami: true, isMixKutami: true, telugu: 'కూటమి (తెదేపా + జనసేన + భాజపా ఉమ్మడి కూటమి)', candidate: 'Pulivarthi Nani (Kutami Joint Nominee)', symbol: '🤝', voteShare: 55.3, votes: 17252, color: '#F59E0B', trend: '+4.7%' },
         { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Pulivarthi Nani (Sitting MLA)', symbol: '🚲', voteShare: 48.2, votes: 15038, color: '#EAB308', trend: '+2.8%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Chevireddy Mohith Reddy', symbol: '🪭', voteShare: 42.1, votes: 13135, color: '#0EA5E9', trend: '-2.2%' },
         { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Tirupati Rural Incharge', symbol: '🍵', voteShare: 4.8, votes: 1497, color: '#DC2626', trend: '+1.5%' },
@@ -442,6 +444,7 @@ export default function NowNineAdminDashboard({
       margin: '+9.4% (3,713 Votes)',
       parliament: 'Vijayawada Lok Sabha',
       parties: [
+        { id: 'kutami', name: 'Kutami (కూటమి / TDP + JSP + BJP)', isKutami: true, isMixKutami: true, telugu: 'కూటమి (తెదేపా + జనసేన + భాజపా ఉమ్మడి కూటమి)', candidate: 'Bonda Umamaheswara Rao (Kutami Joint Nominee)', symbol: '🤝', voteShare: 55.6, votes: 21962, color: '#F59E0B', trend: '+4.8%' },
         { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Bonda Umamaheswara Rao', symbol: '🚲', voteShare: 47.2, votes: 18644, color: '#EAB308', trend: '+3.2%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Velampalli Srinivasa Rao', symbol: '🪭', voteShare: 41.5, votes: 16392, color: '#0EA5E9', trend: '-2.5%' },
         { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Pothina Mahesh / Youth Alliance', symbol: '🍵', voteShare: 5.8, votes: 2291, color: '#DC2626', trend: '+1.6%' },
@@ -468,6 +471,7 @@ export default function NowNineAdminDashboard({
       margin: '+8.2% (2,911 Votes)',
       parliament: 'Guntur Lok Sabha',
       parties: [
+        { id: 'kutami', name: 'Kutami (కూటమి / TDP + JSP + BJP)', isKutami: true, isMixKutami: true, telugu: 'కూటమి (తెదేపా + జనసేన + భాజపా ఉమ్మడి కూటమి)', candidate: 'Galla Madhavi (Kutami Joint Nominee)', symbol: '🤝', voteShare: 55.6, votes: 19737, color: '#F59E0B', trend: '+4.9%' },
         { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Galla Madhavi (Sitting MLA)', symbol: '🚲', voteShare: 48.5, votes: 17217, color: '#EAB308', trend: '+3.1%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Vidadala Rajini (Ex-Minister)', symbol: '🪭', voteShare: 41.8, votes: 14839, color: '#0EA5E9', trend: '-2.1%' },
         { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Alliance Incharge', symbol: '🍵', voteShare: 4.8, votes: 1704, color: '#DC2626', trend: '+1.4%' },
@@ -494,6 +498,7 @@ export default function NowNineAdminDashboard({
       margin: '+12.8% (6,092 Votes)',
       parliament: 'Visakhapatnam Lok Sabha',
       parties: [
+        { id: 'kutami', name: 'Kutami (కూటమి / TDP + JSP + BJP)', isKutami: true, isMixKutami: true, telugu: 'కూటమి (తెదేపా + జనసేన + భాజపా ఉమ్మడి కూటమి)', candidate: 'Velagapudi Ramakrishna Babu (Kutami Joint Nominee)', symbol: '🤝', voteShare: 59.0, votes: 28083, color: '#F59E0B', trend: '+6.6%' },
         { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Velagapudi Ramakrishna Babu (Sitting MLA)', symbol: '🚲', voteShare: 51.4, votes: 24466, color: '#EAB308', trend: '+4.2%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'MVV Satyanarayana', symbol: '🪭', voteShare: 38.6, votes: 18374, color: '#0EA5E9', trend: '-2.8%' },
         { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Vizag North Alliance Team', symbol: '🍵', voteShare: 5.2, votes: 2475, color: '#DC2626', trend: '+1.8%' },
@@ -520,6 +525,7 @@ export default function NowNineAdminDashboard({
       margin: '+8.6% (3,345 Votes)',
       parliament: 'Tirupati Lok Sabha',
       parties: [
+        { id: 'kutami', name: 'Kutami (కూటమి / TDP + JSP + BJP)', isKutami: true, isMixKutami: true, telugu: 'కూటమి (తెదేపా + జనసేన + భాజపా ఉమ్మడి కూటమి)', candidate: 'Arani Srinivasulu (Kutami Joint Nominee)', symbol: '🤝', voteShare: 56.6, votes: 22017, color: '#F59E0B', trend: '+5.0%' },
         { id: 'tdp', name: 'TDP (కూటమి / Kutami)', isKutami: true, telugu: 'తెలుగుదేశం పార్టీ (కూటమి)', candidate: 'Arani Srinivasulu (Sitting MLA)', symbol: '🚲', voteShare: 50.8, votes: 19761, color: '#EAB308', trend: '+3.5%' },
         { id: 'ysrcp', name: 'YSRCP', telugu: 'వైఎస్సార్సీపీ', candidate: 'Bhumana Abhinay Reddy', symbol: '🪭', voteShare: 42.2, votes: 16416, color: '#0EA5E9', trend: '-2.4%' },
         { id: 'jsp', name: 'JSP - JanaSena (కూటమి / Kutami)', telugu: 'జనసేన పార్టీ (కూటమి)', isKutami: true, candidate: 'Tirupati Urban Incharge', symbol: '🍵', voteShare: 4.2, votes: 1634, color: '#DC2626', trend: '+1.2%' },
@@ -717,36 +723,61 @@ export default function NowNineAdminDashboard({
   // 100% DYNAMIC REAL-TIME CONSTITUENCY COMPUTATION
   const baseConstituency = ALL_CONSTITUENCIES[selectedConstituencyKey] || ALL_CONSTITUENCIES.mahabubnagar;
   const currentConstVotes = liveConstituencyVotes[selectedConstituencyKey] || { total: 0, parties: {} };
-  const realConstTotalVotes = currentConstVotes.total || 0;
   
+  // Calculate live dynamic votes for each party (baseline + live real-time incoming ballots)
   const activeConstituencyParties = baseConstituency.parties.map(party => {
-    const pVotes = currentConstVotes.parties?.[party.id] || 0;
-    const pShare = realConstTotalVotes > 0 
-      ? Math.round((pVotes / realConstTotalVotes) * 1000) / 10 
-      : 0;
+    const liveDelta = currentConstVotes.parties?.[party.id] || 0;
+    const totalPVotes = (party.votes || 0) + liveDelta;
     return {
       ...party,
-      votes: pVotes,
+      votes: totalPVotes,
+      liveDelta
+    };
+  });
+
+  // Calculate total votes excluding the combined kutami summary row to prevent double-counting
+  const totalEffectiveVotes = activeConstituencyParties
+    .filter(p => p.id !== 'kutami')
+    .reduce((acc, p) => acc + (p.votes || 0), 0) || baseConstituency.totalVotes || 1;
+
+  // Re-calculate vote share percentages accurately
+  const finalizedParties = activeConstituencyParties.map(party => {
+    if (party.id === 'kutami') {
+      // Kutami alliance vote share = (TDP + JSP + BJP + direct Kutami ballots) / totalEffectiveVotes
+      const tdpV = activeConstituencyParties.find(p => p.id === 'tdp')?.votes || 0;
+      const jspV = activeConstituencyParties.find(p => p.id === 'jsp')?.votes || 0;
+      const bjpV = activeConstituencyParties.find(p => p.id === 'bjp')?.votes || 0;
+      const kutamiDirectV = party.liveDelta || 0;
+      const totalKutamiVotes = tdpV + jspV + bjpV + kutamiDirectV;
+      const pShare = Math.round((totalKutamiVotes / totalEffectiveVotes) * 1000) / 10;
+      return {
+        ...party,
+        votes: totalKutamiVotes,
+        voteShare: pShare,
+        trend: party.liveDelta > 0 ? `+${party.liveDelta} Live` : party.trend
+      };
+    }
+    const pShare = Math.round((party.votes / totalEffectiveVotes) * 1000) / 10;
+    return {
+      ...party,
       voteShare: pShare,
-      trend: pVotes > 0 ? `+${pVotes} Votes` : '0 Votes'
+      trend: party.liveDelta > 0 ? `+${party.liveDelta} Live` : party.trend
     };
   }).sort((a, b) => b.votes - a.votes);
 
-  const topParty = activeConstituencyParties[0];
-  const secondParty = activeConstituencyParties[1];
-  const leadingMargin = realConstTotalVotes === 0 
-    ? '0 Votes • Waiting for first ballot' 
-    : (topParty.votes === secondParty?.votes 
-        ? `Tied (${topParty.votes} Votes each)`
-        : `+${Math.round((topParty.voteShare - (secondParty?.voteShare || 0)) * 10) / 10}% (${topParty.votes - (secondParty?.votes || 0)} Votes Lead)`);
+  const topParty = finalizedParties[0];
+  const secondParty = finalizedParties[1];
+  const leadingMargin = secondParty
+    ? `+${Math.round((topParty.voteShare - (secondParty?.voteShare || 0)) * 10) / 10}% (${(topParty.votes - (secondParty?.votes || 0)).toLocaleString()} Votes Lead)`
+    : `${topParty.votes.toLocaleString()} Votes`;
 
   const activeConstituency = {
     ...baseConstituency,
-    totalVotes: realConstTotalVotes,
-    leadingParty: realConstTotalVotes === 0 ? 'Awaiting First Vote' : topParty.name,
-    leadingCandidate: realConstTotalVotes === 0 ? 'No votes cast yet' : topParty.candidate,
+    totalVotes: totalEffectiveVotes,
+    leadingParty: topParty.name,
+    leadingCandidate: topParty.candidate,
     margin: leadingMargin,
-    parties: activeConstituencyParties
+    parties: finalizedParties
   };
 
   const handleCastVoterChoice = (partyName, candidateName, partyId, optIdx = 0) => {
@@ -1586,16 +1617,116 @@ export default function NowNineAdminDashboard({
                   </div>
                 </div>
 
-                {/* All 8 Parties in Responsive Grid */}
+                {/* Dedicated Mix Party Kutami (TDP + JSP + BJP) Alliance Banner */}
+                {(activeConstituency.state === 'Andhra Pradesh' || activeConstituency.parties.some(p => p.isKutami)) && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/5 border-2 border-amber-400/50 shadow-sm space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5 border-b border-amber-400/25">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-amber-500/25 border border-amber-400/50 flex items-center justify-center text-2xl shadow-xs shrink-0">
+                          🤝
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-sm font-black text-gray-900 flex items-center gap-1.5">
+                              <span>కూటమి (Kutami Alliance)</span>
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-400 text-black shadow-xs">
+                                మిక్స్ పార్టీ కూటమి (Mixed Alliance)
+                              </span>
+                            </h3>
+                          </div>
+                          <p className="text-[11px] text-gray-600 font-medium mt-0.5">
+                            TDP (తెదేపా 🚲) + JanaSena (జనసేన 🍵) + BJP (భాజపా 🪷) • Combined Grand Alliance Standings
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 self-end sm:self-auto">
+                        <div className="text-right">
+                          <span className="text-lg font-black text-amber-700 font-mono block leading-none">
+                            {(activeConstituency.parties.find(p => p.id === 'kutami')?.voteShare ?? ((activeConstituency.parties.find(p => p.id === 'tdp')?.voteShare || 0) + (activeConstituency.parties.find(p => p.id === 'jsp')?.voteShare || 0) + (activeConstituency.parties.find(p => p.id === 'bjp')?.voteShare || 0))).toFixed(1)}%
+                          </span>
+                          <span className="text-[10px] text-gray-600 font-mono font-bold block mt-0.5">
+                            {(activeConstituency.parties.find(p => p.id === 'kutami')?.votes ?? ((activeConstituency.parties.find(p => p.id === 'tdp')?.votes || 0) + (activeConstituency.parties.find(p => p.id === 'jsp')?.votes || 0) + (activeConstituency.parties.find(p => p.id === 'bjp')?.votes || 0))).toLocaleString()} total alliance votes
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const kutamiParty = activeConstituency.parties.find(p => p.id === 'kutami' || p.id === 'tdp');
+                            recordLiveBallot({
+                              party: { name: 'Kutami (కూటమి / TDP + JSP + BJP)', candidate: activeConstituency.leadingCandidate || 'Kutami Joint Nominee', id: 'kutami' },
+                              location: { assembly: activeConstituency.name, locality: activeConstituency.locality?.split(',')[0] || 'Center', state: activeConstituency.state },
+                              answers: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }
+                            });
+                            showToast(`🗳️ 1 Ballot recorded for కూటమి (Kutami Alliance - TDP+JSP+BJP)!`);
+                          }}
+                          className="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-black font-black text-xs flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                        >
+                          <Vote className="w-3.5 h-3.5 text-black" />
+                          <span>+ Vote Kutami</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Breakdown & Segmented Bar */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-gray-700 flex-wrap gap-2">
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#EAB308]"></span>
+                          <span>🚲 TDP: {activeConstituency.parties.find(p => p.id === 'tdp')?.voteShare || 0}% ({activeConstituency.parties.find(p => p.id === 'tdp')?.votes?.toLocaleString() || 0})</span>
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]"></span>
+                          <span>🍵 JSP (JanaSena): {activeConstituency.parties.find(p => p.id === 'jsp')?.voteShare || 0}% ({activeConstituency.parties.find(p => p.id === 'jsp')?.votes?.toLocaleString() || 0})</span>
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#FF6F00]"></span>
+                          <span>🪷 BJP: {activeConstituency.parties.find(p => p.id === 'bjp')?.voteShare || 0}% ({activeConstituency.parties.find(p => p.id === 'bjp')?.votes?.toLocaleString() || 0})</span>
+                        </span>
+                        <span className="text-emerald-700 font-extrabold ml-auto">
+                          Alliance Margin: +{(((activeConstituency.parties.find(p => p.id === 'tdp')?.voteShare || 0) + (activeConstituency.parties.find(p => p.id === 'jsp')?.voteShare || 0) + (activeConstituency.parties.find(p => p.id === 'bjp')?.voteShare || 0)) - (activeConstituency.parties.find(p => p.id === 'ysrcp')?.voteShare || 0)).toFixed(1)}% vs YSRCP
+                        </span>
+                      </div>
+
+                      {/* Multi-segmented Alliance Bar */}
+                      <div className="h-3.5 bg-gray-200/90 rounded-full overflow-hidden flex shadow-inner">
+                        <div 
+                          className="h-full bg-[#EAB308] transition-all duration-700"
+                          style={{ width: `${activeConstituency.parties.find(p => p.id === 'tdp')?.voteShare || 0}%` }}
+                          title={`TDP: ${activeConstituency.parties.find(p => p.id === 'tdp')?.voteShare || 0}%`}
+                        />
+                        <div 
+                          className="h-full bg-[#DC2626] transition-all duration-700"
+                          style={{ width: `${activeConstituency.parties.find(p => p.id === 'jsp')?.voteShare || 0}%` }}
+                          title={`JSP: ${activeConstituency.parties.find(p => p.id === 'jsp')?.voteShare || 0}%`}
+                        />
+                        <div 
+                          className="h-full bg-[#FF6F00] transition-all duration-700"
+                          style={{ width: `${activeConstituency.parties.find(p => p.id === 'bjp')?.voteShare || 0}%` }}
+                          title={`BJP: ${activeConstituency.parties.find(p => p.id === 'bjp')?.voteShare || 0}%`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* All Parties in Responsive Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {activeConstituency.parties.map((party, rank) => (
                     <div
                       key={party.id}
-                      className="p-3 rounded-xl bg-gray-50/80 border border-gray-100 hover:border-gray-300 transition space-y-2"
+                      className={`p-3 rounded-xl border transition space-y-2 ${
+                        party.id === 'kutami'
+                          ? 'bg-amber-500/10 border-amber-400 shadow-sm ring-1 ring-amber-400/40'
+                          : 'bg-gray-50/80 border-gray-100 hover:border-gray-300'
+                      }`}
                     >
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className="w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-700 shrink-0">
+                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                            party.id === 'kutami' ? 'bg-amber-400 text-black font-black' : 'bg-white border border-gray-200 text-gray-700'
+                          }`}>
                             #{rank + 1}
                           </span>
                           <span className="text-lg shrink-0">{party.symbol}</span>
@@ -1604,10 +1735,16 @@ export default function NowNineAdminDashboard({
                               <span className="font-extrabold text-gray-900 text-xs sm:text-sm block truncate">
                                 {party.name}
                               </span>
-                              {(party.isKutami || party.name?.includes('కూటమి') || party.telugu?.includes('కూటమి')) && (
-                                <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                  కూటమి (Kutami)
+                              {party.id === 'kutami' ? (
+                                <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-amber-400 text-black font-black shadow-2xs">
+                                  మిక్స్ పార్టీ కూటమి (Mix Kutami)
                                 </span>
+                              ) : (
+                                (party.isKutami || party.name?.includes('కూటమి') || party.telugu?.includes('కూటమి')) && (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                    కూటమి (Kutami)
+                                  </span>
+                                )
                               )}
                             </div>
                           </div>

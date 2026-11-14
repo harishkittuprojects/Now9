@@ -148,6 +148,26 @@ export function getAndhraAllParties(assembly = 'Andhra Assembly', locality = 'Lo
   const cleanAssembly = (assembly || '').replace(/\s*Assembly\s*Constituency\s*/gi, '').replace(/\s*Assembly\s*/gi, '');
   return [
     {
+      id: 'kutami',
+      name: 'Kutami (కూటమి / TDP + JSP + BJP Alliance)',
+      teluguName: 'కూటమి (తెదేపా + జనసేన + భాజపా)',
+      code: 'KUTAMI',
+      symbol: '🤝',
+      isKutami: true,
+      isMixKutami: true,
+      alliance: 'కూటమి (Kutami Alliance - TDP + JSP + BJP)',
+      candidate: overrides.kutami?.candidate || `Kutami Joint Nominee (${cleanAssembly})`,
+      role: 'Ruling Coalition (కూటమి / Alliance)',
+      status: 'Ruling Coalition (కూటమి / Alliance)',
+      color: '#F59E0B',
+      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+      voteShare: overrides.kutami?.voteShare || 55.3,
+      focus: 'అమరావతి నిర్మాణం, సూపర్ 6 పథకాలు, సమగ్ర అభివృద్ధి & సుపరిపాలన',
+      keyFocus: 'అమరావతి నిర్మాణం, సూపర్ 6 పథకాలు, సమగ్ర అభివృద్ధి & సుపరిపాలన',
+      promises: overrides.kutami?.promises || ['United Kutami Governance', 'Super 6 Guarantee schemes implementation', 'Special state development package'],
+      manifestoPromises: overrides.kutami?.promises || ['United Kutami Governance', 'Super 6 Guarantee schemes implementation', 'Special state development package']
+    },
+    {
       id: 'tdp',
       name: 'TDP (కూటమి / Kutami)',
       teluguName: 'తెలుగుదేశం పార్టీ (కూటమి)',

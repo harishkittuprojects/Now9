@@ -38,17 +38,21 @@ export function recordLiveBallot({ party, location, answers = {} }) {
   
   // Normalize party code
   const pNameLower = (partyName + ' ' + (party?.id || '')).toLowerCase();
-  let partyCode = 'oth';
-  if (pNameLower.includes('congress') || pNameLower.includes('inc')) partyCode = 'inc';
-  else if (pNameLower.includes('brs')) partyCode = 'brs';
-  else if (pNameLower.includes('bjp')) partyCode = 'bjp';
-  else if (pNameLower.includes('tdp')) partyCode = 'tdp';
-  else if (pNameLower.includes('ysr')) partyCode = 'ysrcp';
-  else if (pNameLower.includes('aimim') || pNameLower.includes('mim')) partyCode = 'aimim';
-  else if (pNameLower.includes('janasena') || pNameLower.includes('jsp') || pNameLower.includes('jana sena')) partyCode = 'jsp';
-  else if (pNameLower.includes('cpi') || pNameLower.includes('cpm') || pNameLower.includes('left')) partyCode = 'cpi';
-  else if (pNameLower.includes('bsp')) partyCode = 'bsp';
-  else partyCode = 'oth';
+  let partyCode = (party?.id || '').toLowerCase();
+  if (!partyCode || partyCode === 'oth') {
+    if (pNameLower.startsWith('kutami') || pNameLower.includes('mix party') || pNameLower.includes('మిక్స్') || pNameLower.startsWith('కూటమి')) partyCode = 'kutami';
+    else if (pNameLower.includes('congress') || pNameLower.includes('inc')) partyCode = 'inc';
+    else if (pNameLower.includes('brs')) partyCode = 'brs';
+    else if (pNameLower.includes('janasena') || pNameLower.includes('jsp') || pNameLower.includes('jana sena')) partyCode = 'jsp';
+    else if (pNameLower.includes('tdp')) partyCode = 'tdp';
+    else if (pNameLower.includes('bjp')) partyCode = 'bjp';
+    else if (pNameLower.includes('ysr')) partyCode = 'ysrcp';
+    else if (pNameLower.includes('aimim') || pNameLower.includes('mim')) partyCode = 'aimim';
+    else if (pNameLower.includes('cpi') || pNameLower.includes('cpm') || pNameLower.includes('left')) partyCode = 'cpi';
+    else if (pNameLower.includes('bsp')) partyCode = 'bsp';
+    else if (pNameLower.includes('kutami') || pNameLower.includes('కూటమి')) partyCode = 'kutami';
+    else partyCode = 'oth';
+  }
 
   const ballotId = `#BLT-${String(nextCount).padStart(4, '0')}`;
   
