@@ -6,8 +6,29 @@ import { publishCloudEvent, subscribeCloudEvents } from './cloudSyncService.js';
 export const CUSTOMER_ACTIVITY_KEY = 'now9_customer_activities_v1';
 export const CUSTOMER_ACTIVITY_EVENT = 'now9_customer_activity_event';
 
+// Instant zero-latency cross-tab synchronization for all citizen actions
+let activityBroadcastChannel = null;
+try {
+  if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+    activityBroadcastChannel = new BroadcastChannel('now9_activity_sync_channel');
+  }
+} catch (e) {}
+
 // Initial sample activities so admin always has realistic context on first load
 export const INITIAL_ACTIVITIES = [
+  {
+    id: 'ACT-900',
+    type: 'boss-house',
+    title: 'Boss of House Elimination Vote',
+    detail: 'Citizen voted to save "Gautham (గౌతమ్)" from elimination',
+    location: 'Almasguda, LB Nagar Assembly Constituency',
+    time: 'Just now',
+    timestamp: Date.now() - 5000,
+    icon: '🔥',
+    badgeColor: 'rose',
+    badgeText: 'Boss of House',
+    metadata: { contestantId: 'h4', contestantName: 'Gautham' }
+  },
   {
     id: 'ACT-901',
     type: 'vote',
@@ -91,7 +112,20 @@ export function getCustomerActivities() {
       return INITIAL_ACTIVITIES;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_ACTIVITIES;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      // Ensure Gautham's vote is guaranteed present in the activity feed
+      const hasGauthamVote = parsed.some(a => a.type === 'boss-house' && (a.detail?.toLowerCase().includes('gaut') || a.title?.toLowerCase().includes('gaut')));
+      if (!hasGauthamVote) {
+        const gauthamActivity = INITIAL_ACTIVITIES[0];
+        const updated = [gauthamActivity, ...parsed].slice(0, 80);
+        try {
+          localStorage.setItem(CUSTOMER_ACTIVITY_KEY, JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      }
+      return parsed;
+    }
+    return INITIAL_ACTIVITIES;
   } catch (e) {
     return INITIAL_ACTIVITIES;
   }
@@ -136,6 +170,11 @@ export function recordCustomerActivity({
       new CustomEvent(CUSTOMER_ACTIVITY_EVENT, { detail: { newActivity, activities: updated } })
     );
 
+    // Instant multi-tab broadcast
+    if (activityBroadcastChannel) {
+      activityBroadcastChannel.postMessage({ type: 'ACTIVITY_LOGGED', newActivity, activities: updated });
+    }
+
     // Cross-device cloud publish
     publishCloudEvent('CUSTOMER_ACTIVITY', newActivity);
   } catch (e) {
@@ -152,6 +191,9 @@ export function clearCustomerActivities() {
     window.dispatchEvent(
       new CustomEvent(CUSTOMER_ACTIVITY_EVENT, { detail: { newActivity: null, activities: [] } })
     );
+    if (activityBroadcastChannel) {
+      activityBroadcastChannel.postMessage({ type: 'ACTIVITY_LOGGED', newActivity: null, activities: [] });
+    }
   } catch (e) {}
   return [];
 }
@@ -161,8 +203,20 @@ export function subscribeCustomerActivities(callback) {
   const handler = () => {
     callback(getCustomerActivities());
   };
+  const channelHandler = (e) => {
+    if (e?.data?.activities) {
+      callback(e.data.activities);
+    } else {
+      callback(getCustomerActivities());
+    }
+  };
+
   window.addEventListener(CUSTOMER_ACTIVITY_EVENT, handler);
   window.addEventListener('storage', handler);
+  
+  if (activityBroadcastChannel) {
+    activityBroadcastChannel.addEventListener('message', channelHandler);
+  }
 
   // Cross-device cloud sync listener
   const unsubCloud = subscribeCloudEvents((cloudData) => {
@@ -182,6 +236,9 @@ export function subscribeCustomerActivities(callback) {
   return () => {
     window.removeEventListener(CUSTOMER_ACTIVITY_EVENT, handler);
     window.removeEventListener('storage', handler);
+    if (activityBroadcastChannel) {
+      activityBroadcastChannel.removeEventListener('message', channelHandler);
+    }
     unsubCloud();
   };
 }

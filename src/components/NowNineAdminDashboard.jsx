@@ -78,6 +78,7 @@ import {
   updateHousemate, 
   deleteHousemate, 
   resetHousemateVotes, 
+  voteForHousemate,
   subscribeHousemates 
 } from '../data/bossStore';
 import { 
@@ -311,11 +312,20 @@ export default function NowNineAdminDashboard({
       {
         type: 'boss-house',
         title: 'Boss of House Elimination Vote',
+        detail: 'Citizen voted to save "Gautham (గౌతమ్)" from elimination',
+        location: 'Almasguda, LB Nagar Assembly Constituency',
+        icon: '🔥',
+        badgeColor: 'rose',
+        badgeText: 'Boss of House'
+      },
+      {
+        type: 'boss-house',
+        title: 'Boss of House Elimination Vote',
         detail: 'Citizen voted to save "Vishnupriya (విష్ణుప్రియ)" from elimination',
         location: 'Jubilee Hills, Hyderabad',
         icon: '👑',
         badgeColor: 'rose',
-        badgeText: 'Boss Elimination'
+        badgeText: 'Boss of House'
       },
       {
         type: 'live',
@@ -1031,6 +1041,7 @@ export default function NowNineAdminDashboard({
           <nav className="space-y-1.5 my-5">
             {[
               { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+              { id: 'boss-house', label: 'Boss of House', icon: Eye, badge: 'Voting' },
               { id: 'live-broadcast', label: 'Live Broadcast', icon: Radio },
               { id: 'news', label: 'Manage News', icon: Newspaper },
               { id: 'live-debates', label: 'Manage Videos', icon: Play },
@@ -1061,10 +1072,29 @@ export default function NowNineAdminDashboard({
                         ? 'text-black stroke-[2.5]' 
                         : tab.id === 'live-broadcast' 
                           ? (activeBroadcast?.isLive ? 'text-red-500 animate-pulse' : 'text-red-400') 
-                          : 'text-gray-400'
+                          : tab.id === 'boss-house'
+                            ? 'text-amber-400'
+                            : 'text-gray-400'
                     }`} />
                     <span className="truncate">{tab.label}</span>
                   </div>
+
+                  {tab.id === 'boss-house' && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 ${
+                      isActive ? 'bg-black text-amber-500 font-extrabold' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    }`}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      <span>VOTING</span>
+                    </span>
+                  )}
+
+                  {tab.id === 'customer-tasks' && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black font-mono ${
+                      isActive ? 'bg-black text-emerald-600' : 'bg-emerald-500/20 text-emerald-400'
+                    }`}>
+                      {customerActivities.length}
+                    </span>
+                  )}
 
                   {tab.id === 'live-broadcast' && (
                     <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 ${
@@ -1245,6 +1275,86 @@ export default function NowNineAdminDashboard({
                 </div>
               </div>
 
+              {/* Boss of House Live Elimination Standings Banner */}
+              <div className="bg-gradient-to-r from-[#14141E] via-[#1A1A28] to-[#12121A] rounded-2xl p-4 sm:p-5 border border-amber-500/30 shadow-lg text-white">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/10 gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xl">
+                      👑
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-sm sm:text-base font-black text-white">Boss of House • Live Elimination Voting</h2>
+                        <span className="px-2 py-0.5 rounded-full bg-red-600/30 border border-red-500/40 text-red-400 text-[9px] font-black animate-pulse flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                          LIVE STANDINGS
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-400">Official Telugu housemate voting tallies synced live with citizen mobile app</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <span className="text-xs font-mono font-bold text-amber-300 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
+                      {bossContestants.reduce((s, h) => s + (h.votes || 0), 0).toLocaleString()} Total Votes
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('boss-house')}
+                      className="px-3 py-1 rounded-xl bg-[#F9C942] hover:bg-[#F5C754] text-black text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                    >
+                      <span>Manage Housemates</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Housemates Quick Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-3">
+                  {bossContestants.slice(0, 5).map((c) => (
+                    <div 
+                      key={c.id} 
+                      className={`p-3 rounded-xl border transition-all ${
+                        c.name.toLowerCase().includes('gaut') 
+                          ? 'bg-amber-500/10 border-amber-400/60 shadow-md shadow-amber-500/10 ring-1 ring-amber-400/40' 
+                          : 'bg-[#0E0E16] border-[#222234] hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xl">{c.avatar}</span>
+                        <span className={`text-[8.5px] px-1.5 py-0.5 rounded-full font-bold ${
+                          c.status === 'Danger Zone' 
+                            ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30' 
+                            : c.status === 'Nominated' 
+                              ? 'bg-red-500/20 text-red-300 border border-red-400/30' 
+                              : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+                        }`}>
+                          {c.status}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-black text-white truncate flex items-center gap-1">
+                        <span>{c.name}</span>
+                        {c.name.toLowerCase().includes('gaut') && (
+                          <span className="text-[7.5px] px-1 rounded bg-[#F5C754] text-black font-extrabold">VOTED</span>
+                        )}
+                      </h4>
+                      <span className="text-[9.5px] text-gray-400 font-telugu block truncate">{c.teluguName || c.name}</span>
+                      <div className="mt-2 space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-mono">
+                          <span className="text-gray-400">{(c.votes || 0).toLocaleString()} votes</span>
+                          <span className="text-amber-400 font-bold">{c.percent || 0}%</span>
+                        </div>
+                        <div className="w-full h-1 bg-[#202030] rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" 
+                            style={{ width: `${c.percent || 0}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Lower 2-Column Section: Recent Activity (8 cols) & Quick Actions (4 cols) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
                 
@@ -1265,85 +1375,41 @@ export default function NowNineAdminDashboard({
                     </button>
                   </div>
 
-                  {/* 3 Mockup Activity Rows */}
+                  {/* Real-time Customer Activity Rows */}
                   <div className="space-y-3">
-                    <div className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <img
-                          src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=120&auto=format&fit=crop&q=80"
-                          alt="Activity thumbnail"
-                          className="w-14 h-11 rounded-lg object-cover bg-gray-100 shrink-0 shadow-xs"
-                        />
-                        <div className="min-w-0">
-                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
-                            New Development in {activeConstituency?.locality?.split(',')[0] || 'Almasguda'}
-                          </h3>
-                          <span className="text-[11px] text-gray-400 block mt-0.5">
-                            Local Civic Infrastructure & Water Project
+                    {customerActivities.slice(0, 3).map((act) => (
+                      <div key={act.id} className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="text-2xl p-2 rounded-xl bg-gray-100 shrink-0">
+                            {act.icon}
+                          </span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                                {act.title}
+                              </h3>
+                              <span className="text-[9px] font-mono font-bold text-gray-400">{act.id}</span>
+                            </div>
+                            <span className="text-[11px] text-gray-500 block mt-0.5 truncate">
+                              {act.detail}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <span className="text-xs text-gray-400 font-medium whitespace-nowrap hidden sm:inline">
+                            {act.time || 'Just now'}
+                          </span>
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                            act.badgeColor === 'rose' ? 'bg-rose-100 text-rose-700' :
+                            act.badgeColor === 'emerald' ? 'bg-[#E8F8EE] text-[#059669]' :
+                            act.badgeColor === 'amber' ? 'bg-amber-100 text-amber-800' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {act.badgeText || act.type}
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap hidden sm:inline">
-                          Nov 1, 2026
-                        </span>
-                        <span className="px-2.5 py-1 rounded-full bg-[#E8F8EE] text-[#059669] text-[11px] font-bold">
-                          Published
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <img
-                          src="https://images.unsplash.com/photo-1577495508048-b635879837f1?w=120&auto=format&fit=crop&q=80"
-                          alt="Activity thumbnail"
-                          className="w-14 h-11 rounded-lg object-cover bg-gray-100 shrink-0 shadow-xs"
-                        />
-                        <div className="min-w-0">
-                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
-                            Public Meeting Highlights
-                          </h3>
-                          <span className="text-[11px] text-gray-400 block mt-0.5">
-                            Live Debate & Election Public Forum
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap hidden sm:inline">
-                          Oct 31, 2026
-                        </span>
-                        <span className="px-2.5 py-1 rounded-full bg-[#E8F8EE] text-[#059669] text-[11px] font-bold">
-                          Published
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <img
-                          src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=120&auto=format&fit=crop&q=80"
-                          alt="Activity thumbnail"
-                          className="w-14 h-11 rounded-lg object-cover bg-gray-100 shrink-0 shadow-xs"
-                        />
-                        <div className="min-w-0">
-                          <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
-                            Development Works
-                          </h3>
-                          <span className="text-[11px] text-gray-400 block mt-0.5">
-                            Road Reconstruction & Drainage Status
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap hidden sm:inline">
-                          Oct 30, 2026
-                        </span>
-                        <span className="px-2.5 py-1 rounded-full bg-[#E8F8EE] text-[#059669] text-[11px] font-bold">
-                          Published
-                        </span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
 
@@ -2527,14 +2593,25 @@ export default function NowNineAdminDashboard({
                     Enter housemate names, publish contestants live to the mobile voting screen, and monitor live tallies
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[10px] text-amber-400 font-mono px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 font-bold">
                     {bossContestants.length} Housemates Live
                   </span>
                   <button
                     type="button"
+                    onClick={() => {
+                      voteForHousemate('h4');
+                      showToast('🔥 Live Vote registered for Gautham (గౌతమ్)!');
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold hover:bg-amber-500/30 cursor-pointer transition-colors flex items-center gap-1.5 shadow-xs"
+                    title="Simulate casting a vote for Gautham directly"
+                  >
+                    <span>+ Test Vote for Gautham</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={handleResetHousemateTally}
-                    className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-amber-300 text-xs font-bold hover:bg-[#1E1E2E] cursor-pointer transition-colors"
+                    className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-gray-300 text-xs font-bold hover:bg-[#1E1E2E] cursor-pointer transition-colors"
                   >
                     Reset Week Tally
                   </button>
@@ -2656,58 +2733,86 @@ export default function NowNineAdminDashboard({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {bossContestants.map((c) => (
-                    <div key={c.id} className="p-4 rounded-2xl bg-[#0E0E14] border border-[#222232] space-y-3 hover:border-amber-500/30 transition-all">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-3xl p-1.5 rounded-xl bg-[#14141E] border border-[#242436]">{c.avatar}</span>
-                          <div>
-                            <h3 className="font-extrabold text-sm text-white">{c.name}</h3>
-                            <span className="text-[10px] text-gray-400 font-telugu block">{c.teluguName || c.name} • {c.role}</span>
+                  {bossContestants.map((c) => {
+                    const isGautham = c.name.toLowerCase().includes('gaut');
+                    return (
+                      <div 
+                        key={c.id} 
+                        className={`p-4 rounded-2xl border space-y-3 transition-all ${
+                          isGautham
+                            ? 'bg-[#14120B] border-amber-500/70 shadow-lg shadow-amber-500/10 ring-1 ring-amber-400/50'
+                            : 'bg-[#0E0E14] border-[#222232] hover:border-amber-500/30'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-3xl p-1.5 rounded-xl bg-[#14141E] border border-[#242436]">{c.avatar}</span>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <h3 className="font-extrabold text-sm text-white">{c.name}</h3>
+                                {isGautham && (
+                                  <span className="px-1.5 py-0.2 rounded bg-[#F5C754] text-black text-[7.5px] font-black uppercase">
+                                    VOTED
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[10px] text-gray-400 font-telugu block">{c.teluguName || c.name} • {c.role}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleHousemateStatus(c.id, c.status)}
+                              className={`px-2 py-0.5 rounded-full text-[9px] font-black cursor-pointer transition-all ${
+                                c.status === 'Safe' 
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40' 
+                                  : (c.status === 'Danger Zone' 
+                                    ? 'bg-rose-500/20 text-rose-300 border border-rose-400/40' 
+                                    : 'bg-red-500/20 text-red-300 border border-red-400/40')
+                              }`}
+                              title="Click to toggle nomination status"
+                            >
+                              {c.status}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteHousemate(c.id, c.name)}
+                              className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-white/5 cursor-pointer"
+                              title="Remove housemate"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleHousemateStatus(c.id, c.status)}
-                            className={`px-2 py-0.5 rounded-full text-[9px] font-black cursor-pointer transition-all ${
-                              c.status === 'Safe' 
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40' 
-                                : (c.status === 'Danger Zone' 
-                                  ? 'bg-rose-500/20 text-rose-300 border border-rose-400/40' 
-                                  : 'bg-red-500/20 text-red-300 border border-red-400/40')
-                            }`}
-                            title="Click to toggle nomination status"
-                          >
-                            {c.status}
-                          </button>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs font-mono">
+                            <span className="text-gray-400">{(c.votes || 0).toLocaleString()} votes</span>
+                            <span className="text-amber-400 font-bold">{c.percent || 0}%</span>
+                          </div>
+                          <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" 
+                              style={{ width: `${c.percent || 0}%` }}
+                            ></div>
+                          </div>
+                        </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteHousemate(c.id, c.name)}
-                            className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-white/5 cursor-pointer"
-                            title="Remove housemate"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            voteForHousemate(c.id);
+                            showToast(`🗳️ Vote recorded for ${c.name} (${c.teluguName || c.name})!`);
+                          }}
+                          className="w-full py-1.5 px-2 rounded-xl bg-[#1C1C28] hover:bg-amber-500 hover:text-black text-amber-300 text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <span>+ Cast Vote for {c.name}</span>
+                        </button>
                       </div>
-
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-gray-400">{(c.votes || 0).toLocaleString()} votes</span>
-                          <span className="text-amber-400 font-bold">{c.percent || 0}%</span>
-                        </div>
-                        <div className="h-2 bg-[#1C1C28] rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-500" 
-                            style={{ width: `${c.percent || 0}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>

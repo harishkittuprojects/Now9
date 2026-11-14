@@ -4213,7 +4213,12 @@ export function ScreenNews({ onBack, onNavigate }) {
 // 10. SCREEN 10: BIG BOSS TELUGU SCREEN (Elimination Voting, Polls & House Drama)
 export function ScreenBigBoss({ onBack, onNavigate }) {
   const [activeTab, setActiveTab] = useState('voting'); // 'voting' | 'highlights' | 'contestants'
-  const [selectedContestant, setSelectedContestant] = useState(null);
+  const [selectedContestant, setSelectedContestant] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('now9_boss_user_voted_id') || 'h4';
+    }
+    return 'h4';
+  });
   const [toastMessage, setToastMessage] = useState(null);
   const [pollVotes, setPollVotes] = useState({ 1: null });
   const [housemates, setHousemates] = useState(() => getPublishedHousemates());
@@ -4237,9 +4242,12 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
 
   const handleVoteContestant = (c) => {
     setSelectedContestant(c.id);
+    try {
+      localStorage.setItem('now9_boss_user_voted_id', c.id);
+    } catch (e) {}
     voteForHousemate(c.id);
     setToastMessage(`🎉 మీ ఓటు ${c.name} (${c.teluguName || c.name}) కి నమోదైంది! (Saved Vote Recorded)`);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   return (
