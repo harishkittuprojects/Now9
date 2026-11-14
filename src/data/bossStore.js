@@ -432,3 +432,154 @@ export function subscribeBossVideos(callback) {
     unsubCloud();
   };
 }
+
+// ==========================================
+// BOSS OF HOUSE 24/7 LIVE STREAM STORE
+// ==========================================
+export const BOSS_LIVE_STORAGE_KEY = 'now9_boss_live_broadcast_v2';
+export const BOSS_LIVE_EVENT = 'now9_boss_live_updated';
+
+export const DEFAULT_BOSS_LIVE = {
+  isLive: true,
+  id: 'boss-live-247',
+  title: 'Boss of House Telugu 2026 • 24/7 Multi-Cam Live House Stream',
+  teluguTitle: 'బాస్ ఆఫ్ హౌస్ 2026 • 24/7 లైవ్ హౌస్ కెమెరా & లైవ్ ఓటింగ్',
+  host: 'Now9 Entertainment Desk & Host Live',
+  activeCam: 1,
+  cameras: [
+    { id: 1, name: 'Cam 1: Living Room & Activity Area', label: 'Living Room', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4', status: 'LIVE' },
+    { id: 2, name: 'Cam 2: Garden & Poolside Chill', label: 'Garden & Pool', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', status: 'LIVE' },
+    { id: 3, name: 'Cam 3: Kitchen & Dining Room Debate', label: 'Kitchen & Dining', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', status: 'LIVE' },
+    { id: 4, name: 'Cam 4: Confession & Captaincy Room', label: 'Confession Room', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', status: 'LIVE' },
+  ],
+  videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4',
+  viewers: 42850,
+  likes: 19400,
+  startedAt: Date.now() - 48 * 60 * 1000
+};
+
+export function getBossLiveBroadcast() {
+  if (typeof window === 'undefined') return DEFAULT_BOSS_LIVE;
+  try {
+    const raw = localStorage.getItem(BOSS_LIVE_STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(BOSS_LIVE_STORAGE_KEY, JSON.stringify(DEFAULT_BOSS_LIVE));
+      return DEFAULT_BOSS_LIVE;
+    }
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.id ? parsed : DEFAULT_BOSS_LIVE;
+  } catch (e) {
+    return DEFAULT_BOSS_LIVE;
+  }
+}
+
+export function updateBossLiveBroadcast(updates) {
+  if (typeof window === 'undefined') return DEFAULT_BOSS_LIVE;
+  const current = getBossLiveBroadcast();
+  const updated = { ...current, ...updates };
+  try {
+    localStorage.setItem(BOSS_LIVE_STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent(BOSS_LIVE_EVENT, { detail: updated }));
+    if (bossBroadcastChannel) {
+      bossBroadcastChannel.postMessage({ type: 'BOSS_LIVE_UPDATE', data: updated });
+    }
+    publishCloudEvent('BOSS_LIVE_UPDATE', updated);
+  } catch (e) {}
+  return updated;
+}
+
+export function startBossLiveBroadcast({ title, teluguTitle, videoUrl, host, activeCam = 1 } = {}) {
+  const current = getBossLiveBroadcast();
+  const chosenVideoUrl = videoUrl || current.cameras.find(c => c.id === activeCam)?.videoUrl || current.videoUrl;
+  const updated = updateBossLiveBroadcast({
+    isLive: true,
+    title: title || current.title,
+    teluguTitle: teluguTitle || current.teluguTitle,
+    videoUrl: chosenVideoUrl,
+    host: host || current.host,
+    activeCam,
+    startedAt: Date.now()
+  });
+
+  recordCustomerActivity({
+    type: 'live',
+    title: 'Boss of House Live Broadcast Started',
+    detail: `Live stream conducted: "${updated.title}"`,
+    location: 'Admin Dashboard',
+    icon: '🔴',
+    badgeColor: 'red',
+    badgeText: 'Live Stream'
+  });
+
+  return updated;
+}
+
+export function endBossLiveBroadcast() {
+  const updated = updateBossLiveBroadcast({
+    isLive: false,
+    endedAt: Date.now()
+  });
+
+  recordCustomerActivity({
+    type: 'live',
+    title: 'Boss of House Live Broadcast Ended',
+    detail: `Stream ended by Admin`,
+    location: 'Admin Dashboard',
+    icon: '⏹️',
+    badgeColor: 'gray',
+    badgeText: 'Stream Ended'
+  });
+
+  return updated;
+}
+
+export function switchBossLiveCamera(camId) {
+  const current = getBossLiveBroadcast();
+  const cam = current.cameras.find(c => c.id === camId);
+  if (!cam) return current;
+  return updateBossLiveBroadcast({
+    activeCam: camId,
+    videoUrl: cam.videoUrl
+  });
+}
+
+export function subscribeBossLive(callback) {
+  if (typeof window === 'undefined') return () => {};
+
+  const handler = () => {
+    callback(getBossLiveBroadcast());
+  };
+
+  const channelHandler = (e) => {
+    if (e?.data?.type === 'BOSS_LIVE_UPDATE' && e.data.data) {
+      callback(e.data.data);
+    } else {
+      callback(getBossLiveBroadcast());
+    }
+  };
+
+  window.addEventListener(BOSS_LIVE_EVENT, handler);
+  window.addEventListener('storage', handler);
+
+  if (bossBroadcastChannel) {
+    bossBroadcastChannel.addEventListener('message', channelHandler);
+  }
+
+  const unsubCloud = subscribeCloudEvents((cloudData) => {
+    if (cloudData.type === 'BOSS_LIVE_UPDATE' && cloudData.payload) {
+      try {
+        localStorage.setItem(BOSS_LIVE_STORAGE_KEY, JSON.stringify(cloudData.payload));
+      } catch (err) {}
+      callback(cloudData.payload);
+    }
+  });
+
+  return () => {
+    window.removeEventListener(BOSS_LIVE_EVENT, handler);
+    window.removeEventListener('storage', handler);
+    if (bossBroadcastChannel) {
+      bossBroadcastChannel.removeEventListener('message', channelHandler);
+    }
+    unsubCloud();
+  };
+}

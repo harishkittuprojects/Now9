@@ -85,7 +85,13 @@ import {
   getPublishedBossVideos,
   addBossVideo,
   deleteBossVideo,
-  subscribeBossVideos
+  subscribeBossVideos,
+  getBossLiveBroadcast,
+  startBossLiveBroadcast,
+  endBossLiveBroadcast,
+  updateBossLiveBroadcast,
+  switchBossLiveCamera,
+  subscribeBossLive
 } from '../data/bossStore';
 import { 
   getCustomerActivities, 
@@ -1012,6 +1018,63 @@ export default function NowNineAdminDashboard({
     const updated = deleteBossVideo(id);
     setBossVideos(updated);
     showToast(`🗑️ Removed video "${title}".`);
+  };
+
+  // Boss of House Live Stream State & Handlers
+  const [bossLiveBroadcast, setBossLiveBroadcast] = useState(() => getBossLiveBroadcast());
+  const [liveStreamTitle, setLiveStreamTitle] = useState('');
+  const [liveStreamCategory, setLiveStreamCategory] = useState('');
+  const [bossLiveTitleInput, setBossLiveTitleInput] = useState(bossLiveBroadcast.title || '');
+  const [bossLiveTeluguInput, setBossLiveTeluguInput] = useState(bossLiveBroadcast.teluguTitle || '');
+  const [bossLiveUrlInput, setBossLiveUrlInput] = useState(bossLiveBroadcast.videoUrl || '');
+  const [bossLiveHostInput, setBossLiveHostInput] = useState(bossLiveBroadcast.host || '');
+
+  useEffect(() => {
+    const unsub = subscribeBossLive((data) => {
+      setBossLiveBroadcast(data);
+      if (data) {
+        setBossLiveTitleInput(data.title || '');
+        setBossLiveTeluguInput(data.teluguTitle || '');
+        setBossLiveUrlInput(data.videoUrl || '');
+        setBossLiveHostInput(data.host || '');
+      }
+    });
+    return unsub;
+  }, []);
+
+  const handleToggleBossLive = () => {
+    if (bossLiveBroadcast.isLive) {
+      const ended = endBossLiveBroadcast();
+      setBossLiveBroadcast(ended);
+      showToast('⏹️ Boss of House Live Stream stopped.');
+    } else {
+      const started = startBossLiveBroadcast({
+        title: bossLiveTitleInput.trim() || 'Boss of House Telugu 2026 • 24/7 Multi-Cam Live House Stream',
+        teluguTitle: bossLiveTeluguInput.trim() || 'బాస్ ఆఫ్ హౌస్ 2026 • 24/7 లైవ్ హౌస్ కెమెరా',
+        videoUrl: bossLiveUrlInput.trim() || undefined,
+        host: bossLiveHostInput.trim() || 'Now9 Entertainment Desk & Host Live'
+      });
+      setBossLiveBroadcast(started);
+      showToast('🔴 Boss of House is now LIVE! Broadcast synced to citizen app.');
+    }
+  };
+
+  const handleUpdateBossLiveDetails = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const updated = updateBossLiveBroadcast({
+      title: bossLiveTitleInput.trim() || bossLiveBroadcast.title,
+      teluguTitle: bossLiveTeluguInput.trim() || bossLiveBroadcast.teluguTitle,
+      videoUrl: bossLiveUrlInput.trim() || bossLiveBroadcast.videoUrl,
+      host: bossLiveHostInput.trim() || bossLiveBroadcast.host
+    });
+    setBossLiveBroadcast(updated);
+    showToast('✅ Live Stream configuration updated successfully!');
+  };
+
+  const handleSwitchBossCamera = (camId) => {
+    const updated = switchBossLiveCamera(camId);
+    setBossLiveBroadcast(updated);
+    showToast(`📹 Switched to Camera ${camId} (${updated.cameras.find(c => c.id === camId)?.label || 'Live Cam'})!`);
   };
 
 // Real-time auditStream managed via voteStore
@@ -2811,6 +2874,20 @@ export default function NowNineAdminDashboard({
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBossSubTab('live');
+                      showToast('🔴 Switched to Boss of House Live Stream Control Room');
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-red-950/40 cursor-pointer transition-all ring-1 ring-red-400/40"
+                    title="Conduct Boss of House 24/7 Live Stream & Multi-Cam House Feed"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                    <Video className="w-3.5 h-3.5 text-white" />
+                    <span>🔴 Conduct Live</span>
+                  </button>
+
                   <span className="text-[10px] text-amber-400 font-mono px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 font-bold">
                     {bossContestants.length} Housemates Live
                   </span>
@@ -2835,8 +2912,8 @@ export default function NowNineAdminDashboard({
                 </div>
               </div>
 
-              {/* Sub-navigation Switcher: Housemates vs Videos */}
-              <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#0E0E14] border border-[#20202E] w-fit">
+              {/* Sub-navigation Switcher: Housemates vs Videos vs Conduct Live */}
+              <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#0E0E14] border border-[#20202E] w-fit flex-wrap">
                 <button
                   type="button"
                   onClick={() => setBossSubTab('contestants')}
@@ -2861,6 +2938,24 @@ export default function NowNineAdminDashboard({
                 >
                   <Film className="w-4 h-4" />
                   <span>🎬 Upload Videos & Highlights ({bossVideos.length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBossSubTab('live')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+                    bossSubTab === 'live'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-950/50 ring-1 ring-red-400'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Radio className="w-4 h-4 text-red-400" />
+                  <span>🔴 Conduct 24/7 Live Stream</span>
+                  <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase ${
+                    bossLiveBroadcast.isLive ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-700 text-gray-300'
+                  }`}>
+                    {bossLiveBroadcast.isLive ? 'LIVE' : 'OFFLINE'}
+                  </span>
                 </button>
               </div>
 
@@ -3349,6 +3444,280 @@ export default function NowNineAdminDashboard({
                 </div>
               )}
 
+              {/* TAB 3: CONDUCT 24/7 LIVE STREAM & MULTI-CAM CONTROL */}
+              {bossSubTab === 'live' && (
+                <div className="space-y-6 animate-fadeIn">
+                  {/* Hero Broadcast Status & Quick Control Card */}
+                  <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1A0A0E] via-[#120D14] to-[#0A0A10] border-2 border-red-500/40 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-red-500/20">
+                      <div className="space-y-2 max-w-2xl">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className={`px-3 py-1 rounded-full text-xs font-black uppercase flex items-center gap-1.5 shadow-md ${
+                            bossLiveBroadcast.isLive 
+                              ? 'bg-red-600 text-white animate-pulse shadow-red-950/50' 
+                              : 'bg-gray-800 text-gray-300 border border-gray-700'
+                          }`}>
+                            <span className={`w-2 h-2 rounded-full ${bossLiveBroadcast.isLive ? 'bg-white animate-ping' : 'bg-gray-500'}`}></span>
+                            <span>{bossLiveBroadcast.isLive ? '🔴 24/7 BROADCAST IS LIVE' : '⚪ BROADCAST IS OFFLINE'}</span>
+                          </span>
+
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#1E1624] text-amber-300 border border-amber-400/30 flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-amber-400" />
+                            <span>{(bossLiveBroadcast.viewers || 42850).toLocaleString()} Watching Live</span>
+                          </span>
+
+                          <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#141420] text-gray-300 border border-[#2B2B3E] flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                            <span>Active: Cam {bossLiveBroadcast.activeCam} ({bossLiveBroadcast.cameras?.find(c => c.id === bossLiveBroadcast.activeCam)?.label || 'Live Cam'})</span>
+                          </span>
+                        </div>
+
+                        <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                          {bossLiveBroadcast.title}
+                        </h3>
+                        {bossLiveBroadcast.teluguTitle && (
+                          <p className="text-sm font-bold text-amber-300/90 font-telugu">
+                            {bossLiveBroadcast.teluguTitle}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-400">
+                          Host: <span className="text-white font-semibold">{bossLiveBroadcast.host}</span> • Synced to Citizen Mobile App under "Boss of House &gt; 🔴 24/7 Live"
+                        </p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-3 flex-wrap lg:flex-nowrap shrink-0">
+                        <button
+                          type="button"
+                          onClick={handleToggleBossLive}
+                          className={`px-5 py-3 rounded-2xl text-xs font-black flex items-center gap-2 cursor-pointer transition-all shadow-lg active:scale-95 ${
+                            bossLiveBroadcast.isLive
+                              ? 'bg-red-950/80 hover:bg-red-900 text-red-200 border-2 border-red-500/60 shadow-red-950/50'
+                              : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-extrabold shadow-emerald-950/40'
+                          }`}
+                        >
+                          <Radio className="w-4 h-4" />
+                          <span>{bossLiveBroadcast.isLive ? '⏹️ Stop Live Broadcast' : '🔴 Go Live Now (Start)'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLiveStreamTitle(bossLiveBroadcast.title || 'Boss of House Telugu 2026 • 24/7 Live House Feed & Elimination Special');
+                            setLiveStreamCategory('Boss of House 24/7 Live');
+                            setLiveStreamModalMode('conduct');
+                            setIsLiveStreamModalOpen(true);
+                          }}
+                          className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-black font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-950/40 cursor-pointer transition-all"
+                        >
+                          <Video className="w-4 h-4 text-black" />
+                          <span>📹 Launch WebCam Studio</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Active Live Broadcast Preview Player */}
+                    <div className="mt-6 pt-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-gray-300 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                          <span>Active Master Broadcast Stream (What Citizen Users See)</span>
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-mono">1080p Full HD • Low Latency HLS</span>
+                      </div>
+                      <div className="relative aspect-video max-w-4xl mx-auto rounded-2xl overflow-hidden bg-black border-2 border-red-500/30 shadow-2xl">
+                        <video
+                          src={bossLiveBroadcast.videoUrl}
+                          controls
+                          autoPlay
+                          muted
+                          loop
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 left-3 flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[9px] uppercase tracking-wider animate-pulse flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            LIVE MASTER
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-black/80 text-amber-300 font-mono text-[9px] font-bold">
+                            Cam {bossLiveBroadcast.activeCam}: {bossLiveBroadcast.cameras?.find(c => c.id === bossLiveBroadcast.activeCam)?.label || 'Live Feed'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4-Camera House Multi-View Switcher */}
+                  <div className="p-5 rounded-2xl bg-[#0E0E14] border-2 border-[#20202E] space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1E1E28]">
+                      <div>
+                        <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                          <Sliders className="w-4 h-4 text-amber-400" />
+                          <span>4-Camera Multi-View House Control (Click to Switch Live Stream)</span>
+                        </h3>
+                        <p className="text-[11px] text-gray-400">
+                          Switch between house cameras in real-time. The active camera instantly feeds to all citizen mobile screens.
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full w-fit">
+                        Instant Multi-Cam Sync
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {bossLiveBroadcast.cameras?.map((cam) => {
+                        const isActive = bossLiveBroadcast.activeCam === cam.id;
+                        return (
+                          <div
+                            key={cam.id}
+                            className={`rounded-2xl bg-[#14141E] border-2 overflow-hidden transition-all flex flex-col justify-between ${
+                              isActive 
+                                ? 'border-red-500 shadow-lg shadow-red-950/40 ring-2 ring-red-500/40' 
+                                : 'border-[#222232] hover:border-[#38384E]'
+                            }`}
+                          >
+                            <div className="relative aspect-video bg-black overflow-hidden">
+                              <video
+                                src={cam.videoUrl}
+                                autoPlay
+                                muted
+                                loop
+                                className="w-full h-full object-cover opacity-90"
+                              />
+                              <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                                <span className={`px-2 py-0.5 rounded text-[8.5px] font-black uppercase ${
+                                  isActive ? 'bg-red-600 text-white animate-pulse' : 'bg-black/80 text-gray-300'
+                                }`}>
+                                  {isActive ? '🔴 BROADCASTING LIVE' : `CAM ${cam.id}`}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="p-3 space-y-2">
+                              <div>
+                                <h4 className="font-bold text-xs text-white leading-snug truncate">
+                                  {cam.name}
+                                </h4>
+                                <span className="text-[10px] text-gray-400">{cam.label}</span>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleSwitchBossCamera(cam.id)}
+                                className={`w-full py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                                  isActive
+                                    ? 'bg-red-600 text-white font-black cursor-default'
+                                    : 'bg-[#1E1E2C] hover:bg-amber-500 hover:text-black text-gray-200 border border-[#2F2F44]'
+                                }`}
+                              >
+                                {isActive ? '✓ Active Live Feed' : `Switch to Cam ${cam.id}`}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Live Stream Configuration & Video URL Form */}
+                  <form onSubmit={handleUpdateBossLiveDetails} className="p-5 rounded-2xl bg-[#0E0E14] border-2 border-[#20202E] space-y-4 shadow-xl">
+                    <div className="flex items-center justify-between pb-2 border-b border-[#1E1E28]">
+                      <div>
+                        <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                          <Settings className="w-4 h-4 text-cyan-400" />
+                          <span>Configure Live Stream Details & Custom Video Source</span>
+                        </h3>
+                        <p className="text-[11px] text-gray-400">
+                          Update stream title, Telugu title, host name, or connect an external RTMP / YouTube Live URL
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-cyan-400 font-mono">Real-Time Sync</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300">Live Stream Title (English) *</label>
+                        <input
+                          type="text"
+                          value={bossLiveTitleInput}
+                          onChange={(e) => setBossLiveTitleInput(e.target.value)}
+                          placeholder="e.g. Boss of House Telugu 2026 • 24/7 Multi-Cam Live House Stream"
+                          className="w-full px-3 py-2 rounded-xl bg-[#14141E] border border-[#252535] text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300">Telugu Title (తెలుగు శీర్షిక)</label>
+                        <input
+                          type="text"
+                          value={bossLiveTeluguInput}
+                          onChange={(e) => setBossLiveTeluguInput(e.target.value)}
+                          placeholder="ఉదా: బాస్ ఆఫ్ హౌస్ 2026 • 24/7 లైవ్ హౌస్ కెమెరా"
+                          className="w-full px-3 py-2 rounded-xl bg-[#14141E] border border-[#252535] text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 font-telugu"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300">Live Video Source URL (.mp4 / .m3u8 / Live Stream)</label>
+                        <input
+                          type="url"
+                          value={bossLiveUrlInput}
+                          onChange={(e) => setBossLiveUrlInput(e.target.value)}
+                          placeholder="https://assets.mixkit.co/... or https://...m3u8"
+                          className="w-full px-3 py-2 rounded-xl bg-[#14141E] border border-[#252535] text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 font-mono"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300">Host / Presenter Name</label>
+                        <input
+                          type="text"
+                          value={bossLiveHostInput}
+                          onChange={(e) => setBossLiveHostInput(e.target.value)}
+                          placeholder="e.g. Now9 Entertainment Desk & Host Live"
+                          className="w-full px-3 py-2 rounded-xl bg-[#14141E] border border-[#252535] text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[#1E1E28]">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBossLiveUrlInput('https://assets.mixkit.co/videos/preview/mixkit-news-anchor-talking-on-a-studio-set-41315-large.mp4');
+                            showToast('📹 Loaded High-Def Studio Feed');
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-[#1A1A26] text-gray-300 text-[10px] hover:text-white border border-[#2A2A3C] cursor-pointer"
+                        >
+                          Studio Preset
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBossLiveUrlInput('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4');
+                            showToast('🏊 Loaded Garden & Pool Feed');
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-[#1A1A26] text-gray-300 text-[10px] hover:text-white border border-[#2A2A3C] cursor-pointer"
+                        >
+                          Garden Cam Preset
+                        </button>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-black font-black text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Save Live Configuration</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
               {/* Admin Video Player Preview Modal */}
               {activeAdminPlayingVideo && (
                 <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
@@ -3474,6 +3843,8 @@ export default function NowNineAdminDashboard({
           stateName: 'All AP & Telangana'
         }}
         initialMode={liveStreamModalMode}
+        initialTitle={liveStreamTitle}
+        initialCategory={liveStreamCategory}
       />
 
       {/* Quick Add News Modal */}

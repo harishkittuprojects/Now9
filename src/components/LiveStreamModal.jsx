@@ -29,7 +29,14 @@ import {
 } from 'lucide-react';
 import { startLiveBroadcast, endLiveBroadcast, getActiveBroadcast } from '../data/liveBroadcastStore';
 
-export default function LiveStreamModal({ isOpen, onClose, presentDistrict, initialMode = 'conduct' }) {
+export default function LiveStreamModal({ 
+  isOpen, 
+  onClose, 
+  presentDistrict, 
+  initialMode = 'conduct',
+  initialTitle,
+  initialCategory
+}) {
   if (!isOpen) return null;
 
   // Modes: 'conduct' (host / studio) or 'watch' (viewer)
@@ -43,8 +50,13 @@ export default function LiveStreamModal({ isOpen, onClose, presentDistrict, init
   // Live Stream Details
   const districtName = presentDistrict?.districtName || 'Global Live (All Constituencies)';
   const stateName = presentDistrict?.stateName || 'All AP & Telangana';
-  const [streamTitle, setStreamTitle] = useState('Now 9 Live: 2026 ఎన్నికలు - ప్రజా తీర్పు & లైవ్ చర్చ');
-  const [streamCategory, setStreamCategory] = useState('Global Live Broadcast');
+  const [streamTitle, setStreamTitle] = useState(initialTitle || 'Now 9 Live: 2026 ఎన్నికలు - ప్రజా తీర్పు & లైవ్ చర్చ');
+  const [streamCategory, setStreamCategory] = useState(initialCategory || 'Global Live Broadcast');
+
+  useEffect(() => {
+    if (initialTitle) setStreamTitle(initialTitle);
+    if (initialCategory) setStreamCategory(initialCategory);
+  }, [initialTitle, initialCategory]);
   
   // Stats
   const [viewerCount, setViewerCount] = useState(1480);
