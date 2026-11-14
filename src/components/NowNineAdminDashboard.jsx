@@ -2893,17 +2893,6 @@ export default function NowNineAdminDashboard({
                   </span>
                   <button
                     type="button"
-                    onClick={() => {
-                      voteForHousemate('h4');
-                      showToast('🔥 Live Vote registered for Gautham (గౌతమ్)!');
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold hover:bg-amber-500/30 cursor-pointer transition-colors flex items-center gap-1.5 shadow-xs"
-                    title="Simulate casting a vote for Gautham directly"
-                  >
-                    <span>+ Test Vote for Gautham</span>
-                  </button>
-                  <button
-                    type="button"
                     onClick={handleResetHousemateTally}
                     className="px-3 py-1.5 rounded-xl bg-[#161622] border border-[#2B2B3E] text-gray-300 text-xs font-bold hover:bg-[#1E1E2E] cursor-pointer transition-colors"
                   >
