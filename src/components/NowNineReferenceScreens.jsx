@@ -81,7 +81,9 @@ import { getPublishedNews, subscribeNews } from '../data/newsStore';
 import { 
   getPublishedHousemates, 
   voteForHousemate, 
-  subscribeHousemates 
+  subscribeHousemates,
+  getPublishedBossVideos,
+  subscribeBossVideos
 } from '../data/bossStore';
 import { recordCustomerActivity } from '../data/customerActivityStore';
 import { recordCitizenLogin } from '../data/citizenSessionStore';
@@ -4222,6 +4224,9 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
   const [toastMessage, setToastMessage] = useState(null);
   const [pollVotes, setPollVotes] = useState({ 1: null });
   const [housemates, setHousemates] = useState(() => getPublishedHousemates());
+  const [bossVideos, setBossVideos] = useState(() => getPublishedBossVideos());
+  const [videoFilter, setVideoFilter] = useState('all'); // 'all' | 'highlight' | 'full'
+  const [activePlayingVideo, setActivePlayingVideo] = useState(null);
 
   useEffect(() => {
     const unsub = subscribeHousemates((updatedList) => {
@@ -4230,15 +4235,18 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
     return unsub;
   }, []);
 
+  useEffect(() => {
+    const unsub = subscribeBossVideos((updatedList) => {
+      setBossVideos(updatedList);
+    });
+    return unsub;
+  }, []);
+
   const nominatedContestants = housemates.filter(h => h.isNominated || h.status === 'Nominated' || h.status === 'Danger Zone');
   const votingList = nominatedContestants.length > 0 ? nominatedContestants : housemates;
   const totalVotesCount = housemates.reduce((sum, h) => sum + (h.votes || 0), 0);
 
-  const highlights = [
-    { id: 1, title: '🔥 కెప్టెన్సీ టాస్క్ హై-వోల్టేజ్ గొడవ! శివాజీ vs అమర్‌దీప్', views: '284K', time: '2h ago', duration: '03:45', thumbnail: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=400&q=80' },
-    { id: 2, title: '⚡ నామినేషన్స్ హీట్: శోభా శెట్టి తీవ్ర భావోద్వేగం!', views: '192K', time: '5h ago', duration: '04:12', thumbnail: 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=400&q=80' },
-    { id: 3, title: '🎬 వీకెండ్ ఎపిసోడ్ ప్రోమో: హోస్ట్ స్పెషల్ వార్నింగ్!', views: '640K', time: 'Yesterday', duration: '01:30', thumbnail: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=400&q=80' },
-  ];
+  const filteredVideos = bossVideos.filter(v => videoFilter === 'all' || v.type === videoFilter);
 
   const handleVoteContestant = (c) => {
     setSelectedContestant(c.id);
@@ -4448,38 +4456,80 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
           </div>
         )}
 
-        {/* VIEW 2: HOUSE HIGHLIGHTS */}
+        {/* VIEW 2: HOUSE HIGHLIGHTS & FULL EPISODES */}
         {activeTab === 'highlights' && (
-          <div className="space-y-2.5">
-            {highlights.map((video) => (
-              <div
-                key={video.id}
-                onClick={() => onNavigate ? onNavigate('video-player') : null}
-                className="p-2 rounded-2xl bg-[#121218] border border-[#22222E] hover:border-amber-400/50 transition-all cursor-pointer group space-y-1.5"
-              >
-                <div className="h-28 w-full rounded-xl overflow-hidden relative">
-                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <div className="w-9 h-9 rounded-full bg-[#F5C754] text-black flex items-center justify-center pl-0.5 shadow-lg group-hover:scale-110 transition-transform">
-                      <Play className="w-4 h-4 fill-black stroke-black" />
+          <div className="space-y-3">
+            {/* Filter Category Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 phone-scroll">
+              {[
+                { id: 'all', label: `All Videos (${bossVideos.length})`, icon: '🎬' },
+                { id: 'highlight', label: `Highlights (${bossVideos.filter(v => v.type === 'highlight').length})`, icon: '🔥' },
+                { id: 'full', label: `Full Episodes (${bossVideos.filter(v => v.type === 'full').length})`, icon: '📺' }
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setVideoFilter(f.id)}
+                  className={`px-2.5 py-1 rounded-xl text-[9.5px] font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1 ${
+                    videoFilter === f.id
+                      ? 'bg-[#F5C754] text-black font-extrabold shadow-xs'
+                      : 'bg-[#14141E] text-gray-400 hover:text-white border border-[#222232]'
+                  }`}
+                >
+                  <span>{f.icon}</span>
+                  <span>{f.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Video Cards Grid */}
+            <div className="space-y-2.5">
+              {filteredVideos.map((video) => (
+                <div
+                  key={video.id}
+                  onClick={() => setActivePlayingVideo(video)}
+                  className="p-2.5 rounded-2xl bg-[#121218] border border-[#22222E] hover:border-amber-400/50 transition-all cursor-pointer group space-y-2 shadow-sm"
+                >
+                  <div className="h-32 w-full rounded-xl overflow-hidden relative bg-black">
+                    <img 
+                      src={video.thumbnail} 
+                      alt={video.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform opacity-90" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-[#F5C754] text-black flex items-center justify-center pl-0.5 shadow-lg group-hover:scale-110 transition-transform">
+                        <Play className="w-4 h-4 fill-black stroke-black" />
+                      </div>
+                    </div>
+
+                    {/* Top Type Badge */}
+                    <span className={`absolute top-2 left-2 px-1.5 py-0.5 rounded text-[7.5px] font-black uppercase tracking-wider ${
+                      video.type === 'full' 
+                        ? 'bg-red-600 text-white font-extrabold shadow-xs' 
+                        : 'bg-black/70 text-amber-400 border border-amber-400/40'
+                    }`}>
+                      {video.type === 'full' ? 'FULL EPISODE' : 'HIGHLIGHT'}
+                    </span>
+
+                    {/* Duration Badge */}
+                    <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 text-white font-mono text-[8.5px]">
+                      {video.duration}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-[11px] font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
+                      {video.title}
+                    </h4>
+                    <div className="flex items-center gap-2 text-[8.5px] text-gray-400 mt-1">
+                      <span className="font-mono text-amber-300 font-bold">{video.views} views</span>
+                      <span>•</span>
+                      <span>{video.time}</span>
                     </div>
                   </div>
-                  <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 text-white font-mono text-[8px]">
-                    {video.duration}
-                  </span>
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-black text-white group-hover:text-amber-300 transition-colors leading-snug">
-                    {video.title}
-                  </h4>
-                  <div className="flex items-center gap-2 text-[8px] text-gray-400 mt-1">
-                    <span>{video.views} views</span>
-                    <span>•</span>
-                    <span>{video.time}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
@@ -4518,6 +4568,55 @@ export function ScreenBigBoss({ onBack, onNavigate }) {
           </div>
         )}
       </div>
+
+      {/* Boss Video Player Modal */}
+      {activePlayingVideo && (
+        <div className="absolute inset-0 z-50 bg-black/95 flex flex-col justify-between animate-fadeIn">
+          {/* Header */}
+          <div className="p-3 flex items-center justify-between border-b border-white/10 bg-[#0E0E14] shrink-0">
+            <div className="min-w-0 pr-2">
+              <span className={`text-[8px] px-1.5 py-0.5 rounded font-black uppercase inline-block mb-0.5 ${
+                activePlayingVideo.type === 'full' ? 'bg-red-600 text-white' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'
+              }`}>
+                {activePlayingVideo.type === 'full' ? 'FULL EPISODE' : 'HIGHLIGHT'}
+              </span>
+              <h3 className="text-xs font-black text-white truncate">{activePlayingVideo.title}</h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActivePlayingVideo(null)}
+              className="p-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer shrink-0"
+              title="Close Player"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Video Player */}
+          <div className="flex-1 flex items-center justify-center bg-black p-2 min-h-0">
+            <video
+              src={activePlayingVideo.videoUrl}
+              poster={activePlayingVideo.thumbnail}
+              controls
+              autoPlay
+              playsInline
+              className="max-h-full max-w-full rounded-xl shadow-2xl"
+            />
+          </div>
+
+          {/* Footer Info */}
+          <div className="p-3 bg-[#0E0E14] border-t border-white/10 flex items-center justify-between text-[9px] text-gray-400 shrink-0">
+            <span className="font-mono text-amber-300 font-bold">{activePlayingVideo.views} views • {activePlayingVideo.duration}</span>
+            <button
+              type="button"
+              onClick={() => setActivePlayingVideo(null)}
+              className="px-3 py-1 rounded-lg bg-[#F5C754] text-black font-extrabold text-[9px] cursor-pointer"
+            >
+              Close Video
+            </button>
+          </div>
+        </div>
+      )}
 
       <BottomNavBar activeTab="home" onTabChange={onNavigate || onBack} />
     </div>
