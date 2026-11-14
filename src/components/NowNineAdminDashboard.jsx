@@ -1119,25 +1119,6 @@ export default function NowNineAdminDashboard({
 
           {/* Right: Controls & Mockup-matched Profile Pill */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Embargo Control */}
-            <button
-              type="button"
-              onClick={() => {
-                const next = !isEmbargoActive;
-                setIsEmbargoActive(next);
-                showToast(next ? '🔒 Results Embargo: LOCKED' : '⚠️ Results Embargo: OPEN');
-              }}
-              className={`hidden md:flex px-3 py-1.5 rounded-xl border text-xs font-bold items-center gap-1.5 transition cursor-pointer shadow-2xs ${
-                isEmbargoActive
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                  : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
-              }`}
-              title="Toggle Public Results Visibility"
-            >
-              {isEmbargoActive ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-              <span>{isEmbargoActive ? 'Results Embargo: LOCKED' : 'Results Embargo: OPEN'}</span>
-            </button>
-
             {/* Export CSV Report */}
             <button
               type="button"
