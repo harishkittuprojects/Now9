@@ -1096,22 +1096,36 @@ export default function NowNineAdminDashboard({
         </div>
       </aside>
 
-      {/* Main Right Canvas Container (Clean Light Theme #F4F5F8) */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen bg-[#F4F5F8]">
+      {/* Main Right Canvas Container (Adaptive Dark/Light Theme) */}
+      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-colors duration-200 ${
+        activeTab === 'overview' ? 'bg-[#F4F5F8]' : 'bg-[#0B0C10] text-white'
+      }`}>
         {/* Canvas Top Command Bar */}
-        <header className="h-16 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-20 shadow-2xs">
+        <header className={`h-16 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-20 transition-colors duration-200 ${
+          activeTab === 'overview'
+            ? 'bg-white/95 border-b border-gray-200/80 shadow-2xs'
+            : 'bg-[#111218]/95 border-b border-[#20222D] shadow-md'
+        }`}>
           {/* Left: Mobile Menu Toggle & 24/7 Live Ingestion Badge */}
           <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
+              className={`lg:hidden p-2 rounded-xl transition cursor-pointer ${
+                activeTab === 'overview'
+                  ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  : 'bg-[#1C1E26] hover:bg-[#252834] text-gray-200 border border-[#2B2E3C]'
+              }`}
               title="Toggle Menu"
             >
               {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
 
-            <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-2xs">
+            <span className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold shadow-2xs ${
+              activeTab === 'overview'
+                ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+            }`}>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
               <span>24/7 Live Ingestion Online</span>
             </span>
@@ -1123,10 +1137,14 @@ export default function NowNineAdminDashboard({
             <button
               type="button"
               onClick={handleExportCSV}
-              className="hidden sm:flex px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 text-xs font-bold items-center gap-1.5 transition cursor-pointer"
+              className={`hidden sm:flex px-3 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition cursor-pointer ${
+                activeTab === 'overview'
+                  ? 'bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700'
+                  : 'bg-[#1C1E26] hover:bg-[#252834] border border-[#2B2E3C] text-gray-200'
+              }`}
               title="Download CSV Electoral Report"
             >
-              <Download className="w-3.5 h-3.5 text-gray-600" />
+              <Download className={`w-3.5 h-3.5 ${activeTab === 'overview' ? 'text-gray-600' : 'text-gray-400'}`} />
               <span>Export CSV</span>
             </button>
 
@@ -1143,14 +1161,14 @@ export default function NowNineAdminDashboard({
             </button>
 
             {/* Admin Profile Pill matching mockup */}
-            <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-gray-200">
+            <div className={`flex items-center gap-2 pl-2 sm:pl-3 border-l ${activeTab === 'overview' ? 'border-gray-200' : 'border-[#262835]'}`}>
               <img
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
                 alt="Admin Avatar"
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-200 shadow-2xs"
+                className={`w-8 h-8 rounded-full object-cover shadow-2xs ${activeTab === 'overview' ? 'ring-2 ring-gray-200' : 'ring-2 ring-[#2E3142]'}`}
               />
-              <span className="text-xs font-extrabold text-gray-800 hidden sm:inline">Admin</span>
-              <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+              <span className={`text-xs font-extrabold hidden sm:inline ${activeTab === 'overview' ? 'text-gray-800' : 'text-gray-200'}`}>Admin</span>
+              <ChevronDown className={`w-3.5 h-3.5 ${activeTab === 'overview' ? 'text-gray-500' : 'text-gray-400'}`} />
             </div>
           </div>
         </header>
@@ -1503,7 +1521,7 @@ export default function NowNineAdminDashboard({
                   <button
                     type="button"
                     onClick={handleSimulateCustomerTask}
-                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-400/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                    className="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-400/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     <span>+ Simulate Citizen Task</span>
@@ -1512,7 +1530,7 @@ export default function NowNineAdminDashboard({
                   <button
                     type="button"
                     onClick={handleClearActivities}
-                    className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 text-xs font-bold transition-all cursor-pointer"
+                    className="px-3 py-2 rounded-xl bg-[#1A1C24] hover:bg-[#242632] text-gray-300 hover:text-white border border-[#2B2D3C] text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
                   >
                     <span>Clear Feed</span>
                   </button>
